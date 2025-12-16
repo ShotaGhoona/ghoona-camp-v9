@@ -87,8 +87,8 @@ export function GalleryViewWidget<T>({
   // データが空の場合
   if (data.length === 0) {
     return (
-      <div className={cn('flex flex-1 flex-col', className)}>
-        <div className="flex flex-1 items-center justify-center">
+      <div className={cn('flex min-h-0 flex-1 flex-col', className)}>
+        <div className="flex min-h-0 flex-1 items-center justify-center">
           {emptyContent ?? (
             <p className="text-muted-foreground">データがありません</p>
           )}
@@ -100,9 +100,9 @@ export function GalleryViewWidget<T>({
   const gapClass = getGapClass(gap);
 
   return (
-    <div className={cn('flex flex-1 flex-col', className)}>
+    <div className={cn('flex min-h-0 flex-1 flex-col', className)}>
       {/* グリッドコンテンツ */}
-      <div className="flex-1 overflow-auto p-6">
+      <div className="min-h-0 flex-1 overflow-auto p-6">
         <div
           className={cn('grid', gapClass)}
           style={{ gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))` }}
