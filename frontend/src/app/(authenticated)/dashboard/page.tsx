@@ -65,9 +65,9 @@ export default function DashboardPage() {
                         {user.email}
                       </p>
                     )}
-                    {user.name && (
+                    {user.username && (
                       <p>
-                        <span className='font-medium'>名前:</span> {user.name}
+                        <span className='font-medium'>名前:</span> {user.username}
                       </p>
                     )}
                   </div>
