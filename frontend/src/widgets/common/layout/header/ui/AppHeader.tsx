@@ -33,8 +33,6 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/ui/shadcn/ui/dropdown-menu';
 
@@ -90,7 +88,7 @@ export function AppHeader() {
             </Link>
 
             {/* Main Navigation */}
-            <nav className='hidden items-center gap-1 md:flex'>
+            <nav className='hidden h-14 items-center md:flex'>
               {mainNavItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href;
@@ -99,14 +97,23 @@ export function AppHeader() {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                      'relative flex h-full items-center gap-1.5 px-3 text-sm font-medium transition-colors',
                       isActive
-                        ? 'bg-primary-foreground/20 text-primary-foreground'
-                        : 'text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-primary-foreground',
+                        ? 'text-primary-foreground'
+                        : 'text-primary-foreground/60 hover:text-primary-foreground',
                     )}
                   >
                     <Icon className='size-4' />
                     {item.label}
+                    {/* 下線インジケーター */}
+                    <span
+                      className={cn(
+                        'absolute bottom-0 left-0 h-0.5 w-full transition-all',
+                        isActive
+                          ? 'bg-primary-foreground'
+                          : 'bg-transparent',
+                      )}
+                    />
                   </Link>
                 );
               })}
@@ -144,46 +151,72 @@ export function AppHeader() {
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align='end' className='w-56'>
-                <DropdownMenuLabel className='font-normal'>
-                  <div className='flex flex-col space-y-1'>
-                    <p className='text-sm font-medium'>
+              <DropdownMenuContent align='end' variant='raised' className='w-64 p-3'>
+                {/* ユーザー情報ヘッダー */}
+                <div className='mb-3 flex items-center gap-3 rounded-lg bg-muted/50 p-3 shadow-inset-sm'>
+                  <Avatar className='size-10 shadow-raised-sm'>
+                    <AvatarImage src={user?.avatar_url ?? undefined} />
+                    <AvatarFallback className='bg-primary text-primary-foreground'>
+                      {getInitials(user?.username, user?.email)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className='flex-1 overflow-hidden'>
+                    <p className='truncate text-sm font-semibold'>
                       {user?.username || 'ユーザー'}
                     </p>
-                    <p className='text-xs text-gray-500'>{user?.email}</p>
+                    <p className='truncate text-xs text-muted-foreground'>
+                      {user?.email}
+                    </p>
                   </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  {settingsMenuItems.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <DropdownMenuItem key={item.href} asChild>
-                        <Link href={item.href} className='cursor-pointer'>
-                          <Icon className='mr-2 size-4' />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                  {/* テーマ設定 */}
-                  <DropdownMenuItem
-                    onClick={() => setIsThemeSheetOpen(true)}
-                    className='cursor-pointer'
-                  >
-                    <Palette className='mr-2 size-4' />
-                    テーマ設定
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
+                </div>
+
+                {/* 設定グループ */}
+                <div className='mb-2'>
+                  <DropdownMenuGroup className='space-y-0.5'>
+                    {settingsMenuItems.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <DropdownMenuItem
+                          key={item.href}
+                          asChild
+                          className='cursor-pointer rounded-lg px-3 py-2 transition-all hover:bg-muted/50 hover:shadow-inset-sm focus:bg-muted/50 focus:shadow-inset-sm'
+                        >
+                          <Link href={item.href}>
+                            <div className='mr-3 flex size-7 items-center justify-center rounded-md bg-muted shadow-raised-sm'>
+                              <Icon className='size-3.5 text-muted-foreground' />
+                            </div>
+                            <span className='text-sm'>{item.label}</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                    <DropdownMenuItem
+                      onClick={() => setIsThemeSheetOpen(true)}
+                      className='cursor-pointer rounded-lg px-3 py-2 transition-all hover:bg-muted/50 hover:shadow-inset-sm focus:bg-muted/50 focus:shadow-inset-sm'
+                    >
+                      <div className='mr-3 flex size-7 items-center justify-center rounded-md bg-muted shadow-raised-sm'>
+                        <Palette className='size-3.5 text-muted-foreground' />
+                      </div>
+                      <span className='text-sm'>テーマ設定</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </div>
+
+                {/* 区切り線 */}
+                <div className='my-2 h-px bg-gradient-to-r from-transparent via-border to-transparent' />
+
+                {/* ログアウト */}
                 <DropdownMenuItem
                   onClick={handleLogout}
                   disabled={logoutMutation.isPending}
-                  variant='destructive'
-                  className='cursor-pointer'
+                  className='cursor-pointer rounded-lg px-3 py-2 text-destructive transition-all hover:bg-destructive/10 hover:shadow-inset-sm focus:bg-destructive/10 focus:shadow-inset-sm'
                 >
-                  <LogOut className='mr-2 size-4' />
-                  {logoutMutation.isPending ? 'ログアウト中...' : 'ログアウト'}
+                  <div className='mr-3 flex size-7 items-center justify-center rounded-md bg-destructive/10'>
+                    <LogOut className='size-3.5' />
+                  </div>
+                  <span className='text-sm'>
+                    {logoutMutation.isPending ? 'ログアウト中...' : 'ログアウト'}
+                  </span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
