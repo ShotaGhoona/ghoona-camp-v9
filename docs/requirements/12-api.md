@@ -2,27 +2,95 @@
 
 ## Overview
 Ghoona CampアプリケーションのRESTful API設計書です。
-認証にはClerkを使用し、データベースはSupabaseを使用します。
+FastAPI + PostgreSQL を使用し、認証には JWT (RS256) + Cookie-based 認証を採用しています。
+
+### 技術スタック
+- **フレームワーク**: FastAPI
+- **認証**: JWT (RS256) + httpOnly Cookie
+- **ドキュメント**: Swagger UI (`/docs`)
 
 ## Base URL
 ```
-https://api.ghoona-camp.com/v1
+開発環境: http://localhost:8000/api/v1
+本番環境: https://api.ghoona-camp.com/v1
 ```
 
 ## Authentication
-Clerk認証トークンを使用します。
+Cookie-based JWT認証を使用します。
+- ログイン成功時、JWTトークンが `httpOnly` Cookie として設定されます
+- 以降のリクエストでは Cookie が自動的に送信されます
+- フロントエンドからは `withCredentials: true` でリクエストを送信します
+
 ```
-Authorization: Bearer <clerk_token>
+Cookie: access_token=<jwt_token>
 ```
 
 ## API Endpoints
 
-### User Management
-ユーザー認証・プロフィール管理関連のエンドポイント
+### Authentication
+認証関連のエンドポイント
 
 | Method | Endpoint | Description | Query Params | Access |
 |--------|----------|-------------|--------------|---------|
-| GET | `/auth/me` | 現在ログイン中のユーザー情報を取得。プロフィール設定画面の初期表示などで使用 | ❌ | 🔐 |
+| POST | `/auth/register` | 新規ユーザー登録 | ❌ | 🌍 |
+| POST | `/auth/login` | ログイン。成功時にJWT Cookieを設定 | ❌ | 🌍 |
+| POST | `/auth/logout` | ログアウト。JWT Cookieを削除 | ❌ | 🔐 |
+| GET | `/auth/me` | 現在のユーザー情報を取得 | ❌ | 🔐 |
+
+#### POST /auth/register Request Body
+```json
+{
+  "email": "user@example.com",
+  "password": "securePassword123",
+  "username": "username"
+}
+```
+
+#### POST /auth/login Request Body
+```json
+{
+  "email": "user@example.com",
+  "password": "securePassword123"
+}
+```
+
+#### POST /auth/login Response
+```json
+{
+  "message": "ログイン成功",
+  "user_id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+※ `access_token` は httpOnly Cookie として設定されるためレスポンスボディには含めない
+
+#### GET /auth/me Response
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "email": "user@example.com",
+  "username": "username",
+  "avatar_url": null,
+  "discord_id": null,
+  "is_active": true
+}
+```
+
+**実装時の変更点（テンプレートからの修正）:**
+テンプレートの `backend/app/presentation/api/auth_api.py` を以下のように修正する必要があります：
+
+| テンプレート実装 | Ghoona Camp 要件 |
+|-----------------|------------------|
+| `login_id` でログイン | `email` でログイン |
+| `GET /auth/status` | `GET /auth/me`（ユーザー情報を返す） |
+| `user_id: int` | `user_id: UUID` |
+| レスポンスに `access_token` 含む | Cookie のみ（レスポンスに含めない） |
+| - | `POST /auth/register` 追加 |
+
+### User Management
+ユーザープロフィール管理関連のエンドポイント
+
+| Method | Endpoint | Description | Query Params | Access |
+|--------|----------|-------------|--------------|---------|
 | GET | `/users` | 全ユーザーの一覧を取得。メンバー検索 | ✅ | 🔐 |
 | GET | `/users/{userId}` | 指定したユーザーの詳細情報を取得。メタデータ・SNSリンク情報を含む | ❌ | 🔐 |
 | PUT | `/users/{userId}` | ユーザーの基本情報・メタデータを更新。プロフィール設定で使用 | ❌ | 👤 |
@@ -231,7 +299,7 @@ Discord参加記録・統計管理関連のエンドポイント
 
 ### アクセス権限の説明
 - **🌍 公開**: 認証不要
-- **🔐 認証済み**: Clerk認証が必要
+- **🔐 認証済み**: JWT認証（Cookie）が必要
 - **👤 本人のみ**: 自分のリソースのみアクセス可能
 - **👑 作成者のみ**: リソースの作成者のみアクセス可能
 - **🤖 Bot認証**: Discord Bot専用の認証
