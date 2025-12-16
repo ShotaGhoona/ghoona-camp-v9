@@ -102,24 +102,36 @@ const filteredData = data.filter(item => item.name.includes(searchQuery));
 ## 3. ダミーデータ
 
 ### 配置
-`slice/dummy-data/`内に作成（`ui/`と同じ階層）
+`frontend/src/shared/dummy-data/[ドメイン名]/`内に作成
+
+```
+shared/
+└── dummy-data/
+    ├── members/
+    │   └── members.ts
+    ├── events/
+    │   └── events.ts
+    └── goals/
+        └── goals.ts
+```
 
 ### ルール
 - **型定義も同じファイルに書く**（後でentityの型と混乱を避けるため）
 - APIレスポンス仕様がある場合は、その形に寄せる
+- ドメインごとにディレクトリを分ける
 
 ```typescript
-// slice/dummy-data/samples.ts
+// shared/dummy-data/members/members.ts
 
-export interface SampleItem {
-  id: number;
+export interface MemberItem {
+  id: string;
   name: string;
   email: string;
   // ...
 }
 
-export const dummySamples: SampleItem[] = [
-  { id: 1, name: '山田太郎', email: 'yamada@example.com' },
+export const dummyMembers: MemberItem[] = [
+  { id: '1', name: '山田太郎', email: 'yamada@example.com' },
   // ...
 ];
 ```
@@ -130,7 +142,7 @@ export const dummySamples: SampleItem[] = [
 
 | 状況 | 配置場所 |
 |------|----------|
-| ダミーデータ用（後で消える） | `slice/dummy-data/xxx.ts`内 |
+| ダミーデータ用（後で消える） | `shared/dummy-data/[ドメイン]/xxx.ts`内 |
 | ui-block専用の型（バックエンド接続後も残る） | `ui-block/[block]/model/types.ts` |
 | ページ全体で共有する型 | `slice/model/types.ts` |
 

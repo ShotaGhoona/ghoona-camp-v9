@@ -21,8 +21,8 @@
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --border: 0 0% 82%;
+    --input: 0 0% 82%;
     --ring: 348 55% 62%;
     --radius: 0.5rem;
 
@@ -51,8 +51,8 @@
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 25%;
-    --input: 0 0% 25%;
+    --border: 0 0% 22%;
+    --input: 0 0% 22%;
     --ring: 348 55% 62%;
 
     /* Neumorphism shadows */
