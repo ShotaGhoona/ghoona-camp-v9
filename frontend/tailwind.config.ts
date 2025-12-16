@@ -53,6 +53,12 @@ const config: Config = {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      boxShadow: {
+        raised: 'var(--shadow-raised)',
+        'raised-sm': 'var(--shadow-raised-sm)',
+        inset: 'var(--shadow-inset)',
+        'inset-sm': 'var(--shadow-inset-sm)',
+      },
     },
   },
   plugins: [require('tailwindcss-animate')],

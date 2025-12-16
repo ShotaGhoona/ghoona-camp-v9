@@ -3,7 +3,7 @@ import type { ThemePreset, ThemePresetId, ThemeSettings } from '../model/types';
 export const themePresets: Record<ThemePresetId, ThemePreset> = {
   purple: {
     id: 'purple',
-    name: 'パープル',
+    name: 'Grape',
     hex: '#655395',
     colors: {
       primaryLight: '256 29% 45%', // #655395
@@ -16,7 +16,7 @@ export const themePresets: Record<ThemePresetId, ThemePreset> = {
   },
   red: {
     id: 'red',
-    name: 'レッド',
+    name: 'Strawberry',
     hex: '#d5697e',
     colors: {
       primaryLight: '350 55% 62%', // #d5697e
@@ -29,7 +29,7 @@ export const themePresets: Record<ThemePresetId, ThemePreset> = {
   },
   yellow: {
     id: 'yellow',
-    name: 'イエロー',
+    name: 'Lemon',
     hex: '#b59235',
     colors: {
       primaryLight: '44 55% 46%', // #b59235
@@ -42,7 +42,7 @@ export const themePresets: Record<ThemePresetId, ThemePreset> = {
   },
   blue: {
     id: 'blue',
-    name: 'ブルー',
+    name: 'Soda',
     hex: '#3f77a4',
     colors: {
       primaryLight: '207 44% 45%', // #3f77a4
@@ -55,7 +55,7 @@ export const themePresets: Record<ThemePresetId, ThemePreset> = {
   },
   green: {
     id: 'green',
-    name: 'グリーン',
+    name: 'Melon',
     hex: '#698f75',
     colors: {
       primaryLight: '139 16% 49%', // #698f75
