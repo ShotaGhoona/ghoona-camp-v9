@@ -14,7 +14,7 @@ export default function AuthenticatedLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen flex-col bg-gray-50">
+    <div className="flex h-screen flex-col">
       <AppHeader />
       <main className="flex min-h-0 flex-1 flex-col overflow-auto">
         {children}

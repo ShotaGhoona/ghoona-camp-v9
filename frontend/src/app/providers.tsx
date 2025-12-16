@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { Provider, useDispatch } from 'react-redux';
 import { store, AppDispatch } from '@/store/index';
 import { QueryProvider } from '@/app/provider/QueryProvider';
+import { ThemeProvider } from '@/features/core/theme/lib/theme-context';
 import { setUser, clearUser } from '@/store/slices/authSlice';
 import { authApi } from '@/entities/auth/api/auth-api';
 
@@ -16,9 +17,18 @@ function AuthInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const response = await authApi.getAuthStatus();
-        if (response.is_authenticated && response.user_id) {
-          dispatch(setUser({ id: response.user_id }));
+        const response = await authApi.getMe();
+        if (response.id) {
+          dispatch(
+            setUser({
+              id: response.id,
+              email: response.email,
+              username: response.username ?? undefined,
+              avatar_url: response.avatar_url ?? undefined,
+              discord_id: response.discord_id ?? undefined,
+              is_active: response.is_active,
+            }),
+          );
         } else {
           dispatch(clearUser());
         }
@@ -38,7 +48,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <Provider store={store}>
       <QueryProvider>
-        <AuthInitializer>{children}</AuthInitializer>
+        <ThemeProvider>
+          <AuthInitializer>{children}</AuthInitializer>
+        </ThemeProvider>
       </QueryProvider>
     </Provider>
   );
