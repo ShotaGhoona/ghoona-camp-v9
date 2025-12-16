@@ -15,13 +15,13 @@ import {
 } from '@/shared/ui/shadcn/ui/card';
 
 export function LoginForm() {
-  const [loginId, setLoginId] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const loginMutation = useLogin();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const credentials: LoginFormData = { loginId, password };
+    const credentials: LoginFormData = { email, password };
     loginMutation.mutate(credentials);
   };
 
@@ -29,18 +29,18 @@ export function LoginForm() {
     <Card className='w-full max-w-md'>
       <CardHeader className='space-y-1'>
         <CardTitle className='text-2xl font-bold'>ログイン</CardTitle>
-        <CardDescription>アカウントにログインしてください</CardDescription>
+        <CardDescription>Ghoona Camp にログイン</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div className='space-y-2'>
-            <Label htmlFor='loginId'>ログインID</Label>
+            <Label htmlFor='email'>メールアドレス</Label>
             <Input
-              id='loginId'
-              type='text'
-              placeholder='ログインIDを入力'
-              value={loginId}
-              onChange={(e) => setLoginId(e.target.value)}
+              id='email'
+              type='email'
+              placeholder='email@example.com'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
@@ -57,7 +57,7 @@ export function LoginForm() {
 
           {loginMutation.isError && (
             <div className='rounded-md bg-destructive/15 p-3 text-sm text-destructive'>
-              ログインに失敗しました。ログインIDとパスワードを確認してください。
+              ログインに失敗しました。メールアドレスとパスワードを確認してください。
             </div>
           )}
 

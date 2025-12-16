@@ -1,10 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-interface User {
-  id: number;
-  email?: string;
-  name?: string;
-}
+import { User } from '@/entities/auth/model/types';
 
 interface AuthState {
   user: User | null;
@@ -22,8 +17,15 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<User>) => {
-      state.user = action.payload;
+    setUser: (state, action: PayloadAction<Partial<User> & { id: string }>) => {
+      state.user = {
+        id: action.payload.id,
+        email: action.payload.email ?? '',
+        username: action.payload.username,
+        avatar_url: action.payload.avatar_url,
+        discord_id: action.payload.discord_id,
+        is_active: action.payload.is_active ?? true,
+      };
       state.isAuthenticated = true;
       state.isLoading = false;
     },

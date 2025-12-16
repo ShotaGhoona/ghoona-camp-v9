@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 
+const APP_NAME = 'Ghoona Camp';
+const APP_DESCRIPTION = '朝活の仲間と一緒に成長する、コミュニティ重視のオンライン朝活サービス';
+
 /**
  * 環境に応じたメタデータを生成
  */
@@ -8,23 +11,23 @@ export function generateMetadata(): Metadata {
 
   if (environment === 'development') {
     return {
-      title: 'DEV - AI Solution Template',
-      description: 'This is development mode',
+      title: `DEV - ${APP_NAME}`,
+      description: 'Development mode',
       robots: 'noindex, nofollow',
     };
   }
 
   if (environment === 'test') {
     return {
-      title: 'TEST - AI Solution Template',
-      description: 'test environment',
+      title: `TEST - ${APP_NAME}`,
+      description: 'Test environment',
       robots: 'noindex',
     };
   }
 
   return {
-    title: 'AI Solution Template',
-    description: 'Startup template with Next.js and FastAPI',
+    title: APP_NAME,
+    description: APP_DESCRIPTION,
     robots: 'index, follow',
   };
 }

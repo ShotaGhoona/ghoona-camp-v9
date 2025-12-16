@@ -7,13 +7,13 @@ class ISecurityService(ABC):
 
     @abstractmethod
     def create_access_token(
-        self, user_id: int, expires_delta: timedelta | None = None
+        self, user_id: str, expires_delta: timedelta | None = None
     ) -> str:
         """
         アクセストークンを生成
 
         Args:
-            user_id: ユーザーID
+            user_id: ユーザーID (UUID文字列)
             expires_delta: 有効期限
 
         Returns:
@@ -32,5 +32,18 @@ class ISecurityService(ABC):
 
         Returns:
             bool: パスワードが一致するかどうか
+        """
+        pass
+
+    @abstractmethod
+    def hash_password(self, plain_password: str) -> str:
+        """
+        パスワードをハッシュ化
+
+        Args:
+            plain_password: 平文パスワード
+
+        Returns:
+            str: ハッシュ化されたパスワード
         """
         pass

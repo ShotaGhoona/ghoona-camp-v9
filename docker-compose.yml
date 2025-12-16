@@ -34,7 +34,7 @@ services:
 
   db:
     image: postgres:15
-    container_name: postgres_container_ai_solution
+    container_name: postgres_ghoona_camp
     env_file: ./backend/.env
     ports:
       - "5432:5432"
@@ -42,18 +42,18 @@ services:
       # データを永続化するためのボリュームをマウント
       - ./db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U app_user -d ai_solution_db"]
+      test: ["CMD-SHELL", "pg_isready -U app_user -d ghoona_camp_db"]
       timeout: 20s
       retries: 10
       interval: 5s
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: pgadmin_ai_solution
+    container_name: pgadmin_ghoona_camp
     ports:
       - "8080:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_EMAIL: admin@ghoona.com
       PGADMIN_DEFAULT_PASSWORD: admin
     depends_on:
       - db

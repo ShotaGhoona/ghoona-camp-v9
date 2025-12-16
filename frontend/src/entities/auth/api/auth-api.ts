@@ -3,7 +3,7 @@ import {
   LoginRequest,
   LoginResponse,
   LogoutResponse,
-  StatusResponse,
+  MeResponse,
 } from '../model/types';
 
 /**
@@ -30,10 +30,10 @@ export const authApi = {
   },
 
   /**
-   * 認証状態取得
+   * 現在のユーザー情報取得
    */
-  async getAuthStatus(): Promise<StatusResponse> {
-    const response = await httpClient.get<StatusResponse>('/auth/status');
+  async getMe(): Promise<MeResponse> {
+    const response = await httpClient.get<MeResponse>('/auth/me');
     return response.data;
   },
 };

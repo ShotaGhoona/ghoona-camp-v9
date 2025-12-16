@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 class LoginRequest(BaseModel):
     """ログインリクエスト"""
 
-    login_id: str = Field(..., description='ログインID')
+    email: str = Field(..., description='メールアドレス')
     password: str = Field(..., description='パスワード')
 
 
@@ -12,8 +12,7 @@ class LoginResponse(BaseModel):
     """ログインレスポンス"""
 
     message: str = Field(..., description='メッセージ')
-    access_token: str = Field(..., description='アクセストークン')
-    user_id: int = Field(..., description='ユーザーID')
+    user_id: str = Field(..., description='ユーザーID (UUID)')
 
 
 class LogoutResponse(BaseModel):
@@ -22,8 +21,12 @@ class LogoutResponse(BaseModel):
     message: str = Field(..., description='メッセージ')
 
 
-class StatusResponse(BaseModel):
-    """認証状態レスポンス"""
+class MeResponse(BaseModel):
+    """現在のユーザー情報レスポンス"""
 
-    is_authenticated: bool = Field(..., description='認証済みかどうか')
-    user_id: int = Field(..., description='ユーザーID')
+    id: str = Field(..., description='ユーザーID (UUID)')
+    email: str = Field(..., description='メールアドレス')
+    username: str | None = Field(None, description='ユーザー名')
+    avatar_url: str | None = Field(None, description='アバター画像URL')
+    discord_id: str | None = Field(None, description='Discord User ID')
+    is_active: bool = Field(..., description='アカウント有効状態')

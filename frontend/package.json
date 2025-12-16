@@ -1,6 +1,7 @@
 {
-  "name": "ai-solution-template-frontend",
+  "name": "ghoona-camp-frontend",
   "version": "0.1.0",
+  "description": "朝活コミュニティアプリ Ghoona Camp のフロントエンド",
   "private": true,
   "scripts": {
     "dev": "next dev",

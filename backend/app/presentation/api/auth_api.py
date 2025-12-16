@@ -11,7 +11,7 @@ from app.presentation.schemas.auth_schemas import (
     LoginRequest,
     LoginResponse,
     LogoutResponse,
-    StatusResponse,
+    MeResponse,
 )
 
 router = APIRouter(prefix='/auth', tags=['認証'])
@@ -23,7 +23,7 @@ def login(
     response: Response,
     auth_usecase: AuthUsecase = Depends(get_auth_usecase),
 ) -> LoginResponse:
-    input_dto = LoginInputDTO(login_id=request.login_id, password=request.password)
+    input_dto = LoginInputDTO(email=request.email, password=request.password)
 
     output_dto = auth_usecase.login(input_dto)
 
@@ -37,10 +37,9 @@ def login(
         max_age=7 * 24 * 60 * 60,  # 7日間
     )
 
-    # レスポンスを返す # テスト用にコメント追加
+    # レスポンスを返す（access_tokenはCookieに設定されるためレスポンスボディには含めない）
     return LoginResponse(
         message='ログイン成功',
-        access_token=output_dto.access_token,
         user_id=output_dto.user_id,
     )
 
@@ -60,14 +59,19 @@ def logout(
     return LogoutResponse(message=output_dto.message)
 
 
-@router.get('/status', response_model=StatusResponse, status_code=status.HTTP_200_OK)
-def get_status(
+@router.get('/me', response_model=MeResponse, status_code=status.HTTP_200_OK)
+def get_me(
     current_user: User = Depends(get_current_user_from_cookie),
     auth_usecase: AuthUsecase = Depends(get_auth_usecase),
-) -> StatusResponse:
-    """認証状態取得エンドポイント"""
-    output_dto = auth_usecase.get_auth_status(user_id=current_user.id)
+) -> MeResponse:
+    """現在のユーザー情報取得エンドポイント"""
+    output_dto = auth_usecase.get_me(user_id=current_user.id)
 
-    return StatusResponse(
-        is_authenticated=output_dto.is_authenticated, user_id=output_dto.user_id
+    return MeResponse(
+        id=output_dto.id,
+        email=output_dto.email,
+        username=output_dto.username,
+        avatar_url=output_dto.avatar_url,
+        discord_id=output_dto.discord_id,
+        is_active=output_dto.is_active,
     )

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import HTTPException, Request, status
 from jose import JWTError, jwt
@@ -12,7 +12,7 @@ from app.config import get_settings
 class User(BaseModel):
     """ユーザースキーマ（認証用）"""
 
-    id: int = Field(..., description='ユーザーID')
+    id: str = Field(..., description='ユーザーID (UUID)')
 
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -22,13 +22,13 @@ class SecurityServiceImpl(ISecurityService):
     """セキュリティサービスの実装"""
 
     def create_access_token(
-        self, user_id: int, expires_delta: timedelta | None = None
+        self, user_id: str, expires_delta: timedelta | None = None
     ) -> str:
         """アクセストークンを生成"""
         if expires_delta:
-            expire = datetime.utcnow() + expires_delta
+            expire = datetime.now(timezone.utc) + expires_delta
         else:
-            expire = datetime.utcnow() + timedelta(days=7)
+            expire = datetime.now(timezone.utc) + timedelta(days=7)
 
         to_encode = {'user_id': user_id, 'exp': expire}
         settings = get_settings()
@@ -47,6 +47,10 @@ class SecurityServiceImpl(ISecurityService):
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         """パスワードを検証"""
         return pwd_context.verify(plain_password, hashed_password)
+
+    def hash_password(self, plain_password: str) -> str:
+        """パスワードをハッシュ化"""
+        return pwd_context.hash(plain_password)
 
 
 def _load_rsa_keys() -> tuple:
@@ -96,7 +100,7 @@ def get_current_user_from_cookie(request: Request) -> User:
         else:
             raise ValueError(f'Unsupported JWT algorithm: {algorithm}')
 
-        user_id: int = payload.get('user_id')
+        user_id: str = payload.get('user_id')
         if user_id is None:
             raise credentials_exception
         return User(id=user_id)
