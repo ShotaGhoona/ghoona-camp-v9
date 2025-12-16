@@ -23,8 +23,8 @@ app = FastAPI(
 )
 
 allowed_origins = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
+    'http://localhost:3004',
+    'http://127.0.0.1:3004',
     # 本番環境（デプロイ後に追加）
     # 'https://ghoona-camp.com',
     # 'https://www.ghoona-camp.com',
@@ -65,5 +65,5 @@ if __name__ == '__main__':
         os.makedirs(upload_folder)
         print(f'Created upload folder: {upload_folder}')  # フォルダ作成のログを追加
 
-    print('FastAPI app starting on http://0.0.0.0:8000')
-    uvicorn.run(app, host='0.0.0.0', port=8000, reload=True)
+    print('FastAPI app starting on http://0.0.0.0:8004')
+    uvicorn.run(app, host='0.0.0.0', port=8004, reload=True)
