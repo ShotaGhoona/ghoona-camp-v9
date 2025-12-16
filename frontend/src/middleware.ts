@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 const API_BASE_URL =
   process.env.SERVER_API_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
-  'http://localhost:8000';
+  'http://localhost:8004';
 
 // 認証が必要なパス
 const PROTECTED_PATHS = ['/dashboard'];
@@ -83,7 +83,7 @@ export async function middleware(request: NextRequest) {
  */
 async function verifyToken(token: string): Promise<boolean> {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/status`, {
+    const response = await fetch(`${API_BASE_URL}/auth/me`, {
       method: 'GET',
       headers: {
         Cookie: `access_token=${token}`,

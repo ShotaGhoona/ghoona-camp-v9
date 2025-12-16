@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8004';
 
 // Axiosインスタンス作成
 const httpClient: AxiosInstance = axios.create({
@@ -41,8 +41,8 @@ httpClient.interceptors.response.use(
       if (error.response.status === 401) {
         console.warn('Unauthorized. Redirecting to login...');
 
-        // /auth/status以外のエンドポイントで401エラーが発生した場合のみリダイレクト
-        const isAuthStatusRequest = error.config?.url?.includes('/auth/status');
+        // /auth/me以外のエンドポイントで401エラーが発生した場合のみリダイレクト
+        const isAuthStatusRequest = error.config?.url?.includes('/auth/me');
         if (!isAuthStatusRequest && typeof window !== 'undefined') {
           window.location.href = '/login';
         }
