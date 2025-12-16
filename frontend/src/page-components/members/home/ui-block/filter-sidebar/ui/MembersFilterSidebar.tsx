@@ -7,11 +7,8 @@ import { Button } from '@/shared/ui/shadcn/ui/button';
 import { Badge } from '@/shared/ui/shadcn/ui/badge';
 import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
 import { Card, CardContent } from '@/shared/ui/shadcn/ui/card';
-import {
-  ALL_SKILLS,
-  ALL_INTERESTS,
-  TITLE_MASTER,
-} from '@/shared/dummy-data/members/members';
+import { ALL_SKILLS, ALL_INTERESTS } from '@/shared/dummy-data/members/members';
+import { TITLE_MASTER } from '@/shared/types/title/title';
 
 import type { MembersFilterState } from '../model/types';
 import { initialFilterState, isFilterActive } from '../model/types';

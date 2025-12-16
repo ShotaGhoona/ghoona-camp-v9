@@ -5,6 +5,7 @@ import { Users } from 'lucide-react';
 
 import { dummyMembers } from '@/shared/dummy-data/members/members';
 import type { MemberItem } from '@/shared/dummy-data/members/members';
+import { MemberDetailModalSheet } from '@/widgets/member/member-detail-modal/ui/MemberDetailModalSheet';
 
 import { MembersGalleryView } from '../ui-block/gallery-view/ui/MembersGalleryView';
 import { MembersFilterSidebar } from '../ui-block/filter-sidebar/ui/MembersFilterSidebar';
@@ -19,10 +20,12 @@ import {
 export function MembersHomeContainer() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filter, setFilter] = useState<MembersFilterState>(initialFilterState);
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   const handleMemberClick = (member: MemberItem) => {
-    // TODO: 詳細モーダルを開く
-    alert(`${member.displayName}の詳細モーダルを開く（未実装）`);
+    setSelectedMemberId(member.id);
+    setIsDetailModalOpen(true);
   };
 
   // 今後消す==========================================
@@ -117,6 +120,14 @@ export function MembersHomeContainer() {
         isOpen={isFilterOpen}
         filter={filter}
         onFilterChange={setFilter}
+      />
+
+      {/* メンバー詳細モーダル */}
+      <MemberDetailModalSheet
+        memberId={selectedMemberId}
+        open={isDetailModalOpen}
+        onOpenChange={setIsDetailModalOpen}
+        defaultViewMode="modal"
       />
     </div>
   );

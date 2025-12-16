@@ -1,21 +1,17 @@
 // メンバー一覧ページ用ダミーデータ
 // TODO: バックエンド接続時に削除
 
+import type { SnsPlatform } from '@/shared/types/user/sns';
+import type { Title } from '@/shared/types/title/title';
+import { TITLE_MASTER } from '@/shared/types/title/title';
+
 // ========================================
 // 型定義（ダミーデータ用）
 // ========================================
 
-/** 称号情報 */
-export interface MemberTitle {
-  level: number;
-  nameJp: string;
-  nameEn: string;
-  colorTheme: string;
-}
-
 /** ソーシャルリンク */
 export interface MemberSocialLink {
-  platform: 'twitter' | 'instagram' | 'github' | 'website' | 'blog' | 'note' | 'linkedin';
+  platform: SnsPlatform;
   url: string;
   title?: string;
 }
@@ -47,26 +43,11 @@ export interface MemberItem {
   maxStreakDays: number;
 
   // 称号 (title_achievements + titles)
-  currentTitle: MemberTitle | null;
+  currentTitle: Title | null;
 
   // メタ情報
   joinedAt: string; // ISO date string
 }
-
-// ========================================
-// 称号マスターデータ
-// ========================================
-
-export const TITLE_MASTER: MemberTitle[] = [
-  { level: 1, nameJp: 'まどろみ見習い', nameEn: 'Sleeper', colorTheme: 'slate' },
-  { level: 2, nameJp: '目覚めの探求者', nameEn: 'Awakener', colorTheme: 'zinc' },
-  { level: 3, nameJp: '朝霧の歩行者', nameEn: 'Dawn Walker', colorTheme: 'blue' },
-  { level: 4, nameJp: '暁の先駆者', nameEn: 'Daybreak Pioneer', colorTheme: 'cyan' },
-  { level: 5, nameJp: '黎明の賢者', nameEn: 'Twilight Sage', colorTheme: 'violet' },
-  { level: 6, nameJp: '曙光の守護者', nameEn: 'Aurora Guardian', colorTheme: 'amber' },
-  { level: 7, nameJp: '太陽の使者', nameEn: 'Solar Messenger', colorTheme: 'orange' },
-  { level: 8, nameJp: '朝焼けの覇者', nameEn: 'Sunrise Sovereign', colorTheme: 'rose' },
-];
 
 // ========================================
 // ダミーメンバーデータ
