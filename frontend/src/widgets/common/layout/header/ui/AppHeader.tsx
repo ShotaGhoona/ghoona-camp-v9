@@ -76,7 +76,7 @@ export function AppHeader() {
 
   return (
     <>
-      <header className='bg-primary'>
+      <header className='bg-primary shadow-raised'>
         <div className='flex h-14 items-center justify-between px-4'>
           {/* Logo */}
           <div className='flex items-center gap-8'>
