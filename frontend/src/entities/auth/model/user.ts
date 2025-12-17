@@ -5,19 +5,25 @@ import type { User } from './types';
  * ドメインロジックをカプセル化
  */
 export class UserEntity implements User {
-  id: number;
-  email?: string;
-  name?: string;
+  id: string;
+  email: string;
+  username?: string;
+  avatar_url?: string;
+  discord_id?: string;
+  is_active: boolean;
 
   constructor(data: User) {
     this.id = data.id;
     this.email = data.email;
-    this.name = data.name;
+    this.username = data.username;
+    this.avatar_url = data.avatar_url;
+    this.discord_id = data.discord_id;
+    this.is_active = data.is_active;
   }
 
-  // ユーザー名の取得（メールアドレスから生成など）
+  // ユーザー名の取得
   getDisplayName(): string {
-    return this.name || this.email || `User ${this.id}`;
+    return this.username || this.email || `User ${this.id}`;
   }
 
   // DTOからエンティティへの変換
@@ -30,7 +36,10 @@ export class UserEntity implements User {
     return {
       id: this.id,
       email: this.email,
-      name: this.name,
+      username: this.username,
+      avatar_url: this.avatar_url,
+      discord_id: this.discord_id,
+      is_active: this.is_active,
     };
   }
 }
