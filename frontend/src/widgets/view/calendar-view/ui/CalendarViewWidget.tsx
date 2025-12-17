@@ -17,10 +17,12 @@ interface CalendarViewWidgetProps<T> {
   cardRenderer: (item: T, index: number) => ReactNode;
   /** ユニークなキーを取得する関数 */
   keyExtractor: (item: T) => string | number;
-  /** データが空の時に表示するコンテンツ */
-  emptyContent?: ReactNode;
   /** 追加のクラス名 */
   className?: string;
+  /** データがある日のセルのクラス名 */
+  activeCellClassName?: string;
+  /** データがない日のセルのクラス名 */
+  inactiveCellClassName?: string;
 }
 
 /** 曜日ラベル */
@@ -48,8 +50,9 @@ export function CalendarViewWidget<T>({
   dateExtractor,
   cardRenderer,
   keyExtractor,
-  emptyContent,
   className,
+  activeCellClassName = 'bg-primary/10',
+  inactiveCellClassName = 'bg-muted/30',
 }: CalendarViewWidgetProps<T>) {
   // 日付ごとにデータをグループ化
   const dataByDate = useMemo(() => {
@@ -104,30 +107,19 @@ export function CalendarViewWidget<T>({
     };
   }, []);
 
-  // データが空の場合
-  if (data.length === 0 && emptyContent) {
-    return (
-      <div className={cn('flex min-h-0 flex-1 flex-col', className)}>
-        <div className="flex min-h-0 flex-1 items-center justify-center">
-          {emptyContent}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className={cn('flex min-h-0 flex-1 flex-col', className)}>
       {/* カレンダーグリッド */}
-      <div className="flex min-h-0 flex-1 flex-col p-4">
+      <div className='flex min-h-0 flex-1 flex-col p-4'>
         {/* 曜日ヘッダー */}
-        <div className="mb-2 grid shrink-0 grid-cols-7 gap-1">
+        <div className='mb-2 grid shrink-0 grid-cols-7 gap-1'>
           {WEEKDAY_LABELS.map((label, index) => (
             <div
               key={label}
               className={cn(
                 'py-2 text-center text-sm font-medium',
                 index === 0 && 'text-red-500',
-                index === 6 && 'text-blue-500'
+                index === 6 && 'text-blue-500',
               )}
             >
               {label}
@@ -136,7 +128,7 @@ export function CalendarViewWidget<T>({
         </div>
 
         {/* 日付グリッド */}
-        <div className="grid min-h-0 flex-1 auto-rows-fr grid-cols-7">
+        <div className='grid min-h-0 flex-1 auto-rows-fr grid-cols-7'>
           {calendarGrid.map((week, weekIndex) =>
             week.map((day, dayIndex) => {
               const dateString = day ? formatDate(year, month, day) : null;
@@ -148,43 +140,45 @@ export function CalendarViewWidget<T>({
                 day === today.day;
               const isSunday = dayIndex === 0;
               const isSaturday = dayIndex === 6;
+              const hasData = dayData.length > 0;
 
               return (
                 <div
                   key={`${weekIndex}-${dayIndex}`}
                   className={cn(
                     'flex min-h-0 flex-col overflow-hidden rounded-md border border-transparent p-2',
-                    day !== null && 'bg-muted/30',
-                    day === null && 'bg-transparent'
+                    day !== null && hasData && activeCellClassName,
+                    day !== null && !hasData && inactiveCellClassName,
+                    day === null && 'bg-transparent',
                   )}
                 >
                   {day !== null && (
-                    <div className="flex flex-col h-full shadow-raised-sm rounded-lg">
+                    <div className='flex h-full flex-col rounded-lg shadow-raised-sm'>
                       {/* 日付ヘッダー */}
-                      <div className="flex shrink-0 items-center justify-between px-2 py-1">
+                      <div className='flex shrink-0 items-center justify-between px-2 py-1'>
                         <span
                           className={cn(
                             'flex size-6 items-center justify-center rounded-full text-sm',
                             isToday && 'bg-primary font-bold text-primary-foreground',
                             !isToday && isSunday && 'text-red-500',
-                            !isToday && isSaturday && 'text-blue-500'
+                            !isToday && isSaturday && 'text-blue-500',
                           )}
                         >
                           {day}
                         </span>
                         {dayData.length > 0 && (
-                          <span className="text-xs text-muted-foreground">
+                          <span className='text-xs text-muted-foreground'>
                             {dayData.length}件
                           </span>
                         )}
                       </div>
 
                       {/* イベントカード */}
-                      <ScrollArea className="min-h-0 flex-1">
-                        <div className="space-y-1 px-1 pb-1">
-                          {dayData.map((item, index) => (
+                      <ScrollArea className='min-h-0 flex-1'>
+                        <div className='space-y-1 px-1 pb-1'>
+                          {dayData.map((item) => (
                             <div key={keyExtractor(item)}>
-                              {cardRenderer(item, index)}
+                              {cardRenderer(item, 0)}
                             </div>
                           ))}
                         </div>
@@ -193,7 +187,7 @@ export function CalendarViewWidget<T>({
                   )}
                 </div>
               );
-            })
+            }),
           )}
         </div>
       </div>
