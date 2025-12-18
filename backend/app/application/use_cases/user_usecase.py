@@ -1,14 +1,21 @@
 """ユーザー関連のユースケース"""
 
+import logging
 from uuid import UUID
 
+from app.application.interfaces.security_service import ISecurityService
 from app.application.schemas.user_schemas import (
+    LoginInputDTO,
+    LoginOutputDTO,
+    LogoutOutputDTO,
+    MeOutputDTO,
     PaginationDTO,
     SocialLinkDTO,
     UserDetailDTO,
     UserListItemDTO,
     UsersListDTO,
 )
+from app.domain.exceptions.auth import InvalidCredentialsError, UserNotFoundError
 from app.domain.repositories.user_repository import (
     IUserRepository,
     UserListItem,
@@ -16,18 +23,30 @@ from app.domain.repositories.user_repository import (
     UserWithDetails,
 )
 
+logger = logging.getLogger(__name__)
+
 
 class UserUsecase:
     """ユーザー関連のユースケース"""
 
-    def __init__(self, user_repository: IUserRepository):
+    def __init__(
+        self,
+        user_repository: IUserRepository,
+        security_service: ISecurityService | None = None,
+    ):
         """
         コンストラクタ
 
         Args:
             user_repository: ユーザーリポジトリ
+            security_service: セキュリティサービス（認証機能使用時に必要）
         """
         self.user_repository = user_repository
+        self.security_service = security_service
+
+    # ========================================
+    # ユーザー一覧・詳細
+    # ========================================
 
     def get_users(
         self,
@@ -38,20 +57,7 @@ class UserUsecase:
         limit: int = 20,
         offset: int = 0,
     ) -> UsersListDTO:
-        """
-        ユーザー一覧を取得
-
-        Args:
-            search: キーワード検索
-            skills: スキルフィルター
-            interests: 興味・関心フィルター
-            title_levels: 称号レベルフィルター
-            limit: 取得件数
-            offset: オフセット
-
-        Returns:
-            UsersListDTO: ユーザー一覧
-        """
+        """ユーザー一覧を取得"""
         # バリデーション
         if limit < 1 or limit > 100:
             limit = 20
@@ -100,15 +106,7 @@ class UserUsecase:
         )
 
     def get_user_by_id(self, user_id: UUID) -> UserDetailDTO | None:
-        """
-        ユーザー詳細を取得
-
-        Args:
-            user_id: ユーザーID
-
-        Returns:
-            UserDetailDTO: ユーザー詳細（存在しない場合はNone）
-        """
+        """ユーザー詳細を取得"""
         user_detail = self.user_repository.get_user_detail_by_id(user_id)
         if user_detail is None:
             return None
@@ -144,4 +142,56 @@ class UserUsecase:
             maxStreakDays=user.max_streak_days,
             currentTitleLevel=user.current_title_level,
             joinedAt=user.joined_at,
+        )
+
+    # ========================================
+    # 認証
+    # ========================================
+
+    def login(self, input_dto: LoginInputDTO) -> LoginOutputDTO:
+        """ログイン処理"""
+        if self.security_service is None:
+            raise RuntimeError('security_service is required for login')
+
+        # DBからユーザーを取得
+        user = self.user_repository.get_by_email(input_dto.email)
+
+        if user is None:
+            logger.warning('ログイン失敗（ユーザー不在）: %s', input_dto.email)
+            raise InvalidCredentialsError()
+
+        # パスワード検証
+        is_valid = self.security_service.verify_password(
+            input_dto.password, user.password_hash
+        )
+
+        if not is_valid:
+            logger.warning('ログイン失敗（パスワード不一致）: %s', input_dto.email)
+            raise InvalidCredentialsError()
+
+        # トークン生成
+        access_token = self.security_service.create_access_token(user_id=str(user.id))
+        logger.info('ログイン成功: %s', input_dto.email)
+
+        return LoginOutputDTO(access_token=access_token, user_id=str(user.id))
+
+    def logout(self) -> LogoutOutputDTO:
+        """ログアウト処理（Cookieはエンドポイント側で削除）"""
+        logger.info('ログアウト成功')
+        return LogoutOutputDTO(message='ログアウトしました')
+
+    def get_me(self, user_id: str) -> MeOutputDTO:
+        """現在のユーザー情報を取得"""
+        user = self.user_repository.get_by_id(UUID(user_id))
+
+        if user is None:
+            raise UserNotFoundError()
+
+        return MeOutputDTO(
+            id=str(user.id),
+            email=user.email,
+            username=user.username,
+            avatar_url=user.avatar_url,
+            discord_id=user.discord_id,
+            is_active=user.is_active,
         )

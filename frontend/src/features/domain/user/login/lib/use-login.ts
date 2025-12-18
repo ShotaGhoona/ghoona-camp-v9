@@ -1,8 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { authApi } from '@/entities/auth/api/auth-api';
+
+import { userApi } from '@/entities/domain/user/api/user-api';
 import { useAppDispatch } from '@/store/hooks';
 import { setUser } from '@/store/slices/authSlice';
+
 import type { LoginFormData } from '../model/types';
 
 export function useLogin() {
@@ -11,7 +13,7 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: (credentials: LoginFormData) => {
-      return authApi.login({
+      return userApi.login({
         email: credentials.email,
         password: credentials.password,
       });

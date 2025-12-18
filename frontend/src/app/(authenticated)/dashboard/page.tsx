@@ -1,7 +1,7 @@
 'use client';
 
 import { useAppSelector } from '@/store/hooks';
-import { useLogout } from '@/features/auth/logout/lib/use-logout';
+import { useLogout } from '@/features/domain/user/logout/lib/use-logout';
 import { Button } from '@/shared/ui/shadcn/ui/button';
 import {
   Card,

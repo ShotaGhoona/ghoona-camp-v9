@@ -80,3 +80,40 @@ export type UserSearchParams = {
   limit?: number;
   offset?: number;
 };
+
+// ========================================
+// 認証関連（/auth/*）
+// ========================================
+
+export type LoginRequest = {
+  email: string;
+  password: string;
+};
+
+export type LoginResponse = {
+  message: string;
+  user_id: string;
+};
+
+export type LogoutResponse = {
+  message: string;
+};
+
+export type MeResponse = {
+  id: string;
+  email: string;
+  username: string | null;
+  avatar_url: string | null;
+  discord_id: string | null;
+  is_active: boolean;
+};
+
+/** 認証済みユーザー情報（Redux store用） */
+export type User = {
+  id: string;
+  email: string;
+  username?: string;
+  avatar_url?: string;
+  discord_id?: string;
+  is_active: boolean;
+};

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useLogin } from '@/features/auth/login/lib/use-login';
-import { type LoginFormData } from '@/features/auth/login/model/types';
+import { useLogin } from '@/features/domain/user/login/lib/use-login';
+import { type LoginFormData } from '@/features/domain/user/login/model/types';
 import { Button } from '@/shared/ui/shadcn/ui/button';
 import { Input } from '@/shared/ui/shadcn/ui/input';
 import { Label } from '@/shared/ui/shadcn/ui/label';

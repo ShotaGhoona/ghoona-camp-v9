@@ -6,7 +6,7 @@ import { store, AppDispatch } from '@/store/index';
 import { QueryProvider } from '@/app/provider/QueryProvider';
 import { ThemeProvider } from '@/features/core/theme/lib/theme-context';
 import { setUser, clearUser } from '@/store/slices/authSlice';
-import { authApi } from '@/entities/auth/api/auth-api';
+import { userApi } from '@/entities/domain/user/api/user-api';
 
 /**
  * 認証状態を復元するコンポーネント
@@ -17,7 +17,7 @@ function AuthInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const response = await authApi.getMe();
+        const response = await userApi.getMe();
         if (response.id) {
           dispatch(
             setUser({

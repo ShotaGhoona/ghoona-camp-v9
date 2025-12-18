@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 import { useAppSelector } from '@/store/hooks';
-import { useLogout } from '@/features/auth/logout/lib/use-logout';
+import { useLogout } from '@/features/domain/user/logout/lib/use-logout';
 import { ThemeSheet } from '@/features/core/theme/ui/ThemeSheet';
 import { cn } from '@/shared/ui/shadcn/lib/utils';
 import { Button } from '@/shared/ui/shadcn/ui/button';
