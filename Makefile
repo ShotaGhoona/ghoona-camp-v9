@@ -1,4 +1,4 @@
-.PHONY: help up down build logs restart test lint fix format lint-all db-init db-migrate db-upgrade db-downgrade db-history db-current onion-check generate-rsa-keys install snapshot/update infra/lint infra/format snapshot
+.PHONY: help up down build logs restart test lint fix format lint-all db-init db-migrate db-upgrade db-downgrade db-history db-current db-seed onion-check generate-rsa-keys install snapshot/update infra/lint infra/format snapshot
 
 # デフォルトターゲット
 help:
@@ -18,6 +18,7 @@ help:
 	@echo "  make db-downgrade    - マイグレーションをロールバック"
 	@echo "  make db-history      - マイグレーション履歴を表示"
 	@echo "  make db-current      - 現在のマイグレーションリビジョンを表示"
+	@echo "  make db-seed         - テスト用シードデータを投入"
 	@echo ""
 	@echo "  make lint            - Ruffでコードをチェック"
 	@echo "  make format          - Ruffでコードをフォーマット"
@@ -72,6 +73,9 @@ db-history:
 
 db-current:
 	docker compose run --rm migrator alembic current
+
+db-seed:
+	docker compose exec backend python scripts/seed.py
 
 # ==========================================
 # テスト
