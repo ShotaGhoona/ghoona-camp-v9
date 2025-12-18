@@ -26,15 +26,33 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 
-# -------- 実装出来次第、下記にモデルをインポートしていく。-----------
-# from app.infrastructure.database import Base
-
-
+# -------- モデルのインポート -----------
+from app.infrastructure.db.models import (
+    Base,
+    # User Management
+    UserModel,
+    UserMetadataModel,
+    UserVisionModel,
+    UserSocialLinkModel,
+    UserRivalModel,
+    # Goal Management
+    GoalModel,
+    # Event Management
+    EventModel,
+    EventParticipantModel,
+    # Title Management
+    TitleAchievementModel,
+    # Attendance Management
+    AttendanceLogModel,
+    AttendanceSummaryModel,
+    AttendanceStatisticsModel,
+    # Notification Management
+    NotificationModel,
+    NotificationSettingsModel,
+)
 # ------------------------------------------------------------
 
-
-# target_metadata = Base.metadata # 後でコメントアウトを外す
-target_metadata = None
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
