@@ -27,10 +27,16 @@
     --radius: 0.5rem;
 
     /* Neumorphism shadows */
-    --shadow-raised: 8px 8px 16px rgba(0,0,0,0.15), -8px -8px 16px rgba(255,255,255,0.8);
-    --shadow-raised-sm: 4px 4px 8px rgba(0,0,0,0.1), -4px -4px 8px rgba(255,255,255,0.7);
-    --shadow-inset: inset 4px 4px 8px rgba(0,0,0,0.15), inset -4px -4px 8px rgba(255,255,255,0.7);
-    --shadow-inset-sm: inset 3px 3px 6px rgba(0,0,0,0.12), inset -3px -3px 6px rgba(255,255,255,0.6);
+    --shadow-raised:
+      8px 8px 16px rgba(0, 0, 0, 0.15), -8px -8px 16px rgba(255, 255, 255, 0.8);
+    --shadow-raised-sm:
+      4px 4px 8px rgba(0, 0, 0, 0.1), -4px -4px 8px rgba(255, 255, 255, 0.7);
+    --shadow-inset:
+      inset 4px 4px 8px rgba(0, 0, 0, 0.15),
+      inset -4px -4px 8px rgba(255, 255, 255, 0.7);
+    --shadow-inset-sm:
+      inset 3px 3px 6px rgba(0, 0, 0, 0.12),
+      inset -3px -3px 6px rgba(255, 255, 255, 0.6);
   }
 
   .dark {
@@ -56,10 +62,16 @@
     --ring: 348 55% 62%;
 
     /* Neumorphism shadows */
-    --shadow-raised: 8px 8px 16px rgba(0,0,0,0.4), -8px -8px 16px rgba(255,255,255,0.03);
-    --shadow-raised-sm: 4px 4px 8px rgba(0,0,0,0.3), -4px -4px 8px rgba(255,255,255,0.03);
-    --shadow-inset: inset 4px 4px 8px rgba(0,0,0,0.4), inset -4px -4px 8px rgba(255,255,255,0.03);
-    --shadow-inset-sm: inset 3px 3px 6px rgba(0,0,0,0.3), inset -3px -3px 6px rgba(255,255,255,0.03);
+    --shadow-raised:
+      8px 8px 16px rgba(0, 0, 0, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.03);
+    --shadow-raised-sm:
+      4px 4px 8px rgba(0, 0, 0, 0.3), -4px -4px 8px rgba(255, 255, 255, 0.03);
+    --shadow-inset:
+      inset 4px 4px 8px rgba(0, 0, 0, 0.4),
+      inset -4px -4px 8px rgba(255, 255, 255, 0.03);
+    --shadow-inset-sm:
+      inset 3px 3px 6px rgba(0, 0, 0, 0.3),
+      inset -3px -3px 6px rgba(255, 255, 255, 0.03);
   }
 }
 
@@ -68,6 +80,6 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background font-sans text-foreground;
   }
 }

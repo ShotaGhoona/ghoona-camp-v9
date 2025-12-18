@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 
 const APP_NAME = 'Ghoona Camp';
-const APP_DESCRIPTION = '朝活の仲間と一緒に成長する、コミュニティ重視のオンライン朝活サービス';
+const APP_DESCRIPTION =
+  '朝活の仲間と一緒に成長する、コミュニティ重視のオンライン朝活サービス';
 
 /**
  * 環境に応じたメタデータを生成

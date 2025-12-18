@@ -18,21 +18,22 @@ export function GoalTimelineLabel({ goal }: GoalTimelineLabelProps) {
   const isCompleted = !goal.isActive;
 
   return (
-    <div className="flex w-full items-center gap-3 overflow-hidden">
+    <div className='flex w-full items-center gap-3 overflow-hidden'>
       {/* アイコンコンテナ */}
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted shadow-raised-sm">
+      <div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted shadow-raised-sm'>
         <Target
           className={`size-4 ${isCompleted ? 'text-muted-foreground' : 'text-primary'}`}
         />
       </div>
 
       {/* テキスト */}
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{goal.title}</p>
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Calendar className="size-3" />
+      <div className='min-w-0 flex-1'>
+        <p className='truncate text-sm font-medium'>{goal.title}</p>
+        <div className='flex items-center gap-1.5 text-xs text-muted-foreground'>
+          <Calendar className='size-3' />
           <span>
-            {formatDate(goal.startedAt)} 〜 {goal.endedAt ? formatDate(goal.endedAt) : ''}
+            {formatDate(goal.startedAt)} 〜{' '}
+            {goal.endedAt ? formatDate(goal.endedAt) : ''}
           </span>
         </div>
       </div>

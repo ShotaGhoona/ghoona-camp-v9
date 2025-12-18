@@ -25,7 +25,8 @@ export function ThemeModeButton({
         cardVariants({ variant: isSelected ? 'inset' : 'raised' }),
         'group flex flex-1 cursor-pointer flex-col items-center gap-2 py-4 transition-all duration-300',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-        !isSelected && 'hover:-translate-y-0.5 hover:shadow-raised active:translate-y-0 active:shadow-raised-sm',
+        !isSelected &&
+          'hover:-translate-y-0.5 hover:shadow-raised active:translate-y-0 active:shadow-raised-sm',
       )}
     >
       <Icon
@@ -33,7 +34,7 @@ export function ThemeModeButton({
           'size-6 transition-all duration-300',
           isSelected
             ? 'text-primary'
-            : 'text-muted-foreground group-hover:text-foreground group-hover:scale-110',
+            : 'text-muted-foreground group-hover:scale-110 group-hover:text-foreground',
         )}
       />
       <span

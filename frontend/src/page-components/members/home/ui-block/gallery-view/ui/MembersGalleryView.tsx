@@ -5,7 +5,10 @@ import { GalleryViewWidget } from '@/widgets/view/gallery-view/ui/GalleryViewWid
 
 import { MemberCard } from './components/MemberCard';
 import { MembersGallerySkeleton } from './skeleton/MembersGallerySkeleton';
-import { useMembersGallery, type MembersFilter } from '../lib/use-members-gallery';
+import {
+  useMembersGallery,
+  type MembersFilter,
+} from '../lib/use-members-gallery';
 
 interface MembersGalleryViewProps {
   filter: MembersFilter;

@@ -35,7 +35,7 @@ export function useTagSearch<T extends string | { name: string }>(tags: T[]) {
  * @returns 検索クエリ、セッター、フィルター済み称号
  */
 export function useTitleSearch<T extends { nameJp: string; nameEn: string }>(
-  titles: T[]
+  titles: T[],
 ) {
   const [query, setQuery] = useState('');
 
@@ -46,7 +46,7 @@ export function useTitleSearch<T extends { nameJp: string; nameEn: string }>(
     return titles.filter(
       (title) =>
         title.nameJp.toLowerCase().includes(lowerQuery) ||
-        title.nameEn.toLowerCase().includes(lowerQuery)
+        title.nameEn.toLowerCase().includes(lowerQuery),
     );
   }, [titles, query]);
 

@@ -52,7 +52,8 @@ export function CreateGoalContent({
   isCompareMode = false,
   onToggleCompareMode,
 }: CreateGoalContentProps) {
-  const [formData, setFormData] = useState<CreateGoalFormData>(getDefaultFormData);
+  const [formData, setFormData] =
+    useState<CreateGoalFormData>(getDefaultFormData);
 
   // 現在のユーザー情報を取得
   const currentUser = dummyMembers.find((m) => m.id === CURRENT_USER_ID);
@@ -90,26 +91,26 @@ export function CreateGoalContent({
   };
 
   return (
-    <div className="flex h-full flex-col">
-      <ScrollArea className="flex-1">
-        <div className="flex flex-col">
+    <div className='flex h-full flex-col'>
+      <ScrollArea className='flex-1'>
+        <div className='flex flex-col'>
           {/* ヘッダー部分 */}
-          <div className="relative">
+          <div className='relative'>
             {/* 背景グラデーション */}
-            <div className="h-24 bg-gradient-to-br from-primary via-primary/40 to-primary/5" />
+            <div className='h-24 bg-gradient-to-br from-primary via-primary/40 to-primary/5' />
 
             {/* 自分のアバター */}
-            <div className="absolute left-1/2 top-12 -translate-x-1/2">
-              <div className="size-24 overflow-hidden rounded-full bg-background shadow-raised">
+            <div className='absolute left-1/2 top-12 -translate-x-1/2'>
+              <div className='size-24 overflow-hidden rounded-full bg-background shadow-raised'>
                 {currentUser?.avatarUrl ? (
                   <img
                     src={currentUser.avatarUrl}
                     alt={currentUser.displayName}
-                    className="size-full object-cover"
+                    className='size-full object-cover'
                   />
                 ) : (
-                  <div className="flex size-full items-center justify-center bg-muted">
-                    <User className="size-10 text-muted-foreground" />
+                  <div className='flex size-full items-center justify-center bg-muted'>
+                    <User className='size-10 text-muted-foreground' />
                   </div>
                 )}
               </div>
@@ -117,57 +118,57 @@ export function CreateGoalContent({
           </div>
 
           {/* フォーム */}
-          <div className="mt-14 space-y-5 px-6 pb-6">
+          <div className='mt-14 space-y-5 px-6 pb-6'>
             {/* タイトル & 説明 */}
-            <div className="text-center">
-              <h2 className="text-xl font-bold">新しい目標を作成</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
+            <div className='text-center'>
+              <h2 className='text-xl font-bold'>新しい目標を作成</h2>
+              <p className='mt-1 text-sm text-muted-foreground'>
                 朝活で達成したい目標を設定しましょう
               </p>
             </div>
 
             {/* フォームフィールド */}
-            <div className="space-y-4">
+            <div className='space-y-4'>
               {/* タイトル */}
               <TextField
-                id="goal-title"
-                label="目標タイトル *"
+                id='goal-title'
+                label='目標タイトル *'
                 value={formData.title}
                 onChange={handleTitleChange}
-                placeholder="例: TypeScriptをマスターする"
+                placeholder='例: TypeScriptをマスターする'
               />
 
               {/* 詳細説明 */}
               <TextareaField
-                id="goal-description"
-                label="詳細説明"
+                id='goal-description'
+                label='詳細説明'
                 value={formData.description}
                 onChange={handleDescriptionChange}
-                placeholder="目標の詳細や達成条件を記入してください..."
+                placeholder='目標の詳細や達成条件を記入してください...'
                 rows={3}
               />
 
               {/* 期間設定 */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className='grid grid-cols-2 gap-3'>
                 <DateField
-                  id="goal-started-at"
-                  label="開始日 *"
+                  id='goal-started-at'
+                  label='開始日 *'
                   value={formData.startedAt}
                   onChange={handleStartedAtChange}
                 />
-                <div className="space-y-1">
+                <div className='space-y-1'>
                   <DateField
-                    id="goal-ended-at"
-                    label="終了日（任意）"
+                    id='goal-ended-at'
+                    label='終了日（任意）'
                     value={formData.endedAt}
                     onChange={handleEndedAtChange}
-                    placeholder="終了日を設定"
+                    placeholder='終了日を設定'
                   />
                   {formData.endedAt && (
                     <button
-                      type="button"
+                      type='button'
                       onClick={handleClearEndDate}
-                      className="text-xs text-muted-foreground hover:text-foreground"
+                      className='text-xs text-muted-foreground hover:text-foreground'
                     >
                       クリア
                     </button>
@@ -180,21 +181,24 @@ export function CreateGoalContent({
 
             {/* 公開設定 */}
             <div>
-              <h3 className="mb-3 text-sm font-semibold text-muted-foreground">
+              <h3 className='mb-3 text-sm font-semibold text-muted-foreground'>
                 公開設定
               </h3>
-              <div className="flex items-center justify-between rounded-lg p-3 shadow-raised-sm">
-                <div className="flex items-center gap-3">
+              <div className='flex items-center justify-between rounded-lg p-3 shadow-raised-sm'>
+                <div className='flex items-center gap-3'>
                   {formData.isPublic ? (
-                    <Globe className="size-5 text-primary" />
+                    <Globe className='size-5 text-primary' />
                   ) : (
-                    <Lock className="size-5 text-muted-foreground" />
+                    <Lock className='size-5 text-muted-foreground' />
                   )}
                   <div>
-                    <Label htmlFor="goal-public" className="text-sm font-medium">
+                    <Label
+                      htmlFor='goal-public'
+                      className='text-sm font-medium'
+                    >
                       {formData.isPublic ? '公開' : '非公開'}
                     </Label>
-                    <p className="text-xs text-muted-foreground">
+                    <p className='text-xs text-muted-foreground'>
                       {formData.isPublic
                         ? '他のメンバーがこの目標を閲覧できます'
                         : 'この目標はあなただけが閲覧できます'}
@@ -202,7 +206,7 @@ export function CreateGoalContent({
                   </div>
                 </div>
                 <Switch
-                  id="goal-public"
+                  id='goal-public'
                   checked={formData.isPublic}
                   onCheckedChange={handlePublicChange}
                 />
@@ -213,47 +217,51 @@ export function CreateGoalContent({
       </ScrollArea>
 
       {/* アクションボタン */}
-      <div className="flex gap-2 border-t bg-background px-6 py-4">
+      <div className='flex gap-2 border-t bg-background px-6 py-4'>
         {/* 比較モード切替ボタン */}
         {onToggleCompareMode && (
           <Tooltip>
             <TooltipTrigger asChild>
               <button
-                type="button"
+                type='button'
                 onClick={onToggleCompareMode}
                 className={`flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium shadow-raised-sm transition-all hover:bg-muted ${
-                  isCompareMode ? 'border-primary bg-primary/10 text-primary' : ''
+                  isCompareMode
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : ''
                 }`}
               >
                 {isCompareMode ? (
-                  <EyeOff className="size-4" />
+                  <EyeOff className='size-4' />
                 ) : (
-                  <Eye className="size-4" />
+                  <Eye className='size-4' />
                 )}
               </button>
             </TooltipTrigger>
             <TooltipContent>
-              {isCompareMode ? 'みんなの目標を閉じる' : 'みんなの目標を見ながら作成'}
+              {isCompareMode
+                ? 'みんなの目標を閉じる'
+                : 'みんなの目標を見ながら作成'}
             </TooltipContent>
           </Tooltip>
         )}
 
         {/* キャンセルボタン */}
         <button
-          type="button"
+          type='button'
           onClick={onCancel}
-          className="flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium shadow-raised-sm transition-all hover:bg-muted"
+          className='flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium shadow-raised-sm transition-all hover:bg-muted'
         >
-          <X className="size-4" />
+          <X className='size-4' />
         </button>
 
         {/* 作成ボタン */}
         <button
-          type="button"
+          type='button'
           onClick={handleSubmit}
-          className="flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-raised-sm transition-all hover:bg-primary/90"
+          className='flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-raised-sm transition-all hover:bg-primary/90'
         >
-          <Save className="size-4" />
+          <Save className='size-4' />
           作成する
         </button>
       </div>

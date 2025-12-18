@@ -332,14 +332,14 @@ export function getMyGoals(): GoalItem[] {
 /** 公開目標を取得（自分以外） */
 export function getPublicGoals(): GoalItem[] {
   return dummyGoals.filter(
-    (goal) => goal.isPublic && goal.userId !== CURRENT_USER_ID
+    (goal) => goal.isPublic && goal.userId !== CURRENT_USER_ID,
   );
 }
 
 /** 全ての閲覧可能な目標を取得（自分の全目標 + 他者の公開目標） */
 export function getAllVisibleGoals(): GoalItem[] {
   return dummyGoals.filter(
-    (goal) => goal.userId === CURRENT_USER_ID || goal.isPublic
+    (goal) => goal.userId === CURRENT_USER_ID || goal.isPublic,
   );
 }
 
@@ -362,8 +362,10 @@ export function getProgressPercent(goal: GoalItem): number | null {
   const startDate = new Date(goal.startedAt);
   const endDate = new Date(goal.endedAt);
 
-  const totalDays = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
-  const elapsedDays = (today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+  const totalDays =
+    (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+  const elapsedDays =
+    (today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
 
   if (totalDays <= 0) return 100;
   const progress = Math.min(Math.max((elapsedDays / totalDays) * 100, 0), 100);

@@ -55,4 +55,3 @@ export const notoSansJP = localFont({
   variable: '--font-noto-sans-jp',
   display: 'swap',
 });
-

@@ -22,19 +22,19 @@ export function RankingHomeContainer() {
   };
 
   return (
-    <div className="flex min-h-0 flex-1 gap-0 px-2 py-4">
+    <div className='flex min-h-0 flex-1 gap-0 px-2 py-4'>
       <RankingColumn
-        type="monthly"
+        type='monthly'
         entries={monthlyRanking}
         onEntryClick={handleEntryClick}
       />
       <RankingColumn
-        type="total"
+        type='total'
         entries={totalRanking}
         onEntryClick={handleEntryClick}
       />
       <RankingColumn
-        type="streak"
+        type='streak'
         entries={streakRanking}
         onEntryClick={handleEntryClick}
       />
@@ -44,7 +44,7 @@ export function RankingHomeContainer() {
         memberId={selectedMemberId}
         open={isDetailModalOpen}
         onOpenChange={setIsDetailModalOpen}
-        defaultViewMode="modal"
+        defaultViewMode='modal'
       />
     </div>
   );

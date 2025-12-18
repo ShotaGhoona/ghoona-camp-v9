@@ -21,7 +21,9 @@ function toSearchParams(filter: UserFilter): UserSearchParams {
   return {
     search: filter.search || undefined,
     skills: filter.skills?.length ? filter.skills.join(',') : undefined,
-    interests: filter.interests?.length ? filter.interests.join(',') : undefined,
+    interests: filter.interests?.length
+      ? filter.interests.join(',')
+      : undefined,
     title_levels: filter.titleLevels?.length
       ? filter.titleLevels.join(',')
       : undefined,

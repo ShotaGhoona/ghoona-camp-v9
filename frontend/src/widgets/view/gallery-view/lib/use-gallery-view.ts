@@ -41,8 +41,12 @@ export function useGalleryView<T>({
   const [gridColumns, setGridColumns] = useState(defaultGridColumns);
 
   // 実際に使用する値
-  const currentPage = isControlled ? (controlledCurrentPage ?? 1) : internalCurrentPage;
-  const pageSize = isControlled ? (controlledPageSize ?? DEFAULT_PAGE_SIZE) : internalPageSize;
+  const currentPage = isControlled
+    ? (controlledCurrentPage ?? 1)
+    : internalCurrentPage;
+  const pageSize = isControlled
+    ? (controlledPageSize ?? DEFAULT_PAGE_SIZE)
+    : internalPageSize;
   const total = isControlled ? totalItems : data.length;
 
   // 表示データ（controlled mode: データそのまま、uncontrolled mode: スライス）

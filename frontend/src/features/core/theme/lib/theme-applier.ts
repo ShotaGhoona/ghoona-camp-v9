@@ -32,10 +32,7 @@ export function applyTheme(preset: ThemePreset, isDark: boolean): void {
   );
 
   // Ring (モード別)
-  root.style.setProperty(
-    '--ring',
-    isDark ? colors.ringDark : colors.ringLight,
-  );
+  root.style.setProperty('--ring', isDark ? colors.ringDark : colors.ringLight);
 
   // Accent (モード別)
   root.style.setProperty(

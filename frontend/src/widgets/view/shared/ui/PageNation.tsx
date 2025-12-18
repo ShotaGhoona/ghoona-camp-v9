@@ -2,7 +2,13 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/shared/ui/shadcn/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/shadcn/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/ui/shadcn/ui/select';
 import type { PaginationConfig } from '../model/types';
 
 interface PageNationProps {
@@ -126,26 +132,28 @@ export function PageNation({
 
       <div className='flex min-w-[100px] items-center justify-end gap-4 text-sm text-muted-foreground'>
         {/* グリッド数選択（ギャラリー用） */}
-        {gridColumns !== undefined && gridColumnOptions && onGridColumnsChange && (
-          <div className='flex items-center gap-2'>
-            <span>グリッド</span>
-            <Select
-              value={String(gridColumns)}
-              onValueChange={(value) => onGridColumnsChange(Number(value))}
-            >
-              <SelectTrigger className='h-8 w-[70px]'>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {gridColumnOptions.map((cols) => (
-                  <SelectItem key={cols} value={String(cols)}>
-                    {cols}列
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
+        {gridColumns !== undefined &&
+          gridColumnOptions &&
+          onGridColumnsChange && (
+            <div className='flex items-center gap-2'>
+              <span>グリッド</span>
+              <Select
+                value={String(gridColumns)}
+                onValueChange={(value) => onGridColumnsChange(Number(value))}
+              >
+                <SelectTrigger className='h-8 w-[70px]'>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {gridColumnOptions.map((cols) => (
+                    <SelectItem key={cols} value={String(cols)}>
+                      {cols}列
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
         {/* ページサイズ選択 */}
         <div className='flex items-center gap-2'>

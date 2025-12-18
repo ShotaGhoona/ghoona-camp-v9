@@ -124,15 +124,17 @@ export const userApi = {
 
   /** スキル一覧取得 */
   getSkills: async (): Promise<SkillsListResponse> => {
-    const response =
-      await httpClient.get<SkillsListResponse>('/api/v1/users/skills');
+    const response = await httpClient.get<SkillsListResponse>(
+      '/api/v1/users/skills',
+    );
     return response.data;
   },
 
   /** 興味・関心一覧取得 */
   getInterests: async (): Promise<InterestsListResponse> => {
-    const response =
-      await httpClient.get<InterestsListResponse>('/api/v1/users/interests');
+    const response = await httpClient.get<InterestsListResponse>(
+      '/api/v1/users/interests',
+    );
     return response.data;
   },
 };

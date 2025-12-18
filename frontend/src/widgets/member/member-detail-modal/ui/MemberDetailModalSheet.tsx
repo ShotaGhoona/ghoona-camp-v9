@@ -39,14 +39,14 @@ export function MemberDetailModalSheet({
     <Tooltip>
       <TooltipTrigger asChild>
         <button
-          type="button"
+          type='button'
           onClick={toggleViewMode}
-          className="absolute right-3 top-3 z-10 flex size-8 items-center justify-center rounded-full bg-background text-muted-foreground shadow-inset-sm transition-all hover:text-foreground hover:shadow-inset-sm"
+          className='absolute right-3 top-3 z-10 flex size-8 items-center justify-center rounded-full bg-background text-muted-foreground shadow-inset-sm transition-all hover:text-foreground hover:shadow-inset-sm'
         >
           {isModal ? (
-            <PanelRight className="size-4" />
+            <PanelRight className='size-4' />
           ) : (
-            <Square className="size-4" />
+            <Square className='size-4' />
           )}
         </button>
       </TooltipTrigger>
@@ -61,11 +61,11 @@ export function MemberDetailModalSheet({
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent
-          className="max-h-[85vh] max-w-md gap-0 overflow-hidden border-0 bg-background p-0"
+          className='max-h-[85vh] max-w-md gap-0 overflow-hidden border-0 bg-background p-0'
           showCloseButton={false}
         >
           {ViewModeToggle}
-          <div className="max-h-[85vh]">
+          <div className='max-h-[85vh]'>
             {isLoading || !user ? (
               <MemberDetailSkeleton />
             ) : (
@@ -81,8 +81,8 @@ export function MemberDetailModalSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
-        side="right"
-        className="w-full gap-0 overflow-hidden border-0 bg-background p-0 sm:max-w-md"
+        side='right'
+        className='w-full gap-0 overflow-hidden border-0 bg-background p-0 sm:max-w-md'
         showCloseButton={false}
       >
         {ViewModeToggle}

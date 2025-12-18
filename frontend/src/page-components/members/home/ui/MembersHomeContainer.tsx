@@ -36,25 +36,32 @@ export function MembersHomeContainer() {
   // MembersGalleryViewに渡すフィルター
   const galleryFilter = {
     search: filter.searchQuery || undefined,
-    skills: filter.selectedSkills.length > 0 ? filter.selectedSkills : undefined,
-    interests: filter.selectedInterests.length > 0 ? filter.selectedInterests : undefined,
-    titleLevels: filter.selectedTitleLevels.length > 0 ? filter.selectedTitleLevels : undefined,
+    skills:
+      filter.selectedSkills.length > 0 ? filter.selectedSkills : undefined,
+    interests:
+      filter.selectedInterests.length > 0
+        ? filter.selectedInterests
+        : undefined,
+    titleLevels:
+      filter.selectedTitleLevels.length > 0
+        ? filter.selectedTitleLevels
+        : undefined,
   };
 
   return (
-    <div className="flex min-h-0 flex-1 overflow-hidden">
+    <div className='flex min-h-0 flex-1 overflow-hidden'>
       {/* メインコンテンツ */}
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+      <div className='flex min-h-0 min-w-0 flex-1 flex-col'>
         {/* ヘッダー */}
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3"></div>
+        <div className='flex items-center justify-between px-6 py-4'>
+          <div className='flex items-center gap-3'></div>
 
           {/* 検索 & フィルター */}
-          <div className="flex items-center gap-3">
+          <div className='flex items-center gap-3'>
             <SearchWindow
               value={filter.searchQuery}
               onChange={handleSearchChange}
-              placeholder="名前、一言で検索..."
+              placeholder='名前、一言で検索...'
             />
             <FilterToggleButton
               isOpen={isFilterOpen}
@@ -83,7 +90,7 @@ export function MembersHomeContainer() {
         memberId={selectedMemberId}
         open={isDetailModalOpen}
         onOpenChange={setIsDetailModalOpen}
-        defaultViewMode="modal"
+        defaultViewMode='modal'
       />
     </div>
   );

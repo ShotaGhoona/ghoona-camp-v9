@@ -11,18 +11,25 @@ interface FilterToggleButtonProps {
   onClick: () => void;
 }
 
-export function FilterToggleButton({ isOpen, activeCount, onClick }: FilterToggleButtonProps) {
+export function FilterToggleButton({
+  isOpen,
+  activeCount,
+  onClick,
+}: FilterToggleButtonProps) {
   return (
     <Button
       variant={isOpen ? 'inset' : 'raised'}
-      size="lg"
+      size='lg'
       onClick={onClick}
-      className="gap-2"
+      className='gap-2'
     >
-      <Filter className="size-4" />
+      <Filter className='size-4' />
       <span>フィルター</span>
       {activeCount > 0 && (
-        <Badge variant="default" className="size-5 justify-center rounded-full p-0 text-xs">
+        <Badge
+          variant='default'
+          className='size-5 justify-center rounded-full p-0 text-xs'
+        >
           {activeCount}
         </Badge>
       )}

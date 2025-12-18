@@ -15,7 +15,9 @@ const CURRENT_USER_ID = '1';
 
 export function ActivityHomeContainer() {
   // 現在表示中の年月
-  const [currentYear, setCurrentYear] = useState(() => new Date().getFullYear());
+  const [currentYear, setCurrentYear] = useState(() =>
+    new Date().getFullYear(),
+  );
   const [currentMonth, setCurrentMonth] = useState(
     () => new Date().getMonth() + 1,
   );

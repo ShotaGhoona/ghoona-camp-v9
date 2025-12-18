@@ -56,23 +56,20 @@ export function TagSearchInput({
   const isExpanded = isOpen || value.length > 0;
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className='relative'>
       <div
         className={cn(
           'flex items-center overflow-hidden rounded-md transition-all duration-200 ease-out',
-          isExpanded ? 'w-48 shadow-inset-sm' : 'w-7'
+          isExpanded ? 'w-48 shadow-inset-sm' : 'w-7',
         )}
       >
         <Button
-          variant="ghost"
-          size="icon"
-          className={cn(
-            'size-7 shrink-0',
-            isExpanded && 'pointer-events-none'
-          )}
+          variant='ghost'
+          size='icon'
+          className={cn('size-7 shrink-0', isExpanded && 'pointer-events-none')}
           onClick={() => setIsOpen(true)}
         >
-          <Search className="size-3 text-muted-foreground" />
+          <Search className='size-3 text-muted-foreground' />
         </Button>
 
         <Input
@@ -82,18 +79,18 @@ export function TagSearchInput({
           onChange={(e) => onChange(e.target.value)}
           className={cn(
             'h-7 border-none bg-transparent p-0 pr-6 text-xs shadow-none ring-0 transition-all duration-200 focus-visible:ring-0',
-            isExpanded ? 'w-full opacity-100' : 'w-0 opacity-0'
+            isExpanded ? 'w-full opacity-100' : 'w-0 opacity-0',
           )}
         />
 
         {value && (
           <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-0 top-1/2 size-7 -translate-y-1/2"
+            variant='ghost'
+            size='icon'
+            className='absolute right-0 top-1/2 size-7 -translate-y-1/2'
             onClick={handleClear}
           >
-            <X className="size-3" />
+            <X className='size-3' />
           </Button>
         )}
       </div>

@@ -32,42 +32,42 @@ export function SidebarGoalCard({ goal, onClick }: SidebarGoalCardProps) {
 
   return (
     <Card
-      variant="raised"
-      className="cursor-pointer p-3 transition-all hover:shadow-lg"
+      variant='raised'
+      className='cursor-pointer p-3 transition-all hover:shadow-lg'
       onClick={handleClick}
     >
-      <div className="flex items-start gap-3">
+      <div className='flex items-start gap-3'>
         {/* アバター */}
-        <div className="size-10 shrink-0 overflow-hidden rounded-full bg-muted shadow-inset-sm">
+        <div className='size-10 shrink-0 overflow-hidden rounded-full bg-muted shadow-inset-sm'>
           {goal.creator.avatarUrl ? (
             <img
               src={goal.creator.avatarUrl}
               alt={goal.creator.displayName}
-              className="size-full object-cover"
+              className='size-full object-cover'
             />
           ) : (
-            <div className="flex size-full items-center justify-center">
-              <User className="size-4 text-muted-foreground" />
+            <div className='flex size-full items-center justify-center'>
+              <User className='size-4 text-muted-foreground' />
             </div>
           )}
         </div>
 
         {/* コンテンツ */}
-        <div className="min-w-0 flex-1">
-          <p className="text-xs text-muted-foreground">
+        <div className='min-w-0 flex-1'>
+          <p className='text-xs text-muted-foreground'>
             {goal.creator.displayName}
           </p>
-          <p className="mt-0.5 line-clamp-2 text-sm font-medium leading-tight">
+          <p className='mt-0.5 line-clamp-2 text-sm font-medium leading-tight'>
             {goal.title}
           </p>
-          <div className="mt-2 flex items-center gap-2">
+          <div className='mt-2 flex items-center gap-2'>
             <Badge
               variant={isCompleted ? 'secondary' : 'default'}
-              className="h-4 px-1 text-[10px]"
+              className='h-4 px-1 text-[10px]'
             >
               {isCompleted ? '完了' : '進行中'}
             </Badge>
-            <span className="text-[10px] text-muted-foreground">
+            <span className='text-[10px] text-muted-foreground'>
               {isCompleted ? '達成済み' : remainingText}
             </span>
           </div>

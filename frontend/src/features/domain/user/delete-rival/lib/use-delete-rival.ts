@@ -17,13 +17,7 @@ export function useDeleteRival(options?: UseDeleteRivalOptions) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      userId,
-      rivalId,
-    }: {
-      userId: string;
-      rivalId: string;
-    }) => {
+    mutationFn: ({ userId, rivalId }: { userId: string; rivalId: string }) => {
       return userApi.deleteRival(userId, rivalId);
     },
     onSuccess: (response, variables) => {

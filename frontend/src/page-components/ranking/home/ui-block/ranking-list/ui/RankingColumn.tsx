@@ -3,7 +3,10 @@
 import { Calendar, Flame, Trophy } from 'lucide-react';
 
 import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
-import type { RankingEntry, RankingType } from '@/shared/dummy-data/ranking/ranking';
+import type {
+  RankingEntry,
+  RankingType,
+} from '@/shared/dummy-data/ranking/ranking';
 import { getScoreValue } from '@/shared/dummy-data/ranking/ranking';
 
 import { TopThreeItem } from './components/TopThreeItem';
@@ -50,40 +53,44 @@ export function RankingColumn({
   const myRank = currentUserEntry?.rank ?? '-';
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-0">
+    <div className='flex min-h-0 flex-1 flex-col gap-0'>
       {/* ヘッダー */}
-      <div className="shrink-0 px-4">
-        <div className="flex items-center justify-between rounded-xl bg-primary/20 p-3 shadow-raised">
+      <div className='shrink-0 px-4'>
+        <div className='flex items-center justify-between rounded-xl bg-primary/20 p-3 shadow-raised'>
           {/* 左: アイコン + タイトル */}
-          <div className="flex items-center gap-2.5">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/20">
-              <Icon className="size-4 text-primary" />
+          <div className='flex items-center gap-2.5'>
+            <div className='flex size-9 items-center justify-center rounded-lg bg-primary/20'>
+              <Icon className='size-4 text-primary' />
             </div>
             <div>
-              <h2 className="text-sm font-bold leading-tight">{config.title}</h2>
-              <p className="text-[10px] text-muted-foreground">{config.subtitle}</p>
+              <h2 className='text-sm font-bold leading-tight'>
+                {config.title}
+              </h2>
+              <p className='text-[10px] text-muted-foreground'>
+                {config.subtitle}
+              </p>
             </div>
           </div>
 
           {/* 右: 自分のスコア・順位 */}
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-lg font-bold tabular-nums">{myScore}</span>
-            <span className="text-[10px] text-muted-foreground">日</span>
-            <span className="mx-1 text-muted-foreground/50">/</span>
-            <span className="flex size-5 items-center justify-center rounded bg-primary text-[10px] font-bold text-white">
+          <div className='flex items-baseline gap-1.5'>
+            <span className='text-lg font-bold tabular-nums'>{myScore}</span>
+            <span className='text-[10px] text-muted-foreground'>日</span>
+            <span className='mx-1 text-muted-foreground/50'>/</span>
+            <span className='flex size-5 items-center justify-center rounded bg-primary text-[10px] font-bold text-white'>
               {myRank}
             </span>
-            <span className="text-[10px] text-muted-foreground">位</span>
+            <span className='text-[10px] text-muted-foreground'>位</span>
           </div>
         </div>
       </div>
 
       {/* ランキングリスト */}
-      <div className="min-h-0 flex-1 overflow-hidden">
-        <ScrollArea className="h-full">
-          <div className="flex flex-col gap-4 p-6">
+      <div className='min-h-0 flex-1 overflow-hidden'>
+        <ScrollArea className='h-full'>
+          <div className='flex flex-col gap-4 p-6'>
             {/* トップ3（横並び） */}
-            <div className="flex gap-3">
+            <div className='flex gap-3'>
               {topThree.map((entry) => (
                 <TopThreeItem
                   key={entry.user.id}
@@ -95,7 +102,7 @@ export function RankingColumn({
             </div>
 
             {/* 4位以下 */}
-            <div className="flex flex-col gap-2">
+            <div className='flex flex-col gap-2'>
               {rest.map((entry) => (
                 <RankingItem
                   key={entry.user.id}

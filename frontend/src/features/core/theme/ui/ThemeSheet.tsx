@@ -39,7 +39,9 @@ export function ThemeSheet({ open, onOpenChange }: ThemeSheetProps) {
         <div className='space-y-6 px-4'>
           {/* カラープリセット - 縦並び棒グラフ */}
           <div className='space-y-3'>
-            <h3 className='text-base font-medium text-foreground'>テーマカラー</h3>
+            <h3 className='text-base font-medium text-foreground'>
+              テーマカラー
+            </h3>
             <Card variant='raised' className='py-3'>
               <CardContent className='space-y-1 px-3'>
                 {themePresetList.map((preset) => (
@@ -57,7 +59,9 @@ export function ThemeSheet({ open, onOpenChange }: ThemeSheetProps) {
 
           {/* モード切り替え */}
           <div className='space-y-3'>
-            <h3 className='text-base font-medium text-foreground'>表示モード</h3>
+            <h3 className='text-base font-medium text-foreground'>
+              表示モード
+            </h3>
             <div className='flex gap-3'>
               {modes.map(({ value, label, icon }) => (
                 <ThemeModeButton

@@ -39,14 +39,14 @@ export function GoalsTimelineView({
       onItemClick={onGoalClick}
       keyExtractor={(goal) => goal.id}
       emptyContent={
-        <div className="flex flex-col items-center justify-center rounded-xl bg-muted/30 px-8 py-12 text-center shadow-inset">
-          <div className="mb-4 flex size-16 items-center justify-center rounded-2xl bg-muted shadow-raised-sm">
-            <Target className="size-8 text-muted-foreground" />
+        <div className='flex flex-col items-center justify-center rounded-xl bg-muted/30 px-8 py-12 text-center shadow-inset'>
+          <div className='mb-4 flex size-16 items-center justify-center rounded-2xl bg-muted shadow-raised-sm'>
+            <Target className='size-8 text-muted-foreground' />
           </div>
-          <p className="text-sm font-medium text-muted-foreground">
+          <p className='text-sm font-medium text-muted-foreground'>
             この月の目標はありません
           </p>
-          <p className="mt-1 text-xs text-muted-foreground/70">
+          <p className='mt-1 text-xs text-muted-foreground/70'>
             「新規作成」から目標を追加しましょう
           </p>
         </div>

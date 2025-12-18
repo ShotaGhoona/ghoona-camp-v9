@@ -4,7 +4,12 @@
  */
 
 /** イベントタイプ */
-export type EventType = 'study' | 'exercise' | 'meditation' | 'reading' | 'general';
+export type EventType =
+  | 'study'
+  | 'exercise'
+  | 'meditation'
+  | 'reading'
+  | 'general';
 
 /** イベントタイプのラベル */
 export const EVENT_TYPE_LABELS: Record<EventType, string> = {
@@ -81,8 +86,20 @@ export const dummyEvents: EventItem[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=yamada',
     },
     participants: [
-      { id: 'p-001', userId: '2', userName: '鈴木花子', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=suzuki', status: 'registered' },
-      { id: 'p-002', userId: '3', userName: '田中二郎', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=tanaka', status: 'registered' },
+      {
+        id: 'p-001',
+        userId: '2',
+        userName: '鈴木花子',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=suzuki',
+        status: 'registered',
+      },
+      {
+        id: 'p-002',
+        userId: '3',
+        userName: '田中二郎',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=tanaka',
+        status: 'registered',
+      },
     ],
     isActive: true,
     createdAt: '2025-01-01T00:00:00Z',
@@ -104,9 +121,27 @@ export const dummyEvents: EventItem[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=suzuki',
     },
     participants: [
-      { id: 'p-003', userId: '1', userName: '山田太郎', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=yamada', status: 'registered' },
-      { id: 'p-004', userId: '4', userName: '佐藤ゆき', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sato', status: 'registered' },
-      { id: 'p-005', userId: '11', userName: '高橋優', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=takahashi', status: 'registered' },
+      {
+        id: 'p-003',
+        userId: '1',
+        userName: '山田太郎',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=yamada',
+        status: 'registered',
+      },
+      {
+        id: 'p-004',
+        userId: '4',
+        userName: '佐藤ゆき',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sato',
+        status: 'registered',
+      },
+      {
+        id: 'p-005',
+        userId: '11',
+        userName: '高橋優',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=takahashi',
+        status: 'registered',
+      },
     ],
     isActive: true,
     createdAt: '2025-01-02T00:00:00Z',
@@ -128,7 +163,13 @@ export const dummyEvents: EventItem[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=watanabe',
     },
     participants: [
-      { id: 'p-006', userId: '1', userName: '山田太郎', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=yamada', status: 'registered' },
+      {
+        id: 'p-006',
+        userId: '1',
+        userName: '山田太郎',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=yamada',
+        status: 'registered',
+      },
     ],
     isActive: true,
     createdAt: '2025-01-03T00:00:00Z',
@@ -150,10 +191,34 @@ export const dummyEvents: EventItem[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=kobayashi',
     },
     participants: [
-      { id: 'p-007', userId: '2', userName: '鈴木花子', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=suzuki', status: 'registered' },
-      { id: 'p-008', userId: '11', userName: '高橋優', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=takahashi', status: 'registered' },
-      { id: 'p-009', userId: '6', userName: '伊藤美香', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ito', status: 'registered' },
-      { id: 'p-010', userId: '5', userName: '渡辺健', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=watanabe', status: 'registered' },
+      {
+        id: 'p-007',
+        userId: '2',
+        userName: '鈴木花子',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=suzuki',
+        status: 'registered',
+      },
+      {
+        id: 'p-008',
+        userId: '11',
+        userName: '高橋優',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=takahashi',
+        status: 'registered',
+      },
+      {
+        id: 'p-009',
+        userId: '6',
+        userName: '伊藤美香',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ito',
+        status: 'registered',
+      },
+      {
+        id: 'p-010',
+        userId: '5',
+        userName: '渡辺健',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=watanabe',
+        status: 'registered',
+      },
     ],
     isActive: true,
     createdAt: '2025-01-04T00:00:00Z',
@@ -175,9 +240,27 @@ export const dummyEvents: EventItem[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=takahashi',
     },
     participants: [
-      { id: 'p-011', userId: '1', userName: '山田太郎', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=yamada', status: 'registered' },
-      { id: 'p-012', userId: '2', userName: '鈴木花子', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=suzuki', status: 'registered' },
-      { id: 'p-013', userId: '3', userName: '田中二郎', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=tanaka', status: 'registered' },
+      {
+        id: 'p-011',
+        userId: '1',
+        userName: '山田太郎',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=yamada',
+        status: 'registered',
+      },
+      {
+        id: 'p-012',
+        userId: '2',
+        userName: '鈴木花子',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=suzuki',
+        status: 'registered',
+      },
+      {
+        id: 'p-013',
+        userId: '3',
+        userName: '田中二郎',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=tanaka',
+        status: 'registered',
+      },
     ],
     isActive: true,
     createdAt: '2025-01-05T00:00:00Z',
@@ -199,7 +282,13 @@ export const dummyEvents: EventItem[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=morita',
     },
     participants: [
-      { id: 'p-014', userId: '5', userName: '渡辺健', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=watanabe', status: 'registered' },
+      {
+        id: 'p-014',
+        userId: '5',
+        userName: '渡辺健',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=watanabe',
+        status: 'registered',
+      },
     ],
     isActive: true,
     createdAt: '2025-01-06T00:00:00Z',
@@ -221,8 +310,20 @@ export const dummyEvents: EventItem[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=kimura',
     },
     participants: [
-      { id: 'p-015', userId: '2', userName: '鈴木花子', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=suzuki', status: 'registered' },
-      { id: 'p-016', userId: '11', userName: '高橋優', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=takahashi', status: 'registered' },
+      {
+        id: 'p-015',
+        userId: '2',
+        userName: '鈴木花子',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=suzuki',
+        status: 'registered',
+      },
+      {
+        id: 'p-016',
+        userId: '11',
+        userName: '高橋優',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=takahashi',
+        status: 'registered',
+      },
     ],
     isActive: true,
     createdAt: '2025-01-07T00:00:00Z',
@@ -244,9 +345,27 @@ export const dummyEvents: EventItem[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=yamada',
     },
     participants: [
-      { id: 'p-017', userId: '4', userName: '佐藤ゆき', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sato', status: 'registered' },
-      { id: 'p-018', userId: '6', userName: '伊藤美香', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ito', status: 'registered' },
-      { id: 'p-019', userId: '5', userName: '渡辺健', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=watanabe', status: 'registered' },
+      {
+        id: 'p-017',
+        userId: '4',
+        userName: '佐藤ゆき',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sato',
+        status: 'registered',
+      },
+      {
+        id: 'p-018',
+        userId: '6',
+        userName: '伊藤美香',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ito',
+        status: 'registered',
+      },
+      {
+        id: 'p-019',
+        userId: '5',
+        userName: '渡辺健',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=watanabe',
+        status: 'registered',
+      },
     ],
     isActive: true,
     createdAt: '2025-01-08T00:00:00Z',
@@ -268,8 +387,20 @@ export const dummyEvents: EventItem[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ogawa',
     },
     participants: [
-      { id: 'p-020', userId: '2', userName: '鈴木花子', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=suzuki', status: 'registered' },
-      { id: 'p-021', userId: '3', userName: '田中二郎', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=tanaka', status: 'registered' },
+      {
+        id: 'p-020',
+        userId: '2',
+        userName: '鈴木花子',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=suzuki',
+        status: 'registered',
+      },
+      {
+        id: 'p-021',
+        userId: '3',
+        userName: '田中二郎',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=tanaka',
+        status: 'registered',
+      },
     ],
     isActive: true,
     createdAt: '2025-01-09T00:00:00Z',
@@ -291,10 +422,34 @@ export const dummyEvents: EventItem[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=tanaka',
     },
     participants: [
-      { id: 'p-022', userId: '1', userName: '山田太郎', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=yamada', status: 'registered' },
-      { id: 'p-023', userId: '11', userName: '高橋優', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=takahashi', status: 'registered' },
-      { id: 'p-024', userId: '6', userName: '伊藤美香', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ito', status: 'registered' },
-      { id: 'p-025', userId: '5', userName: '渡辺健', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=watanabe', status: 'registered' },
+      {
+        id: 'p-022',
+        userId: '1',
+        userName: '山田太郎',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=yamada',
+        status: 'registered',
+      },
+      {
+        id: 'p-023',
+        userId: '11',
+        userName: '高橋優',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=takahashi',
+        status: 'registered',
+      },
+      {
+        id: 'p-024',
+        userId: '6',
+        userName: '伊藤美香',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ito',
+        status: 'registered',
+      },
+      {
+        id: 'p-025',
+        userId: '5',
+        userName: '渡辺健',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=watanabe',
+        status: 'registered',
+      },
     ],
     isActive: true,
     createdAt: '2025-01-10T00:00:00Z',
@@ -317,7 +472,13 @@ export const dummyEvents: EventItem[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=shimizu',
     },
     participants: [
-      { id: 'p-026', userId: '1', userName: '山田太郎', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=yamada', status: 'registered' },
+      {
+        id: 'p-026',
+        userId: '1',
+        userName: '山田太郎',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=yamada',
+        status: 'registered',
+      },
     ],
     isActive: true,
     createdAt: '2025-01-11T00:00:00Z',
@@ -339,8 +500,20 @@ export const dummyEvents: EventItem[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=watanabe',
     },
     participants: [
-      { id: 'p-027', userId: '4', userName: '佐藤ゆき', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sato', status: 'registered' },
-      { id: 'p-028', userId: '6', userName: '伊藤美香', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ito', status: 'registered' },
+      {
+        id: 'p-027',
+        userId: '4',
+        userName: '佐藤ゆき',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sato',
+        status: 'registered',
+      },
+      {
+        id: 'p-028',
+        userId: '6',
+        userName: '伊藤美香',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ito',
+        status: 'registered',
+      },
     ],
     isActive: true,
     createdAt: '2025-01-12T00:00:00Z',
@@ -357,7 +530,10 @@ export const EVENT_TYPE_COLORS: Record<EventType, string> = {
 };
 
 /** イベントタイプに対応するアイコン色（Badge用） */
-export const EVENT_TYPE_BADGE_VARIANTS: Record<EventType, 'default' | 'secondary' | 'outline'> = {
+export const EVENT_TYPE_BADGE_VARIANTS: Record<
+  EventType,
+  'default' | 'secondary' | 'outline'
+> = {
   study: 'default',
   exercise: 'secondary',
   meditation: 'outline',

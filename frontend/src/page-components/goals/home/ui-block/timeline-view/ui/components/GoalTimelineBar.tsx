@@ -22,10 +22,10 @@ export function GoalTimelineBar({ goal, barProps }: GoalTimelineBarProps) {
           ? 'bg-muted text-muted-foreground'
           : 'bg-primary text-primary-foreground',
         barProps.startsBeforeRange ? 'rounded-l-md' : 'rounded-l-full',
-        barProps.endsAfterRange ? 'rounded-r-md' : 'rounded-r-full'
+        barProps.endsAfterRange ? 'rounded-r-md' : 'rounded-r-full',
       )}
     >
-      <span className="truncate">{goal.title}</span>
+      <span className='truncate'>{goal.title}</span>
     </div>
   );
 }

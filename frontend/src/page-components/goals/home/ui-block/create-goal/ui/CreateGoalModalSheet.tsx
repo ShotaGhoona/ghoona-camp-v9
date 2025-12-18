@@ -10,8 +10,14 @@ import {
   TooltipTrigger,
 } from '@/shared/ui/shadcn/ui/tooltip';
 
-import { useViewMode, type ViewMode } from '../../goal-detail-modal/lib/use-view-mode';
-import { CreateGoalContent, type CreateGoalFormData } from './CreateGoalContent';
+import {
+  useViewMode,
+  type ViewMode,
+} from '../../goal-detail-modal/lib/use-view-mode';
+import {
+  CreateGoalContent,
+  type CreateGoalFormData,
+} from './CreateGoalContent';
 import { GoalComparePanel } from './GoalComparePanel';
 import { useCompareMode } from '../lib/use-compare-mode';
 
@@ -44,14 +50,14 @@ export function CreateGoalModalSheet({
     <Tooltip>
       <TooltipTrigger asChild>
         <button
-          type="button"
+          type='button'
           onClick={toggleViewMode}
-          className="absolute right-3 top-3 z-10 flex size-8 items-center justify-center rounded-full bg-background text-muted-foreground shadow-inset-sm transition-all hover:text-foreground hover:shadow-inset-sm"
+          className='absolute right-3 top-3 z-10 flex size-8 items-center justify-center rounded-full bg-background text-muted-foreground shadow-inset-sm transition-all hover:text-foreground hover:shadow-inset-sm'
         >
           {isModal ? (
-            <PanelRight className="size-4" />
+            <PanelRight className='size-4' />
           ) : (
-            <Square className="size-4" />
+            <Square className='size-4' />
           )}
         </button>
       </TooltipTrigger>
@@ -72,10 +78,10 @@ export function CreateGoalModalSheet({
           showCloseButton={false}
         >
           {ViewModeToggle}
-          <div className="flex max-h-[85vh]">
+          <div className='flex max-h-[85vh]'>
             {/* 比較パネル（左側） */}
             {isCompareMode && (
-              <div className="w-1/2 border-r">
+              <div className='w-1/2 border-r'>
                 <GoalComparePanel />
               </div>
             )}
@@ -98,17 +104,17 @@ export function CreateGoalModalSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
-        side="right"
+        side='right'
         className={`gap-0 overflow-hidden border-0 bg-background p-0 transition-all duration-300 ${
           isCompareMode ? 'w-full sm:max-w-4xl' : 'w-full sm:max-w-md'
         }`}
         showCloseButton={false}
       >
         {ViewModeToggle}
-        <div className="flex h-full">
+        <div className='flex h-full'>
           {/* 比較パネル（左側） */}
           {isCompareMode && (
-            <div className="w-1/2 border-r">
+            <div className='w-1/2 border-r'>
               <GoalComparePanel />
             </div>
           )}

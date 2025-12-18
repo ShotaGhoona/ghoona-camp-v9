@@ -85,47 +85,43 @@ export function GoalsHomeContainer() {
   }, []);
 
   return (
-    <div className="flex min-h-0 flex-1 gap-4 overflow-hidden p-4">
+    <div className='flex min-h-0 flex-1 gap-4 overflow-hidden p-4'>
       {/* 左側: タイムライン */}
-      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden">
+      <div className='flex min-h-0 flex-1 flex-col gap-4 overflow-hidden'>
         {/* ツールバー */}
-        <div className="flex shrink-0 items-center gap-4">
+        <div className='flex shrink-0 items-center gap-4'>
           {/* 月ナビゲーション */}
-          <div className="flex items-center gap-2">
+          <div className='flex items-center gap-2'>
             <Button
-              variant="raised"
-              size="icon"
-              className="size-8"
+              variant='raised'
+              size='icon'
+              className='size-8'
               onClick={handlePrevMonth}
             >
-              <ChevronLeft className="size-4" />
+              <ChevronLeft className='size-4' />
             </Button>
-            <span className="min-w-[100px] text-center font-medium">
+            <span className='min-w-[100px] text-center font-medium'>
               {baseYear}年{baseMonth}月
             </span>
             <Button
-              variant="raised"
-              size="icon"
-              className="size-8"
+              variant='raised'
+              size='icon'
+              className='size-8'
               onClick={handleNextMonth}
             >
-              <ChevronRight className="size-4" />
+              <ChevronRight className='size-4' />
             </Button>
           </div>
 
           {/* 新規作成ボタン */}
-          <Button
-            variant="raised"
-            onClick={handleCreateGoal}
-            className="gap-2"
-          >
-            <Plus className="size-4" />
+          <Button variant='raised' onClick={handleCreateGoal} className='gap-2'>
+            <Plus className='size-4' />
             新規作成
           </Button>
         </div>
 
         {/* タイムラインビュー */}
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
           <GoalsTimelineView
             year={baseYear}
             month={baseMonth}
@@ -136,7 +132,7 @@ export function GoalsHomeContainer() {
       </div>
 
       {/* 右側: みんなの目標（サイドバー） */}
-      <div className="w-96 shrink-0">
+      <div className='w-96 shrink-0'>
         <GoalsSidebar onGoalClick={handleGoalClick} />
       </div>
 
@@ -145,7 +141,7 @@ export function GoalsHomeContainer() {
         goalId={selectedGoalId}
         open={isDetailModalOpen}
         onOpenChange={setIsDetailModalOpen}
-        defaultViewMode="modal"
+        defaultViewMode='modal'
         onMemberClick={handleMemberClick}
         onEdit={handleEditGoal}
       />
@@ -154,7 +150,7 @@ export function GoalsHomeContainer() {
       <CreateGoalModalSheet
         open={isCreateModalOpen}
         onOpenChange={setIsCreateModalOpen}
-        defaultViewMode="modal"
+        defaultViewMode='modal'
       />
 
       {/* 編集モーダル */}
@@ -162,7 +158,7 @@ export function GoalsHomeContainer() {
         goalId={editGoalId}
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
-        defaultViewMode="modal"
+        defaultViewMode='modal'
       />
 
       {/* メンバー詳細モーダル */}

@@ -136,7 +136,7 @@ export function TimelineViewWidget<T>({
   if (filteredData.length === 0 && emptyContent) {
     return (
       <div className={cn('flex min-h-0 flex-1 flex-col', className)}>
-        <div className="flex min-h-0 flex-1 items-center justify-center">
+        <div className='flex min-h-0 flex-1 items-center justify-center'>
           {emptyContent}
         </div>
       </div>
@@ -148,25 +148,22 @@ export function TimelineViewWidget<T>({
 
   return (
     <div className={cn('flex min-h-0 flex-1 flex-col', className)}>
-      <ScrollArea className="min-h-0 flex-1">
+      <ScrollArea className='min-h-0 flex-1'>
         <div style={{ minWidth: totalWidth }}>
           {/* ヘッダー（日付） */}
-          <div
-            className="sticky top-0 z-10 flex"
-            style={{ height: 48 }}
-          >
+          <div className='sticky top-0 z-10 flex' style={{ height: 48 }}>
             {/* ラベル列ヘッダー */}
             <div
-              className="sticky left-0 z-20 flex shrink-0 items-center bg-background px-4"
+              className='sticky left-0 z-20 flex shrink-0 items-center bg-background px-4'
               style={{ width: labelWidth }}
             >
-              <span className="text-sm font-bold text-foreground">
+              <span className='text-sm font-bold text-foreground'>
                 {year}年{month}月
               </span>
             </div>
 
             {/* 日付セル */}
-            <div className="flex">
+            <div className='flex'>
               {days.map((day) => {
                 const date = new Date(year, month - 1, day);
                 const dayOfWeek = date.getDay();
@@ -179,12 +176,12 @@ export function TimelineViewWidget<T>({
                     key={day}
                     className={cn(
                       'flex shrink-0 flex-col items-center justify-center text-xs font-medium',
-                      isToday && 'relative'
+                      isToday && 'relative',
                     )}
                     style={{ width: cellWidth }}
                   >
                     {isToday ? (
-                      <span className="flex size-7 items-center justify-center rounded-full bg-primary font-bold text-primary-foreground shadow-raised-sm">
+                      <span className='flex size-7 items-center justify-center rounded-full bg-primary font-bold text-primary-foreground shadow-raised-sm'>
                         {day}
                       </span>
                     ) : (
@@ -192,7 +189,7 @@ export function TimelineViewWidget<T>({
                         className={cn(
                           'text-muted-foreground',
                           isSunday && 'text-red-500',
-                          isSaturday && 'text-blue-500'
+                          isSaturday && 'text-blue-500',
                         )}
                       >
                         {day}
@@ -213,13 +210,13 @@ export function TimelineViewWidget<T>({
                 key={keyExtractor(item)}
                 className={cn(
                   'flex transition-colors',
-                  index % 2 === 0 ? 'bg-background' : 'bg-muted/20'
+                  index % 2 === 0 ? 'bg-background' : 'bg-muted/20',
                 )}
                 style={{ height: rowHeight }}
               >
                 {/* ラベル列 */}
                 <div
-                  className="sticky left-0 z-10 flex shrink-0 items-center bg-inherit px-4"
+                  className='sticky left-0 z-10 flex shrink-0 items-center bg-inherit px-4'
                   style={{ width: labelWidth }}
                 >
                   {labelRenderer(item)}
@@ -227,13 +224,13 @@ export function TimelineViewWidget<T>({
 
                 {/* タイムライン領域 */}
                 <div
-                  className="relative flex-1"
+                  className='relative flex-1'
                   style={{ width: daysInMonth * cellWidth }}
                 >
                   {/* 今日の列ハイライト */}
                   {todayInMonth && (
                     <div
-                      className="absolute top-0 h-full bg-primary/5"
+                      className='absolute top-0 h-full bg-primary/5'
                       style={{
                         left: (todayInMonth - 1) * cellWidth,
                         width: cellWidth,
@@ -243,7 +240,7 @@ export function TimelineViewWidget<T>({
 
                   {/* バー */}
                   <div
-                    className="absolute top-1/2 -translate-y-1/2 cursor-pointer"
+                    className='absolute top-1/2 -translate-y-1/2 cursor-pointer'
                     style={{
                       left: barProps.left + 4,
                       width: barProps.width - 8,
@@ -261,8 +258,8 @@ export function TimelineViewWidget<T>({
             );
           })}
         </div>
-        <ScrollBar orientation="horizontal" />
-        <ScrollBar orientation="vertical" />
+        <ScrollBar orientation='horizontal' />
+        <ScrollBar orientation='vertical' />
       </ScrollArea>
     </div>
   );
@@ -275,7 +272,7 @@ function DefaultBar({ barProps }: { barProps: TimelineBarProps }) {
       className={cn(
         'h-8 bg-primary shadow-raised-sm transition-all hover:shadow-raised',
         barProps.startsBeforeRange ? 'rounded-l' : 'rounded-l-full',
-        barProps.endsAfterRange ? 'rounded-r' : 'rounded-r-full'
+        barProps.endsAfterRange ? 'rounded-r' : 'rounded-r-full',
       )}
     />
   );

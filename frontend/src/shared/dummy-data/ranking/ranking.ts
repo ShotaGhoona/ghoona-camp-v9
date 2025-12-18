@@ -49,7 +49,10 @@ export interface CurrentUserRanking {
 export const CURRENT_USER_ID = '1';
 
 /** ランキングエントリー一覧（スコア順にソートして使用） */
-export const dummyRankingEntries: Omit<RankingEntry, 'rank' | 'isCurrentUser'>[] = [
+export const dummyRankingEntries: Omit<
+  RankingEntry,
+  'rank' | 'isCurrentUser'
+>[] = [
   {
     user: {
       id: '3',
@@ -283,7 +286,9 @@ export const dummyRankingEntries: Omit<RankingEntry, 'rank' | 'isCurrentUser'>[]
 type SortKey = 'monthlyDays' | 'totalDays' | 'currentStreak';
 
 function createRanking(sortKey: SortKey): RankingEntry[] {
-  const sorted = [...dummyRankingEntries].sort((a, b) => b[sortKey] - a[sortKey]);
+  const sorted = [...dummyRankingEntries].sort(
+    (a, b) => b[sortKey] - a[sortKey],
+  );
 
   return sorted.map((entry, index) => ({
     ...entry,
@@ -316,7 +321,7 @@ export function getRankingByType(type: RankingType): RankingEntry[] {
 /** 現在のユーザーのランキング情報を取得 */
 export function getCurrentUserRanking(): CurrentUserRanking {
   const currentUserEntry = dummyRankingEntries.find(
-    (entry) => entry.user.id === CURRENT_USER_ID
+    (entry) => entry.user.id === CURRENT_USER_ID,
   );
 
   if (!currentUserEntry) {
@@ -324,9 +329,11 @@ export function getCurrentUserRanking(): CurrentUserRanking {
   }
 
   return {
-    monthlyRank: monthlyRanking.findIndex((e) => e.user.id === CURRENT_USER_ID) + 1,
+    monthlyRank:
+      monthlyRanking.findIndex((e) => e.user.id === CURRENT_USER_ID) + 1,
     totalRank: totalRanking.findIndex((e) => e.user.id === CURRENT_USER_ID) + 1,
-    streakRank: streakRanking.findIndex((e) => e.user.id === CURRENT_USER_ID) + 1,
+    streakRank:
+      streakRanking.findIndex((e) => e.user.id === CURRENT_USER_ID) + 1,
     monthlyDays: currentUserEntry.monthlyDays,
     totalDays: currentUserEntry.totalDays,
     currentStreak: currentUserEntry.currentStreak,

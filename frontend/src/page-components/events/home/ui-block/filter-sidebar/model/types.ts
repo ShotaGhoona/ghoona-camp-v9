@@ -17,8 +17,7 @@ export const initialFilterState: EventsFilterState = {
 /** フィルターがアクティブかどうかを判定 */
 export function isFilterActive(filter: EventsFilterState): boolean {
   return (
-    filter.selectedEventTypes.length > 0 ||
-    filter.participationStatus !== null
+    filter.selectedEventTypes.length > 0 || filter.participationStatus !== null
   );
 }
 

@@ -47,39 +47,39 @@ export function EventsFilterSidebar({
       className={cn(
         'relative flex min-h-0 shrink-0 flex-col overflow-hidden bg-background py-2 shadow-raised',
         'transition-all duration-300 ease-out',
-        isOpen ? 'w-72 opacity-100' : 'w-0 opacity-0'
+        isOpen ? 'w-72 opacity-100' : 'w-0 opacity-0',
       )}
     >
       {/* リセットボタン */}
       {isFilterActive(filter) && (
-        <div className="absolute right-2 top-2 z-10">
+        <div className='absolute right-2 top-2 z-10'>
           <Button
-            variant="ghost"
-            size="icon"
-            className="size-8"
+            variant='ghost'
+            size='icon'
+            className='size-8'
             onClick={handleReset}
-            title="リセット"
+            title='リセット'
           >
-            <RotateCcw className="size-4" />
+            <RotateCcw className='size-4' />
           </Button>
         </div>
       )}
 
       {/* フィルター内容 */}
-      <ScrollArea className="min-h-0 flex-1 pt-2">
-        <div className="space-y-6 p-4">
+      <ScrollArea className='min-h-0 flex-1 pt-2'>
+        <div className='space-y-6 p-4'>
           {/* イベントタイプフィルター */}
-          <div className="space-y-3">
-            <h3 className="text-base font-medium text-foreground">
+          <div className='space-y-3'>
+            <h3 className='text-base font-medium text-foreground'>
               イベントタイプ
               {filter.selectedEventTypes.length > 0 && (
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
+                <span className='ml-2 text-sm font-normal text-muted-foreground'>
                   ({filter.selectedEventTypes.length}件選択)
                 </span>
               )}
             </h3>
-            <Card variant="inset" className="py-3">
-              <CardContent className="flex flex-wrap gap-2 px-3">
+            <Card variant='inset' className='py-3'>
+              <CardContent className='flex flex-wrap gap-2 px-3'>
                 {ALL_EVENT_TYPES.map((eventType) => (
                   <Badge
                     key={eventType}
@@ -88,7 +88,7 @@ export function EventsFilterSidebar({
                         ? 'default'
                         : 'outline'
                     }
-                    className="cursor-pointer transition-colors"
+                    className='cursor-pointer transition-colors'
                     onClick={() => handleEventTypeToggle(eventType)}
                   >
                     {EVENT_TYPE_LABELS[eventType]}
@@ -99,27 +99,33 @@ export function EventsFilterSidebar({
           </div>
 
           {/* 参加状態フィルター */}
-          <div className="space-y-3">
-            <h3 className="text-base font-medium text-foreground">参加状態</h3>
-            <Card variant="inset" className="py-3">
-              <CardContent className="flex flex-wrap gap-2 px-3">
+          <div className='space-y-3'>
+            <h3 className='text-base font-medium text-foreground'>参加状態</h3>
+            <Card variant='inset' className='py-3'>
+              <CardContent className='flex flex-wrap gap-2 px-3'>
                 <Badge
-                  variant={filter.participationStatus === null ? 'default' : 'outline'}
-                  className="cursor-pointer transition-colors"
+                  variant={
+                    filter.participationStatus === null ? 'default' : 'outline'
+                  }
+                  className='cursor-pointer transition-colors'
                   onClick={() => handleParticipationChange(null)}
                 >
                   すべて
                 </Badge>
                 <Badge
-                  variant={filter.participationStatus === true ? 'default' : 'outline'}
-                  className="cursor-pointer transition-colors"
+                  variant={
+                    filter.participationStatus === true ? 'default' : 'outline'
+                  }
+                  className='cursor-pointer transition-colors'
                   onClick={() => handleParticipationChange(true)}
                 >
                   参加済み
                 </Badge>
                 <Badge
-                  variant={filter.participationStatus === false ? 'default' : 'outline'}
-                  className="cursor-pointer transition-colors"
+                  variant={
+                    filter.participationStatus === false ? 'default' : 'outline'
+                  }
+                  className='cursor-pointer transition-colors'
                   onClick={() => handleParticipationChange(false)}
                 >
                   未参加

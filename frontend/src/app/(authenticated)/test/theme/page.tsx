@@ -1,6 +1,14 @@
 'use client';
 
-import { Check, Sun, Moon, Monitor, Info, AlertCircle, CheckCircle } from 'lucide-react';
+import {
+  Check,
+  Sun,
+  Moon,
+  Monitor,
+  Info,
+  AlertCircle,
+  CheckCircle,
+} from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -15,7 +23,11 @@ import { Label } from '@/shared/ui/shadcn/ui/label';
 import { Checkbox } from '@/shared/ui/shadcn/ui/checkbox';
 import { Switch } from '@/shared/ui/shadcn/ui/switch';
 import { Progress } from '@/shared/ui/shadcn/ui/progress';
-import { Alert, AlertDescription, AlertTitle } from '@/shared/ui/shadcn/ui/alert';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from '@/shared/ui/shadcn/ui/alert';
 import { Separator } from '@/shared/ui/shadcn/ui/separator';
 import {
   Select,
@@ -65,7 +77,9 @@ export default function ThemeTestPage() {
         <CardContent className='space-y-6'>
           {/* カラープリセット */}
           <div className='space-y-3'>
-            <h3 className='text-sm font-medium text-foreground'>テーマカラー</h3>
+            <h3 className='text-sm font-medium text-foreground'>
+              テーマカラー
+            </h3>
             <div className='flex flex-wrap gap-2'>
               {themePresetList.map((preset) => {
                 const isSelected = settings.presetId === preset.id;
@@ -84,7 +98,7 @@ export default function ThemeTestPage() {
                       className={cn(
                         'relative size-10 rounded-full transition-transform',
                         'group-hover:scale-110',
-                        isSelected && 'ring-2 ring-offset-2 ring-foreground',
+                        isSelected && 'ring-2 ring-foreground ring-offset-2',
                       )}
                       style={{ backgroundColor: preset.hex }}
                     >
@@ -97,7 +111,9 @@ export default function ThemeTestPage() {
                     <span
                       className={cn(
                         'text-xs font-medium',
-                        isSelected ? 'text-foreground' : 'text-muted-foreground',
+                        isSelected
+                          ? 'text-foreground'
+                          : 'text-muted-foreground',
                       )}
                     >
                       {preset.name}
@@ -174,7 +190,11 @@ export default function ThemeTestPage() {
           <CardContent className='space-y-4'>
             <div className='space-y-2'>
               <Label htmlFor='email'>メールアドレス</Label>
-              <Input id='email' type='email' placeholder='example@example.com' />
+              <Input
+                id='email'
+                type='email'
+                placeholder='example@example.com'
+              />
             </div>
             <div className='space-y-2'>
               <Label htmlFor='select'>選択</Label>
@@ -301,9 +321,7 @@ export default function ThemeTestPage() {
               </AccordionItem>
               <AccordionItem value='item-2'>
                 <AccordionTrigger>セクション2</AccordionTrigger>
-                <AccordionContent>
-                  別のセクションの内容です。
-                </AccordionContent>
+                <AccordionContent>別のセクションの内容です。</AccordionContent>
               </AccordionItem>
             </Accordion>
           </CardContent>
@@ -325,68 +343,92 @@ export default function ThemeTestPage() {
           <div className='grid gap-4 md:grid-cols-2'>
             {/* 推奨カラー */}
             <div className='space-y-3'>
-              <h4 className='font-semibold text-green-700 dark:text-green-400'>✅ テーマ連動（推奨）</h4>
+              <h4 className='font-semibold text-green-700 dark:text-green-400'>
+                ✅ テーマ連動（推奨）
+              </h4>
               <div className='space-y-2 text-sm'>
                 <div className='flex items-center gap-3'>
                   <div className='size-6 rounded bg-primary' />
-                  <code className='bg-muted rounded px-2 py-1'>bg-primary</code>
+                  <code className='rounded bg-muted px-2 py-1'>bg-primary</code>
                   <span className='text-muted-foreground'>メインカラー</span>
                 </div>
                 <div className='flex items-center gap-3'>
-                  <div className='size-6 rounded bg-primary-foreground border' />
-                  <code className='bg-muted rounded px-2 py-1'>text-primary-foreground</code>
-                  <span className='text-muted-foreground'>primary上のテキスト</span>
+                  <div className='size-6 rounded border bg-primary-foreground' />
+                  <code className='rounded bg-muted px-2 py-1'>
+                    text-primary-foreground
+                  </code>
+                  <span className='text-muted-foreground'>
+                    primary上のテキスト
+                  </span>
                 </div>
                 <div className='flex items-center gap-3'>
                   <div className='size-6 rounded border-2 border-ring' />
-                  <code className='bg-muted rounded px-2 py-1'>ring-ring / border-ring</code>
-                  <span className='text-muted-foreground'>フォーカスリング</span>
+                  <code className='rounded bg-muted px-2 py-1'>
+                    ring-ring / border-ring
+                  </code>
+                  <span className='text-muted-foreground'>
+                    フォーカスリング
+                  </span>
                 </div>
                 <div className='flex items-center gap-3'>
                   <div className='size-6 rounded bg-accent' />
-                  <code className='bg-muted rounded px-2 py-1'>bg-accent</code>
-                  <span className='text-muted-foreground'>ホバー・選択状態</span>
+                  <code className='rounded bg-muted px-2 py-1'>bg-accent</code>
+                  <span className='text-muted-foreground'>
+                    ホバー・選択状態
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* 固定カラー */}
             <div className='space-y-3'>
-              <h4 className='font-semibold text-blue-700 dark:text-blue-400'>🔒 固定カラー（テーマ非連動）</h4>
+              <h4 className='font-semibold text-blue-700 dark:text-blue-400'>
+                🔒 固定カラー（テーマ非連動）
+              </h4>
               <div className='space-y-2 text-sm'>
                 <div className='flex items-center gap-3'>
-                  <div className='size-6 rounded bg-background border' />
-                  <code className='bg-muted rounded px-2 py-1'>bg-background</code>
+                  <div className='size-6 rounded border bg-background' />
+                  <code className='rounded bg-muted px-2 py-1'>
+                    bg-background
+                  </code>
                   <span className='text-muted-foreground'>背景色</span>
                 </div>
                 <div className='flex items-center gap-3'>
                   <div className='size-6 rounded bg-foreground' />
-                  <code className='bg-muted rounded px-2 py-1'>text-foreground</code>
+                  <code className='rounded bg-muted px-2 py-1'>
+                    text-foreground
+                  </code>
                   <span className='text-muted-foreground'>メインテキスト</span>
                 </div>
                 <div className='flex items-center gap-3'>
-                  <div className='size-6 rounded bg-card border' />
-                  <code className='bg-muted rounded px-2 py-1'>bg-card</code>
+                  <div className='size-6 rounded border bg-card' />
+                  <code className='rounded bg-muted px-2 py-1'>bg-card</code>
                   <span className='text-muted-foreground'>カード背景</span>
                 </div>
                 <div className='flex items-center gap-3'>
                   <div className='size-6 rounded bg-muted' />
-                  <code className='bg-muted rounded px-2 py-1'>bg-muted</code>
+                  <code className='rounded bg-muted px-2 py-1'>bg-muted</code>
                   <span className='text-muted-foreground'>控えめな背景</span>
                 </div>
                 <div className='flex items-center gap-3'>
                   <div className='size-6 rounded bg-secondary' />
-                  <code className='bg-muted rounded px-2 py-1'>bg-secondary</code>
+                  <code className='rounded bg-muted px-2 py-1'>
+                    bg-secondary
+                  </code>
                   <span className='text-muted-foreground'>セカンダリ背景</span>
                 </div>
                 <div className='flex items-center gap-3'>
                   <div className='size-6 rounded bg-destructive' />
-                  <code className='bg-muted rounded px-2 py-1'>bg-destructive</code>
+                  <code className='rounded bg-muted px-2 py-1'>
+                    bg-destructive
+                  </code>
                   <span className='text-muted-foreground'>エラー・警告</span>
                 </div>
                 <div className='flex items-center gap-3'>
                   <div className='size-6 rounded bg-border' />
-                  <code className='bg-muted rounded px-2 py-1'>border-border</code>
+                  <code className='rounded bg-muted px-2 py-1'>
+                    border-border
+                  </code>
                   <span className='text-muted-foreground'>ボーダー</span>
                 </div>
               </div>
@@ -397,27 +439,35 @@ export default function ThemeTestPage() {
 
           {/* 注意事項 */}
           <div className='space-y-3'>
-            <h4 className='font-semibold text-amber-700 dark:text-amber-400'>⚠️ 実装時の注意事項</h4>
+            <h4 className='font-semibold text-amber-700 dark:text-amber-400'>
+              ⚠️ 実装時の注意事項
+            </h4>
             <ul className='space-y-2 text-sm text-muted-foreground'>
               <li>
                 <strong>1. ブランドカラーにはprimaryを使用:</strong>{' '}
-                ボタンやリンクなど、アプリのブランドカラーが必要な場所では<code className='bg-muted rounded px-1'>primary</code>を使用してください。
+                ボタンやリンクなど、アプリのブランドカラーが必要な場所では
+                <code className='rounded bg-muted px-1'>primary</code>
+                を使用してください。
               </li>
               <li>
                 <strong>2. ハードコードは避ける:</strong>{' '}
-                <code className='bg-muted rounded px-1'>bg-[#d5697e]</code>のような直接指定は避け、CSS変数を使用してください。
+                <code className='rounded bg-muted px-1'>bg-[#d5697e]</code>
+                のような直接指定は避け、CSS変数を使用してください。
               </li>
               <li>
                 <strong>3. ダークモード対応:</strong>{' '}
-                <code className='bg-muted rounded px-1'>dark:</code>プレフィックスを使わなくても、CSS変数を使えば自動的にダークモードに対応します。
+                <code className='rounded bg-muted px-1'>dark:</code>
+                プレフィックスを使わなくても、CSS変数を使えば自動的にダークモードに対応します。
               </li>
               <li>
-                <strong>4. フォーカス状態:</strong>{' '}
-                フォーカスリングには<code className='bg-muted rounded px-1'>ring-ring</code>を使用すると、テーマカラーに連動します。
+                <strong>4. フォーカス状態:</strong> フォーカスリングには
+                <code className='rounded bg-muted px-1'>ring-ring</code>
+                を使用すると、テーマカラーに連動します。
               </li>
               <li>
-                <strong>5. ホバー状態:</strong>{' '}
-                ホバー時の背景には<code className='bg-muted rounded px-1'>hover:bg-accent</code>が推奨です。
+                <strong>5. ホバー状態:</strong> ホバー時の背景には
+                <code className='rounded bg-muted px-1'>hover:bg-accent</code>
+                が推奨です。
               </li>
             </ul>
           </div>

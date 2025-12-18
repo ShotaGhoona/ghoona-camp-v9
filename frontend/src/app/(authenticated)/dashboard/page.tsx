@@ -67,7 +67,8 @@ export default function DashboardPage() {
                     )}
                     {user.username && (
                       <p>
-                        <span className='font-medium'>名前:</span> {user.username}
+                        <span className='font-medium'>名前:</span>{' '}
+                        {user.username}
                       </p>
                     )}
                   </div>

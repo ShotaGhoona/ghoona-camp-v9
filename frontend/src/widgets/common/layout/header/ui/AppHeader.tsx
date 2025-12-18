@@ -74,7 +74,7 @@ export function AppHeader() {
 
   return (
     <>
-      <header className='bg-primary shadow-raised z-10'>
+      <header className='z-10 bg-primary shadow-raised'>
         <div className='flex h-14 items-center justify-between px-4'>
           {/* Logo */}
           <div className='flex items-center gap-8'>
@@ -109,9 +109,7 @@ export function AppHeader() {
                     <span
                       className={cn(
                         'absolute bottom-0 left-0 h-0.5 w-full transition-all',
-                        isActive
-                          ? 'bg-primary-foreground'
-                          : 'bg-transparent',
+                        isActive ? 'bg-primary-foreground' : 'bg-transparent',
                       )}
                     />
                   </Link>
@@ -151,7 +149,11 @@ export function AppHeader() {
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align='end' variant='raised' className='w-64 p-3'>
+              <DropdownMenuContent
+                align='end'
+                variant='raised'
+                className='w-64 p-3'
+              >
                 {/* ユーザー情報ヘッダー */}
                 <div className='mb-3 flex items-center gap-3 rounded-lg bg-muted/50 p-3 shadow-inset-sm'>
                   <Avatar className='size-10 shadow-raised-sm'>
@@ -215,7 +217,9 @@ export function AppHeader() {
                     <LogOut className='size-3.5' />
                   </div>
                   <span className='text-sm'>
-                    {logoutMutation.isPending ? 'ログアウト中...' : 'ログアウト'}
+                    {logoutMutation.isPending
+                      ? 'ログアウト中...'
+                      : 'ログアウト'}
                   </span>
                 </DropdownMenuItem>
               </DropdownMenuContent>

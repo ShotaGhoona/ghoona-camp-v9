@@ -19,7 +19,7 @@ interface GoalsSidebarProps {
 /** みんなの公開目標を取得（自分以外） */
 function getPublicGoals(): GoalItem[] {
   return dummyGoals.filter(
-    (goal) => goal.isPublic && goal.userId !== CURRENT_USER_ID
+    (goal) => goal.isPublic && goal.userId !== CURRENT_USER_ID,
   );
 }
 
@@ -27,25 +27,28 @@ export function GoalsSidebar({ onGoalClick }: GoalsSidebarProps) {
   const publicGoals = getPublicGoals();
 
   return (
-    <Card variant="raised" className="flex h-full flex-col overflow-hidden p-0 gap-0">
+    <Card
+      variant='raised'
+      className='flex h-full flex-col gap-0 overflow-hidden p-0'
+    >
       {/* ヘッダー */}
-      <div className="shrink-0 border-b bg-muted/30 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <Users className="size-4 text-muted-foreground" />
-          <h3 className="text-sm font-semibold">みんなの目標</h3>
+      <div className='shrink-0 border-b bg-muted/30 px-4 py-3'>
+        <div className='flex items-center gap-2'>
+          <Users className='size-4 text-muted-foreground' />
+          <h3 className='text-sm font-semibold'>みんなの目標</h3>
         </div>
-        <p className="mt-1 text-xs text-muted-foreground">
+        <p className='mt-1 text-xs text-muted-foreground'>
           {publicGoals.length}件の公開目標
         </p>
       </div>
 
       {/* 目標リスト */}
-      <ScrollArea className="flex-1 min-h-0">
-        <div className="flex flex-col gap-3 p-4">
+      <ScrollArea className='min-h-0 flex-1'>
+        <div className='flex flex-col gap-3 p-4'>
           {publicGoals.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <Target className="mb-2 size-8 text-muted-foreground/50" />
-              <p className="text-sm text-muted-foreground">
+            <div className='flex flex-col items-center justify-center py-8 text-center'>
+              <Target className='mb-2 size-8 text-muted-foreground/50' />
+              <p className='text-sm text-muted-foreground'>
                 公開されている目標がありません
               </p>
             </div>

@@ -132,7 +132,9 @@ export function CalendarViewWidget<T>({
           {calendarGrid.map((week, weekIndex) =>
             week.map((day, dayIndex) => {
               const dateString = day ? formatDate(year, month, day) : null;
-              const dayData = dateString ? dataByDate.get(dateString) || [] : [];
+              const dayData = dateString
+                ? dataByDate.get(dateString) || []
+                : [];
               const isToday =
                 day !== null &&
                 year === today.year &&
@@ -159,7 +161,8 @@ export function CalendarViewWidget<T>({
                         <span
                           className={cn(
                             'flex size-6 items-center justify-center rounded-full text-sm',
-                            isToday && 'bg-primary font-bold text-primary-foreground',
+                            isToday &&
+                              'bg-primary font-bold text-primary-foreground',
                             !isToday && isSunday && 'text-red-500',
                             !isToday && isSaturday && 'text-blue-500',
                           )}
