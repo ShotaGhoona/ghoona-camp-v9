@@ -8,7 +8,6 @@ import {
   Swords,
   Trophy,
   User,
-  UserMinus,
 } from 'lucide-react';
 
 import { Badge } from '@/shared/ui/shadcn/ui/badge';
@@ -210,31 +209,29 @@ export function MemberDetailContent({ user }: MemberDetailContentProps) {
       {/* ライバル設定ボタン */}
       {!isSelf && (
         <div className="border-t bg-background px-6 py-4">
-          {!isRival && remainingSlots <= 0 ? (
-            <p className="text-center text-sm text-muted-foreground">
-              ライバル枠が上限（3人）に達しています
-            </p>
-          ) : (
-            <button
-              type="button"
-              onClick={handleRivalAction}
-              disabled={isDisabled}
-              className={`flex w-full items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium shadow-raised-sm transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
-                isRival
-                  ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+          <button
+            type="button"
+            onClick={handleRivalAction}
+            disabled={isDisabled}
+            className={`flex w-full items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium shadow-raised-sm transition-all disabled:cursor-not-allowed ${
+              isRival
+                ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                : remainingSlots <= 0
+                  ? 'text-muted-foreground'
                   : 'bg-primary text-primary-foreground hover:bg-primary/90'
-              }`}
-            >
-              {isPending ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : isRival ? (
-                <UserMinus className="size-4" />
-              ) : (
-                <Swords className="size-4" />
-              )}
-              {isRival ? 'ライバルを解除する' : 'ライバルに設定する'}
-            </button>
-          )}
+            }`}
+          >
+            {isPending ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Swords className="size-4" />
+            )}
+            {isRival
+              ? 'ライバルを解除する'
+              : remainingSlots <= 0
+                ? 'ライバル枠が上限に達しています'
+                : 'ライバルに設定する'}
+          </button>
         </div>
       )}
     </div>

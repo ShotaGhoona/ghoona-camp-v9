@@ -3,7 +3,6 @@
 import { useState } from 'react';
 
 import type { UserListItem } from '@/entities/domain/user/model/types';
-import { useUsers } from '@/features/domain/user/get-users/lib/use-users';
 import { MemberDetailModalSheet } from '@/widgets/member/member-detail-modal/ui/MemberDetailModalSheet';
 
 import { MembersGalleryView } from '../ui-block/gallery-view/ui/MembersGalleryView';
@@ -17,31 +16,29 @@ import {
 } from '../ui-block/filter-sidebar/model/types';
 
 export function MembersHomeContainer() {
+  // フィルター状態
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filter, setFilter] = useState<MembersFilterState>(initialFilterState);
+
+  // モーダル状態
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-
-  // APIからユーザー一覧を取得
-  const { data, isLoading } = useUsers({
-    search: filter.searchQuery || undefined,
-    skills: filter.selectedSkills.length > 0 ? filter.selectedSkills : undefined,
-    interests: filter.selectedInterests.length > 0 ? filter.selectedInterests : undefined,
-    titleLevels: filter.selectedTitleLevels.length > 0 ? filter.selectedTitleLevels : undefined,
-  });
-
-  const users = data?.data.users ?? [];
-  const total = data?.data.pagination.total ?? 0;
 
   const handleMemberClick = (member: UserListItem) => {
     setSelectedMemberId(member.id);
     setIsDetailModalOpen(true);
   };
 
-  const activeFilterCount = getActiveFilterCount(filter);
-
   const handleSearchChange = (value: string) => {
     setFilter((prev) => ({ ...prev, searchQuery: value }));
+  };
+
+  // MembersGalleryViewに渡すフィルター
+  const galleryFilter = {
+    search: filter.searchQuery || undefined,
+    skills: filter.selectedSkills.length > 0 ? filter.selectedSkills : undefined,
+    interests: filter.selectedInterests.length > 0 ? filter.selectedInterests : undefined,
+    titleLevels: filter.selectedTitleLevels.length > 0 ? filter.selectedTitleLevels : undefined,
   };
 
   return (
@@ -61,7 +58,7 @@ export function MembersHomeContainer() {
             />
             <FilterToggleButton
               isOpen={isFilterOpen}
-              activeCount={activeFilterCount}
+              activeCount={getActiveFilterCount(filter)}
               onClick={() => setIsFilterOpen(!isFilterOpen)}
             />
           </div>
@@ -69,9 +66,8 @@ export function MembersHomeContainer() {
 
         {/* ギャラリーコンテンツ */}
         <MembersGalleryView
-          members={users}
+          filter={galleryFilter}
           onMemberClick={handleMemberClick}
-          isLoading={isLoading}
         />
       </div>
 

@@ -5,6 +5,7 @@ import { Provider, useDispatch } from 'react-redux';
 import { store, AppDispatch } from '@/store/index';
 import { QueryProvider } from '@/app/provider/QueryProvider';
 import { ThemeProvider } from '@/features/core/theme/lib/theme-context';
+import { Toaster } from '@/shared/ui/shadcn/ui/sonner';
 import { setUser, clearUser } from '@/store/slices/authSlice';
 import { userApi } from '@/entities/domain/user/api/user-api';
 
@@ -50,6 +51,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <QueryProvider>
         <ThemeProvider>
           <AuthInitializer>{children}</AuthInitializer>
+          <Toaster />
         </ThemeProvider>
       </QueryProvider>
     </Provider>

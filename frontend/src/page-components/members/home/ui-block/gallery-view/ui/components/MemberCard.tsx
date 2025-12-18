@@ -20,7 +20,7 @@ export function MemberCard({ member, onClick }: MemberCardProps) {
   return (
     <Card
       variant="raised"
-      className="group relative cursor-pointer gap-0 overflow-hidden py-5 transition-all duration-500 hover:shadow-lg"
+      className="group relative h-full cursor-pointer gap-0 overflow-hidden py-5 transition-all duration-500 hover:shadow-lg"
       onClick={handleClick}
     >
       {/* 背景レイヤー - ホバー時に表示される拡大画像 */}
@@ -45,7 +45,7 @@ export function MemberCard({ member, onClick }: MemberCardProps) {
             {member.avatarUrl ? (
               <img
                 src={member.avatarUrl}
-                alt={member.displayName}
+                alt={member.displayName ?? ''}
                 className="size-full object-cover"
               />
             ) : (

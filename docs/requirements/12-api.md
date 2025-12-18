@@ -92,6 +92,8 @@ Cookie: access_token=<jwt_token>
 | Method | Endpoint | Description | Query Params | Access |
 |--------|----------|-------------|--------------|---------|
 | GET | `/users` | 全ユーザーの一覧を取得。メンバー検索 | ✅ | 🔐 |
+| GET | `/users/skills` | 登録されているスキル一覧を取得。フィルター選択肢で使用 | ❌ | 🔐 |
+| GET | `/users/interests` | 登録されている興味・関心一覧を取得。フィルター選択肢で使用 | ❌ | 🔐 |
 | GET | `/users/{userId}` | 指定したユーザーの詳細情報を取得。メタデータ・SNSリンク情報を含む | ❌ | 🔐 |
 | PUT | `/users/{userId}` | ユーザーの基本情報・メタデータ・SNSリンクを更新。プロフィール設定で使用 | ❌ | 👤 |
 | GET | `/users/{userId}/rivals` | ユーザーが設定したライバル一覧を取得（最大3人） | ❌ | 👤 |
@@ -107,6 +109,7 @@ Cookie: access_token=<jwt_token>
 - `offset` (number): オフセット（ページネーション用）
 
 **例:** `GET /users?search=エンジニア&skills=TypeScript,React&limit=20&offset=0`
+
 
 ### Goal Management
 目標設定・管理関連のエンドポイント

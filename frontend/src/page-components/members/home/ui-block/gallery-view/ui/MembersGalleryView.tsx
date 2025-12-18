@@ -5,18 +5,27 @@ import { GalleryViewWidget } from '@/widgets/view/gallery-view/ui/GalleryViewWid
 
 import { MemberCard } from './components/MemberCard';
 import { MembersGallerySkeleton } from './skeleton/MembersGallerySkeleton';
+import { useMembersGallery, type MembersFilter } from '../lib/use-members-gallery';
 
 interface MembersGalleryViewProps {
-  members: UserListItem[];
+  filter: MembersFilter;
   onMemberClick?: (member: UserListItem) => void;
-  isLoading?: boolean;
 }
 
 export function MembersGalleryView({
-  members,
+  filter,
   onMemberClick,
-  isLoading,
 }: MembersGalleryViewProps) {
+  const {
+    members,
+    total,
+    isLoading,
+    currentPage,
+    pageSize,
+    handlePageChange,
+    handlePageSizeChange,
+  } = useMembersGallery(filter);
+
   if (isLoading) {
     return <MembersGallerySkeleton />;
   }
@@ -28,6 +37,11 @@ export function MembersGalleryView({
       cardRenderer={(member) => (
         <MemberCard member={member} onClick={onMemberClick} />
       )}
+      totalItems={total}
+      currentPage={currentPage}
+      pageSize={pageSize}
+      onPageChange={handlePageChange}
+      onPageSizeChange={handlePageSizeChange}
     />
   );
 }

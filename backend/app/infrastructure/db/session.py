@@ -26,10 +26,15 @@ def get_db():
     データベースセッションを取得するジェネレータ
 
     FastAPIのDependsで使用する。
-    リクエスト終了時に自動的にセッションをクローズする。
+    リクエスト成功時にコミット、例外発生時にロールバック、
+    最後にセッションをクローズする。
     """
     db = SessionLocal()
     try:
         yield db
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
     finally:
         db.close()
