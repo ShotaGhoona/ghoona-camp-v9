@@ -97,3 +97,50 @@ class ErrorResponse(BaseModel):
 
     error: ErrorDetail
     timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+
+
+# ========================================
+# プロフィール更新
+# ========================================
+
+
+class SocialLinkRequest(BaseModel):
+    """ソーシャルリンクリクエスト"""
+
+    platform: str = Field(
+        ...,
+        description='プラットフォーム種別',
+        pattern='^(twitter|instagram|github|linkedin|website|blog|note)$',
+    )
+    url: str = Field(..., description='リンクURL', max_length=2000)
+    title: str | None = Field(None, description='リンクのタイトル', max_length=100)
+
+
+class UpdateUserProfileRequest(BaseModel):
+    """プロフィール更新リクエスト"""
+
+    username: str | None = Field(
+        None,
+        description='ユーザー名',
+        max_length=100,
+        pattern='^[a-zA-Z0-9_]+$',
+    )
+    avatarUrl: str | None = Field(None, description='アバター画像URL', max_length=2000)
+    displayName: str | None = Field(None, description='表示名', max_length=100)
+    tagline: str | None = Field(None, description='一言プロフィール', max_length=150)
+    bio: str | None = Field(None, description='自己紹介文', max_length=1000)
+    skills: list[str] | None = Field(None, description='スキル一覧', max_length=20)
+    interests: list[str] | None = Field(None, description='興味・関心一覧', max_length=20)
+    vision: str | None = Field(None, description='ビジョン・将来の目標', max_length=500)
+    isVisionPublic: bool | None = Field(None, description='ビジョンの公開設定')
+    socialLinks: list[SocialLinkRequest] | None = Field(
+        None, description='SNSリンク一覧', max_length=10
+    )
+
+
+class UpdateUserProfileAPIResponse(BaseModel):
+    """プロフィール更新APIレスポンス"""
+
+    data: UserDetailDataResponse
+    message: str = 'プロフィールを更新しました'
+    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())

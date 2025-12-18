@@ -102,3 +102,31 @@ class MeOutputDTO(BaseModel):
     avatar_url: str | None = Field(None, description='アバター画像URL')
     discord_id: str | None = Field(None, description='Discord User ID')
     is_active: bool = Field(..., description='アカウント有効状態')
+
+
+# ========================================
+# プロフィール更新関連DTO
+# ========================================
+
+
+class SocialLinkInputDTO(BaseModel):
+    """ソーシャルリンク入力DTO"""
+
+    platform: str = Field(..., description='プラットフォーム種別')
+    url: str = Field(..., description='リンクURL')
+    title: str | None = Field(None, description='リンクのタイトル')
+
+
+class UpdateUserProfileInputDTO(BaseModel):
+    """プロフィール更新入力DTO"""
+
+    username: str | None = Field(None, description='ユーザー名')
+    avatar_url: str | None = Field(None, description='アバター画像URL')
+    display_name: str | None = Field(None, description='表示名')
+    tagline: str | None = Field(None, description='一言プロフィール')
+    bio: str | None = Field(None, description='自己紹介文')
+    skills: list[str] | None = Field(None, description='スキル一覧')
+    interests: list[str] | None = Field(None, description='興味・関心一覧')
+    vision: str | None = Field(None, description='ビジョン・将来の目標')
+    is_vision_public: bool | None = Field(None, description='ビジョンの公開設定')
+    social_links: list[SocialLinkInputDTO] | None = Field(None, description='SNSリンク一覧')

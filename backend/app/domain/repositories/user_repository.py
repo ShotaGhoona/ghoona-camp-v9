@@ -63,6 +63,31 @@ class UserWithDetails:
     joined_at: str
 
 
+@dataclass
+class SocialLinkInput:
+    """ソーシャルリンク入力データ"""
+
+    platform: str
+    url: str
+    title: str | None = None
+
+
+@dataclass
+class UserProfileUpdateData:
+    """ユーザープロフィール更新データ（部分更新用）"""
+
+    username: str | None = None
+    avatar_url: str | None = None
+    display_name: str | None = None
+    tagline: str | None = None
+    bio: str | None = None
+    skills: list[str] | None = None
+    interests: list[str] | None = None
+    vision: str | None = None
+    is_vision_public: bool | None = None
+    social_links: list[SocialLinkInput] | None = None
+
+
 class IUserRepository(ABC):
     """ユーザーリポジトリのインターフェース"""
 
@@ -156,5 +181,34 @@ class IUserRepository(ABC):
 
         Returns:
             bool: 削除成功の場合True
+        """
+        pass
+
+    @abstractmethod
+    def get_by_username(self, username: str) -> User | None:
+        """
+        ユーザー名でユーザーを取得
+
+        Args:
+            username: ユーザー名
+
+        Returns:
+            Optional[User]: ユーザーエンティティ（存在しない場合はNone）
+        """
+        pass
+
+    @abstractmethod
+    def update_user_profile(
+        self, user_id: UUID, update_data: UserProfileUpdateData
+    ) -> UserWithDetails | None:
+        """
+        ユーザープロフィールを更新（部分更新対応）
+
+        Args:
+            user_id: ユーザーID
+            update_data: 更新データ
+
+        Returns:
+            Optional[UserWithDetails]: 更新後のユーザー詳細情報（存在しない場合はNone）
         """
         pass

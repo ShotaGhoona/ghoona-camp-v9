@@ -11,14 +11,23 @@ from app.application.schemas.user_schemas import (
     MeOutputDTO,
     PaginationDTO,
     SocialLinkDTO,
+    UpdateUserProfileInputDTO,
     UserDetailDTO,
     UserListItemDTO,
     UsersListDTO,
 )
-from app.domain.exceptions.auth import InvalidCredentialsError, UserNotFoundError
+from app.domain.exceptions.auth import InvalidCredentialsError
+from app.domain.exceptions.auth import UserNotFoundError as AuthUserNotFoundError
+from app.domain.exceptions.user import (
+    ForbiddenError,
+    UsernameAlreadyExistsError,
+    UserNotFoundError,
+)
 from app.domain.repositories.user_repository import (
     IUserRepository,
+    SocialLinkInput,
     UserListItem,
+    UserProfileUpdateData,
     UserSearchFilter,
     UserWithDetails,
 )
@@ -105,11 +114,11 @@ class UserUsecase:
             currentTitleLevel=user.current_title_level,
         )
 
-    def get_user_by_id(self, user_id: UUID) -> UserDetailDTO | None:
+    def get_user_by_id(self, user_id: UUID) -> UserDetailDTO:
         """ユーザー詳細を取得"""
         user_detail = self.user_repository.get_user_detail_by_id(user_id)
         if user_detail is None:
-            return None
+            raise UserNotFoundError()
 
         return self._to_user_detail_dto(user_detail)
 
@@ -185,7 +194,7 @@ class UserUsecase:
         user = self.user_repository.get_by_id(UUID(user_id))
 
         if user is None:
-            raise UserNotFoundError()
+            raise AuthUserNotFoundError()
 
         return MeOutputDTO(
             id=str(user.id),
@@ -195,3 +204,67 @@ class UserUsecase:
             discord_id=user.discord_id,
             is_active=user.is_active,
         )
+
+    # ========================================
+    # プロフィール更新
+    # ========================================
+
+    def update_user_profile(
+        self,
+        user_id: UUID,
+        current_user_id: str,
+        input_dto: UpdateUserProfileInputDTO,
+    ) -> UserDetailDTO:
+        """ユーザープロフィールを更新"""
+        # 権限チェック: 本人のみ更新可能
+        if str(user_id) != current_user_id:
+            logger.warning(
+                'プロフィール更新権限エラー: user_id=%s, current_user_id=%s',
+                user_id,
+                current_user_id,
+            )
+            raise ForbiddenError()
+
+        # ユーザー存在確認
+        user = self.user_repository.get_by_id(user_id)
+        if user is None:
+            raise UserNotFoundError()
+
+        # ユーザー名の重複チェック
+        if input_dto.username is not None:
+            existing_user = self.user_repository.get_by_username(input_dto.username)
+            if existing_user is not None and existing_user.id != user_id:
+                raise UsernameAlreadyExistsError()
+
+        # 更新データを作成
+        social_links = None
+        if input_dto.social_links is not None:
+            social_links = [
+                SocialLinkInput(
+                    platform=link.platform,
+                    url=link.url,
+                    title=link.title,
+                )
+                for link in input_dto.social_links
+            ]
+
+        update_data = UserProfileUpdateData(
+            username=input_dto.username,
+            avatar_url=input_dto.avatar_url,
+            display_name=input_dto.display_name,
+            tagline=input_dto.tagline,
+            bio=input_dto.bio,
+            skills=input_dto.skills,
+            interests=input_dto.interests,
+            vision=input_dto.vision,
+            is_vision_public=input_dto.is_vision_public,
+            social_links=social_links,
+        )
+
+        # リポジトリで更新
+        updated_user = self.user_repository.update_user_profile(user_id, update_data)
+        if updated_user is None:
+            raise UserNotFoundError()
+
+        logger.info('プロフィール更新成功: user_id=%s', user_id)
+        return self._to_user_detail_dto(updated_user)

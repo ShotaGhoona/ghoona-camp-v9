@@ -10,6 +10,7 @@ from app.domain.repositories.user_repository import (
     IUserRepository,
     PaginatedUserList,
     UserListItem,
+    UserProfileUpdateData,
     UserSearchFilter,
     UserWithDetails,
 )
@@ -290,6 +291,102 @@ class UserRepositoryImpl(IUserRepository):
         user_model.is_active = False
         self.session.flush()
         return True
+
+    def get_by_username(self, username: str) -> User | None:
+        """ユーザー名でユーザーを取得"""
+        user_model = (
+            self.session.query(UserModel)
+            .filter(UserModel.username == username)
+            .filter(UserModel.is_active == True)
+            .first()
+        )
+        if user_model is None:
+            return None
+        return self._to_entity(user_model)
+
+    def update_user_profile(
+        self, user_id: UUID, update_data: UserProfileUpdateData
+    ) -> UserWithDetails | None:
+        """ユーザープロフィールを更新（部分更新対応）"""
+        # ユーザー存在確認
+        user_model = (
+            self.session.query(UserModel)
+            .filter(UserModel.id == user_id)
+            .filter(UserModel.is_active == True)
+            .first()
+        )
+        if user_model is None:
+            return None
+
+        # usersテーブルの更新
+        if update_data.username is not None:
+            user_model.username = update_data.username
+        if update_data.avatar_url is not None:
+            user_model.avatar_url = update_data.avatar_url
+
+        # user_metadataの更新（UPSERT）
+        metadata = (
+            self.session.query(UserMetadataModel)
+            .filter(UserMetadataModel.user_id == user_id)
+            .first()
+        )
+        if metadata is None:
+            # 新規作成
+            metadata = UserMetadataModel(user_id=user_id)
+            self.session.add(metadata)
+
+        if update_data.display_name is not None:
+            metadata.display_name = update_data.display_name
+        if update_data.tagline is not None:
+            metadata.tagline = update_data.tagline
+        if update_data.bio is not None:
+            metadata.bio = update_data.bio
+        if update_data.skills is not None:
+            # 重複除去
+            metadata.skills = list(dict.fromkeys(update_data.skills))
+        if update_data.interests is not None:
+            # 重複除去
+            metadata.interests = list(dict.fromkeys(update_data.interests))
+
+        # user_visionsの更新（UPSERT）
+        if update_data.vision is not None or update_data.is_vision_public is not None:
+            vision_model = (
+                self.session.query(UserVisionModel)
+                .filter(UserVisionModel.user_id == user_id)
+                .first()
+            )
+            if vision_model is None:
+                # 新規作成
+                vision_model = UserVisionModel(user_id=user_id)
+                self.session.add(vision_model)
+
+            if update_data.vision is not None:
+                vision_model.vision = update_data.vision
+            if update_data.is_vision_public is not None:
+                vision_model.is_public = update_data.is_vision_public
+
+        # user_social_linksの更新（全置換）
+        if update_data.social_links is not None:
+            # 既存リンクを全削除
+            self.session.query(UserSocialLinkModel).filter(
+                UserSocialLinkModel.user_id == user_id
+            ).delete()
+
+            # 新しいリンクを挿入
+            for link in update_data.social_links:
+                social_link_model = UserSocialLinkModel(
+                    user_id=user_id,
+                    platform=link.platform,
+                    url=link.url,
+                    title=link.title,
+                    is_public=True,
+                )
+                self.session.add(social_link_model)
+
+        self.session.flush()
+
+        # 更新後のユーザー詳細を取得して返す
+        return self._get_user_detail(user_id)
 
     def _to_entity(self, user_model: UserModel) -> User:
         """DBモデルをエンティティに変換"""
