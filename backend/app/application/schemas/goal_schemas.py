@@ -3,6 +3,17 @@
 from pydantic import BaseModel, Field
 
 
+class GoalCreatorDTO(BaseModel):
+    """目標作成者DTO"""
+
+    id: str
+    display_name: str | None = Field(alias='displayName')
+    avatar_url: str | None = Field(alias='avatarUrl')
+
+    class Config:
+        populate_by_name = True
+
+
 class GoalItemDTO(BaseModel):
     """目標アイテムDTO"""
 
@@ -16,6 +27,7 @@ class GoalItemDTO(BaseModel):
     is_public: bool = Field(alias='isPublic')
     created_at: str = Field(alias='createdAt')
     updated_at: str = Field(alias='updatedAt')
+    creator: GoalCreatorDTO
 
     class Config:
         populate_by_name = True

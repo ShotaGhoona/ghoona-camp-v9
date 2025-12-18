@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Eye, EyeOff, Globe, Lock, Save, Target, X } from 'lucide-react';
+import { Eye, EyeOff, Globe, Lock, Save, Target, User, X } from 'lucide-react';
 
 import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
 import { Separator } from '@/shared/ui/shadcn/ui/separator';

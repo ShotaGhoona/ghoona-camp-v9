@@ -3,6 +3,7 @@
 ## 概要
 
 目標ドメインのバックエンドAPI（`GET /goals/me`、`POST /goals`、`GET /goals/public`、`PUT /goals/{goalId}`、`DELETE /goals/{goalId}`）をオニオンアーキテクチャに従って実装。
+全APIで作成者情報（displayName, avatarUrl）を返すように対応。
 
 ## 変更ファイル
 
@@ -122,7 +123,8 @@ backend/app/
 **データクラス:**
 - `GoalSearchFilter` - 自分の目標検索フィルター（user_id, year, month, is_public）
 - `PublicGoalSearchFilter` - 公開目標検索フィルター（year, month, user_id）
-- `GoalItem` - 目標アイテム（10フィールド）
+- `GoalCreator` - 目標作成者情報（id, display_name, avatar_url）
+- `GoalItem` - 目標アイテム（10フィールド + creator）
 - `GoalListResult` - 目標一覧結果（goals, total）
 - `GoalCreateData` - 目標作成データ
 - `GoalUpdateData` - 目標更新データ（部分更新用）
@@ -142,7 +144,18 @@ backend/app/
 ### Infrastructure層
 
 **クエリ:**
-- goalsテーブルのみ参照（シンプル）
+- goals + users + user_metadata テーブルをJOINして取得
+- 全メソッドでcreator情報（displayName, avatarUrl）を返却
+
+```python
+# JOINクエリ例
+query = (
+    self.session.query(GoalModel, UserModel, UserMetadataModel)
+    .join(UserModel, GoalModel.user_id == UserModel.id)
+    .outerjoin(UserMetadataModel, UserModel.id == UserMetadataModel.user_id)
+    .filter(...)
+)
+```
 
 **フィルタリング:**
 - 月にかかる目標: `started_at <= month_end AND (ended_at >= month_start OR ended_at IS NULL)`
@@ -151,9 +164,11 @@ backend/app/
 
 **作成処理:**
 - started_at 未指定時は `date.today()` を使用
+- 作成後、JOINクエリで再取得してcreator情報を含めて返却
 
 **更新処理:**
 - 部分更新（指定されたフィールドのみ更新）
+- 更新後、JOINクエリで再取得してcreator情報を含めて返却
 
 **削除処理:**
 - 物理削除
@@ -161,7 +176,8 @@ backend/app/
 ### Application層
 
 **DTO:**
-- `GoalItemDTO` - 目標アイテム
+- `GoalCreatorDTO` - 目標作成者情報（id, display_name, avatar_url）
+- `GoalItemDTO` - 目標アイテム（creator含む）
 - `MyGoalsListDTO` - 自分の目標一覧
 - `PublicGoalsListDTO` - 公開目標一覧
 - `CreateGoalInputDTO` - 目標作成入力
@@ -181,7 +197,8 @@ backend/app/
 ### Presentation層
 
 **スキーマ:**
-- `GoalItemResponse` - 目標アイテムレスポンス
+- `GoalCreatorResponse` - 目標作成者レスポンス（id, displayName, avatarUrl）
+- `GoalItemResponse` - 目標アイテムレスポンス（creator含む）
 - `MyGoalsListAPIResponse` - 自分の目標一覧レスポンス
 - `PublicGoalsListAPIResponse` - 公開目標一覧レスポンス
 - `CreateGoalRequest` / `CreateGoalAPIResponse` - 目標作成
@@ -214,7 +231,12 @@ backend/app/
         "isActive": true,
         "isPublic": true,
         "createdAt": "2025-01-01T00:00:00",
-        "updatedAt": "2025-01-01T00:00:00"
+        "updatedAt": "2025-01-01T00:00:00",
+        "creator": {
+          "id": "550e8400-e29b-41d4-a716-446655440001",
+          "displayName": "田中太郎",
+          "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=user1"
+        }
       }
     ],
     "total": 1
@@ -239,7 +261,12 @@ backend/app/
       "isActive": true,
       "isPublic": true,
       "createdAt": "2025-01-01T00:00:00",
-      "updatedAt": "2025-01-01T00:00:00"
+      "updatedAt": "2025-01-01T00:00:00",
+      "creator": {
+        "id": "550e8400-e29b-41d4-a716-446655440001",
+        "displayName": "田中太郎",
+        "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=user1"
+      }
     }
   },
   "message": "目標を作成しました",

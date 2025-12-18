@@ -1,6 +1,6 @@
 'use client';
 
-import { User, Target } from 'lucide-react';
+import { User } from 'lucide-react';
 
 import { Badge } from '@/shared/ui/shadcn/ui/badge';
 import { Card } from '@/shared/ui/shadcn/ui/card';
@@ -42,6 +42,7 @@ export function SidebarGoalCard({ goal, onClick }: SidebarGoalCardProps) {
   const remainingDays = getRemainingDays(goal);
   const remainingText = getRemainingText(remainingDays);
   const isCompleted = !goal.isActive;
+  const { creator } = goal;
 
   return (
     <Card
@@ -50,14 +51,23 @@ export function SidebarGoalCard({ goal, onClick }: SidebarGoalCardProps) {
       onClick={handleClick}
     >
       <div className='flex items-start gap-3'>
-        {/* アイコン */}
-        <div className='flex size-10 shrink-0 items-center justify-center rounded-full bg-muted shadow-inset-sm'>
-          <Target className='size-4 text-muted-foreground' />
+        {/* アバター */}
+        <div className='flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted shadow-inset-sm'>
+          {creator.avatarUrl ? (
+            <img
+              src={creator.avatarUrl}
+              alt={creator.displayName ?? ''}
+              className='size-full object-cover'
+            />
+          ) : (
+            <User className='size-4 text-muted-foreground' />
+          )}
         </div>
 
         {/* コンテンツ */}
         <div className='min-w-0 flex-1'>
           <p className='text-xs text-muted-foreground'>
+            {creator.displayName ?? '名前未設定'} ・{' '}
             {formatDateRange(goal.startedAt, goal.endedAt)}
           </p>
           <p className='mt-0.5 line-clamp-2 text-sm font-medium leading-tight'>

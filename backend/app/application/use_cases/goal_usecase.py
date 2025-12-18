@@ -6,6 +6,7 @@ from uuid import UUID
 
 from app.application.schemas.goal_schemas import (
     CreateGoalInputDTO,
+    GoalCreatorDTO,
     GoalItemDTO,
     MyGoalsListDTO,
     PublicGoalsListDTO,
@@ -281,6 +282,11 @@ class GoalUsecase:
 
     def _to_goal_item_dto(self, goal: GoalItem) -> GoalItemDTO:
         """GoalItemをGoalItemDTOに変換"""
+        creator_dto = GoalCreatorDTO(
+            id=str(goal.creator.id),
+            displayName=goal.creator.display_name,
+            avatarUrl=goal.creator.avatar_url,
+        )
         return GoalItemDTO(
             id=str(goal.id),
             userId=str(goal.user_id),
@@ -292,4 +298,5 @@ class GoalUsecase:
             isPublic=goal.is_public,
             createdAt=goal.created_at.isoformat(),
             updatedAt=goal.updated_at.isoformat(),
+            creator=creator_dto,
         )

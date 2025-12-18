@@ -19,6 +19,7 @@ from app.presentation.schemas.goal_schemas import (
     DeleteGoalAPIResponse,
     DeleteGoalDataResponse,
     ErrorResponse,
+    GoalCreatorResponse,
     GoalItemResponse,
     MyGoalsListAPIResponse,
     MyGoalsListDataResponse,
@@ -85,6 +86,11 @@ def get_my_goals(
             isPublic=goal.is_public,
             createdAt=goal.created_at,
             updatedAt=goal.updated_at,
+            creator=GoalCreatorResponse(
+                id=goal.creator.id,
+                displayName=goal.creator.display_name,
+                avatarUrl=goal.creator.avatar_url,
+            ),
         )
         for goal in result.goals
     ]
@@ -151,6 +157,11 @@ def create_goal(
         isPublic=result.is_public,
         createdAt=result.created_at,
         updatedAt=result.updated_at,
+        creator=GoalCreatorResponse(
+            id=result.creator.id,
+            displayName=result.creator.display_name,
+            avatarUrl=result.creator.avatar_url,
+        ),
     )
 
     return CreateGoalAPIResponse(
@@ -207,6 +218,11 @@ def get_public_goals(
             isPublic=goal.is_public,
             createdAt=goal.created_at,
             updatedAt=goal.updated_at,
+            creator=GoalCreatorResponse(
+                id=goal.creator.id,
+                displayName=goal.creator.display_name,
+                avatarUrl=goal.creator.avatar_url,
+            ),
         )
         for goal in result.goals
     ]
@@ -292,6 +308,11 @@ def update_goal(
         isPublic=result.is_public,
         createdAt=result.created_at,
         updatedAt=result.updated_at,
+        creator=GoalCreatorResponse(
+            id=result.creator.id,
+            displayName=result.creator.display_name,
+            avatarUrl=result.creator.avatar_url,
+        ),
     )
 
     return UpdateGoalAPIResponse(

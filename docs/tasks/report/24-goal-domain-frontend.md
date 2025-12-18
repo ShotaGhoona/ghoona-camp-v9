@@ -3,13 +3,16 @@
 ## 概要
 
 目標ドメインのフロントエンド実装。目標ページのAPI接続、目標作成・更新・削除機能をFSD構成で実装。
+バックエンドと連携し、全APIでcreator情報（displayName, avatarUrl）を返すように対応。
 
 ## 変更ファイル
+
+### フロントエンド
 
 ```
 frontend/src/
 ├── entities/domain/goal/
-│   ├── model/types.ts                # 型定義（一覧・作成・更新・削除）
+│   ├── model/types.ts                # 型定義（GoalItem + creator）
 │   └── api/goal-api.ts               # APIクライアント
 ├── features/domain/goal/
 │   ├── get-my-goals/lib/use-my-goals.ts       # 自分の目標一覧取得hook
@@ -22,16 +25,16 @@ frontend/src/
 │   └── ui-block/
 │       ├── goal-detail-modal/ui/
 │       │   ├── GoalDetailModalSheet.tsx       # UIラッパー
-│       │   └── GoalDetailContent.tsx          # useDeleteGoal
+│       │   └── GoalDetailContent.tsx          # useDeleteGoal, creator表示
 │       ├── create-goal/ui/
 │       │   ├── CreateGoalModalSheet.tsx       # UIラッパー
 │       │   └── CreateGoalContent.tsx          # useCreateGoal
 │       ├── edit-goal/ui/
 │       │   ├── EditGoalModalSheet.tsx         # UIラッパー
-│       │   └── EditGoalContent.tsx            # useUpdateGoal
+│       │   └── EditGoalContent.tsx            # useUpdateGoal, creator表示
 │       ├── goals-sidebar/ui/
 │       │   ├── GoalsSidebar.tsx               # usePublicGoals
-│       │   └── components/SidebarGoalCard.tsx # creator情報なし対応
+│       │   └── components/SidebarGoalCard.tsx # creator表示（アバター + displayName）
 │       └── timeline-view/ui/
 │           ├── GoalsTimelineView.tsx          # isLoading対応
 │           └── components/
@@ -39,9 +42,30 @@ frontend/src/
 │               └── GoalTimelineLabel.tsx      # 型変更
 ```
 
+### バックエンド
+
+```
+backend/app/
+├── domain/repositories/goal_repository.py      # GoalCreator, GoalItem.creator追加
+├── infrastructure/db/repositories/goal_repository_impl.py  # JOINクエリでcreator取得
+├── application/schemas/goal_schemas.py         # GoalCreatorDTO追加
+├── application/use_cases/goal_usecase.py       # creator変換追加
+├── presentation/schemas/goal_schemas.py        # GoalCreatorResponse追加
+└── presentation/api/goal_api.py                # レスポンスにcreator追加
+```
+
 ## Entity層
 
 ### 型定義（types.ts）
+
+**目標作成者:**
+```typescript
+type GoalCreator = {
+  id: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+};
+```
 
 **目標アイテム:**
 ```typescript
@@ -56,19 +80,7 @@ type GoalItem = {
   isPublic: boolean;
   createdAt: string;      // ISO 8601
   updatedAt: string;      // ISO 8601
-};
-```
-
-**目標作成者（未使用 - バックエンド未対応）:**
-```typescript
-type GoalCreator = {
-  id: string;
-  displayName: string;
-  avatarUrl: string | null;
-};
-
-type GoalItemWithCreator = GoalItem & {
-  creator: GoalCreator;
+  creator: GoalCreator;   // 作成者情報（全APIで返却）
 };
 ```
 
@@ -215,45 +227,59 @@ const goal = goalProp ??
 | `CURRENT_USER_ID` | `useAppSelector((state) => state.auth)` |
 | `dummyGoals` | `useMyGoals()` / `usePublicGoals()` |
 
-## 残課題
+## バックエンド修正内容
 
-### バックエンドAPIの修正が必要
+### GoalItemにcreator情報を追加
 
-**問題:**
-`GET /goals/public` のレスポンスに作成者情報（displayName, avatarUrl）が含まれていない。
+全APIでcreator情報（displayName, avatarUrl）を返すように修正。
 
-**現在のレスポンス:**
+**修正方針:**
+- `GoalItem`に`creator`フィールドを追加（必須）
+- 全メソッド（get_my_goals, get_public_goals, create, update, get_by_id）でJOINクエリを使用
+- `users`テーブルから`avatar_url`、`user_metadata`テーブルから`display_name`を取得
+
+**レスポンス例:**
 ```json
 {
-  "goals": [{
-    "id": "...",
-    "userId": "...",   // ← userIdのみ
-    "title": "...",
-    ...
-  }]
-}
-```
-
-**必要なレスポンス:**
-```json
-{
-  "goals": [{
-    "id": "...",
-    "userId": "...",
-    "title": "...",
-    "creator": {       // ← これが必要
+  "data": {
+    "goals": [{
       "id": "...",
-      "displayName": "田中太郎",
-      "avatarUrl": "https://..."
-    }
-  }]
+      "userId": "...",
+      "title": "TypeScriptをマスターする",
+      "creator": {
+        "id": "...",
+        "displayName": "田中太郎",
+        "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=user1"
+      }
+    }],
+    "total": 1
+  }
 }
 ```
 
-**影響箇所:**
-- `GoalsSidebar > SidebarGoalCard` - 作成者のアバター・名前が表示できない
-- `GoalDetailContent` - 他人の目標の場合、作成者名が表示できない
+## creator情報のUI表示
 
-**暫定対応:**
-- アバターの代わりにTargetアイコンを表示
-- 作成者名の代わりに「他のメンバーの目標」と表示
+### SidebarGoalCard
+
+- アバター画像を表示（なければUserアイコン）
+- displayNameを日付の前に表示
+
+```
+[アバター] 山田太郎 ・ 12/1 〜 12/31
+           TypeScriptをマスターする
+           [進行中] 残り12日
+```
+
+### GoalDetailContent
+
+- ヘッダーにアバター画像を表示（なければUserアイコン）
+- 他人の目標の場合「山田太郎の目標」と表示
+
+### EditGoalContent
+
+- ヘッダーにアバター画像を表示（なければUserアイコン）
+
+### CreateGoalContent
+
+- 新規作成のためcreator情報なし
+- Targetアイコンを表示

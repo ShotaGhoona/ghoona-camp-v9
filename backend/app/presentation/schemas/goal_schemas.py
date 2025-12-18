@@ -8,6 +8,14 @@ from app.presentation.schemas.common import BaseAPIResponse, ErrorResponse
 __all__ = ['ErrorResponse']
 
 
+class GoalCreatorResponse(BaseModel):
+    """目標作成者レスポンス"""
+
+    id: str
+    displayName: str | None
+    avatarUrl: str | None
+
+
 class GoalItemResponse(BaseModel):
     """目標アイテムレスポンス"""
 
@@ -21,6 +29,7 @@ class GoalItemResponse(BaseModel):
     isPublic: bool
     createdAt: str
     updatedAt: str
+    creator: GoalCreatorResponse
 
 
 class MyGoalsListDataResponse(BaseModel):

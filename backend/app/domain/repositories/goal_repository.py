@@ -17,6 +17,15 @@ class GoalSearchFilter:
 
 
 @dataclass
+class GoalCreator:
+    """目標作成者情報"""
+
+    id: UUID
+    display_name: str | None
+    avatar_url: str | None
+
+
+@dataclass
 class GoalItem:
     """目標アイテム"""
 
@@ -30,6 +39,7 @@ class GoalItem:
     is_public: bool
     created_at: datetime
     updated_at: datetime
+    creator: GoalCreator
 
 
 @dataclass

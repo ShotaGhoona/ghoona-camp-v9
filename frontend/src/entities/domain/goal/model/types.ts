@@ -7,10 +7,10 @@
 // 目標アイテム
 // ========================================
 
-/** 目標作成者（表示用） */
+/** 目標作成者 */
 export type GoalCreator = {
   id: string;
-  displayName: string;
+  displayName: string | null;
   avatarUrl: string | null;
 };
 
@@ -26,10 +26,6 @@ export type GoalItem = {
   isPublic: boolean;
   createdAt: string; // ISO 8601
   updatedAt: string; // ISO 8601
-};
-
-/** 目標アイテム（表示用、作成者情報付き） */
-export type GoalItemWithCreator = GoalItem & {
   creator: GoalCreator;
 };
 

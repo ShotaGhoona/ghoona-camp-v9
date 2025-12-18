@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.domain.repositories.goal_repository import (
     GoalCreateData,
+    GoalCreator,
     GoalItem,
     GoalListResult,
     GoalSearchFilter,
@@ -16,6 +17,7 @@ from app.domain.repositories.goal_repository import (
     PublicGoalSearchFilter,
 )
 from app.infrastructure.db.models.goal_model import GoalModel
+from app.infrastructure.db.models.user_model import UserMetadataModel, UserModel
 
 
 class GoalRepositoryImpl(IGoalRepository):
@@ -42,13 +44,15 @@ class GoalRepositoryImpl(IGoalRepository):
         _, last_day = calendar.monthrange(filter.year, filter.month)
         month_end = date(filter.year, filter.month, last_day)
 
-        # ベースクエリ: 指定ユーザーの目標
-        query = self.session.query(GoalModel).filter(
-            GoalModel.user_id == filter.user_id
+        # JOINクエリ: goals + users + user_metadata
+        query = (
+            self.session.query(GoalModel, UserModel, UserMetadataModel)
+            .join(UserModel, GoalModel.user_id == UserModel.id)
+            .outerjoin(UserMetadataModel, UserModel.id == UserMetadataModel.user_id)
+            .filter(GoalModel.user_id == filter.user_id)
         )
 
         # 月にかかる目標をフィルタリング
-        # 開始日が月末以前 AND (終了日が月初以降 OR 終了日がnull)
         query = query.filter(
             GoalModel.started_at <= month_end,
             or_(
@@ -68,7 +72,10 @@ class GoalRepositoryImpl(IGoalRepository):
         results = query.order_by(GoalModel.started_at.asc()).all()
 
         # GoalItemに変換
-        goals = [self._to_goal_item(goal) for goal in results]
+        goals = [
+            self._to_goal_item(goal, user, metadata)
+            for goal, user, metadata in results
+        ]
 
         return GoalListResult(goals=goals, total=total)
 
@@ -84,11 +91,14 @@ class GoalRepositoryImpl(IGoalRepository):
         )
         self.session.add(goal_model)
         self.session.flush()
-        return self._to_goal_item(goal_model)
+
+        # creator情報を取得
+        user, metadata = self._get_user_info(data.user_id)
+        return self._to_goal_item(goal_model, user, metadata)
 
     def get_public_goals(self, filter: PublicGoalSearchFilter) -> GoalListResult:
         """
-        公開目標一覧を取得
+        公開目標一覧を取得（作成者情報付き）
 
         指定月に「かかる」公開目標を返す:
         - 開始日が月末以前 AND (終了日が月初以降 OR 終了日がnull)
@@ -98,8 +108,13 @@ class GoalRepositoryImpl(IGoalRepository):
         _, last_day = calendar.monthrange(filter.year, filter.month)
         month_end = date(filter.year, filter.month, last_day)
 
-        # ベースクエリ: 公開目標のみ
-        query = self.session.query(GoalModel).filter(GoalModel.is_public == True)
+        # JOINクエリ: goals + users + user_metadata
+        query = (
+            self.session.query(GoalModel, UserModel, UserMetadataModel)
+            .join(UserModel, GoalModel.user_id == UserModel.id)
+            .outerjoin(UserMetadataModel, UserModel.id == UserMetadataModel.user_id)
+            .filter(GoalModel.is_public == True)
+        )
 
         # user_id フィルター（オプション）
         if filter.user_id is not None:
@@ -121,18 +136,26 @@ class GoalRepositoryImpl(IGoalRepository):
         results = query.order_by(GoalModel.started_at.asc()).all()
 
         # GoalItemに変換
-        goals = [self._to_goal_item(goal) for goal in results]
+        goals = [
+            self._to_goal_item(goal, user, metadata)
+            for goal, user, metadata in results
+        ]
 
         return GoalListResult(goals=goals, total=total)
 
     def get_by_id(self, goal_id) -> GoalItem | None:
         """IDで目標を取得"""
-        goal_model = (
-            self.session.query(GoalModel).filter(GoalModel.id == goal_id).first()
+        result = (
+            self.session.query(GoalModel, UserModel, UserMetadataModel)
+            .join(UserModel, GoalModel.user_id == UserModel.id)
+            .outerjoin(UserMetadataModel, UserModel.id == UserMetadataModel.user_id)
+            .filter(GoalModel.id == goal_id)
+            .first()
         )
-        if goal_model is None:
+        if result is None:
             return None
-        return self._to_goal_item(goal_model)
+        goal_model, user_model, metadata_model = result
+        return self._to_goal_item(goal_model, user_model, metadata_model)
 
     def update(self, goal_id, data: GoalUpdateData) -> GoalItem | None:
         """目標を更新（部分更新対応）"""
@@ -155,7 +178,10 @@ class GoalRepositoryImpl(IGoalRepository):
             goal_model.is_public = data.is_public
 
         self.session.flush()
-        return self._to_goal_item(goal_model)
+
+        # creator情報を取得
+        user, metadata = self._get_user_info(goal_model.user_id)
+        return self._to_goal_item(goal_model, user, metadata)
 
     def delete(self, goal_id) -> bool:
         """目標を削除"""
@@ -165,8 +191,28 @@ class GoalRepositoryImpl(IGoalRepository):
         self.session.flush()
         return deleted_count > 0
 
-    def _to_goal_item(self, goal_model: GoalModel) -> GoalItem:
+    def _get_user_info(self, user_id) -> tuple[UserModel, UserMetadataModel | None]:
+        """ユーザー情報を取得"""
+        result = (
+            self.session.query(UserModel, UserMetadataModel)
+            .outerjoin(UserMetadataModel, UserModel.id == UserMetadataModel.user_id)
+            .filter(UserModel.id == user_id)
+            .first()
+        )
+        return result
+
+    def _to_goal_item(
+        self,
+        goal_model: GoalModel,
+        user_model: UserModel,
+        metadata_model: UserMetadataModel | None,
+    ) -> GoalItem:
         """DBモデルをGoalItemに変換"""
+        creator = GoalCreator(
+            id=user_model.id,
+            display_name=metadata_model.display_name if metadata_model else None,
+            avatar_url=user_model.avatar_url,
+        )
         return GoalItem(
             id=goal_model.id,
             user_id=goal_model.user_id,
@@ -178,4 +224,5 @@ class GoalRepositoryImpl(IGoalRepository):
             is_public=goal_model.is_public,
             created_at=goal_model.created_at,
             updated_at=goal_model.updated_at,
+            creator=creator,
         )

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Globe, Lock, Save, Target, X } from 'lucide-react';
+import { Globe, Lock, Save, User, X } from 'lucide-react';
 
 import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
 import { Separator } from '@/shared/ui/shadcn/ui/separator';
@@ -105,11 +105,19 @@ export function EditGoalContent({
             {/* 背景グラデーション */}
             <div className='h-24 bg-gradient-to-br from-primary via-primary/40 to-primary/5' />
 
-            {/* アイコン */}
+            {/* アバター */}
             <div className='absolute left-1/2 top-12 -translate-x-1/2'>
               <div className='size-24 overflow-hidden rounded-full bg-background shadow-raised'>
                 <div className='flex size-full items-center justify-center bg-muted'>
-                  <Target className='size-10 text-muted-foreground' />
+                  {goal.creator.avatarUrl ? (
+                    <img
+                      src={goal.creator.avatarUrl}
+                      alt={goal.creator.displayName ?? ''}
+                      className='size-full object-cover'
+                    />
+                  ) : (
+                    <User className='size-10 text-muted-foreground' />
+                  )}
                 </div>
               </div>
             </div>

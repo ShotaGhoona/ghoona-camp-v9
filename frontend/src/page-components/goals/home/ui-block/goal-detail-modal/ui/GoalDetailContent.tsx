@@ -7,6 +7,7 @@ import {
   Lock,
   Target,
   Trash2,
+  User,
 } from 'lucide-react';
 
 import { Badge } from '@/shared/ui/shadcn/ui/badge';
@@ -111,7 +112,7 @@ export function GoalDetailContent({
               )}
             </div>
 
-            {/* アイコン */}
+            {/* アバター */}
             <div className='absolute left-1/2 top-12 -translate-x-1/2'>
               <button
                 type='button'
@@ -120,7 +121,15 @@ export function GoalDetailContent({
                 className='size-24 overflow-hidden rounded-full bg-background shadow-raised transition-transform hover:scale-105 disabled:cursor-default disabled:hover:scale-100'
               >
                 <div className='flex size-full items-center justify-center bg-muted'>
-                  <Target className='size-10 text-muted-foreground' />
+                  {goal.creator.avatarUrl ? (
+                    <img
+                      src={goal.creator.avatarUrl}
+                      alt={goal.creator.displayName ?? ''}
+                      className='size-full object-cover'
+                    />
+                  ) : (
+                    <User className='size-10 text-muted-foreground' />
+                  )}
                 </div>
               </button>
             </div>
@@ -132,7 +141,9 @@ export function GoalDetailContent({
             <div className='text-center'>
               <h2 className='text-xl font-bold'>{goal.title}</h2>
               <p className='mt-1 text-sm text-muted-foreground'>
-                {isOwn ? 'あなたの目標' : '他のメンバーの目標'}
+                {isOwn
+                  ? 'あなたの目標'
+                  : `${goal.creator.displayName ?? '名前未設定'}の目標`}
               </p>
             </div>
 
