@@ -4,6 +4,7 @@
  */
 
 import type { Pagination } from '@/shared/types/api/pagination';
+import type { SnsPlatform } from '@/shared/types/user/sns';
 
 // ========================================
 // 一覧用（GET /api/v1/users）
@@ -23,7 +24,7 @@ export type UserListItem = {
 
 export type SocialLink = {
   id: string;
-  platform: string;
+  platform: SnsPlatform;
   url: string;
   title: string | null;
 };
@@ -123,14 +124,7 @@ export type User = {
 // ========================================
 
 export type SocialLinkInput = {
-  platform:
-    | 'twitter'
-    | 'instagram'
-    | 'github'
-    | 'linkedin'
-    | 'website'
-    | 'blog'
-    | 'note';
+  platform: SnsPlatform;
   url: string;
   title?: string | null;
 };
