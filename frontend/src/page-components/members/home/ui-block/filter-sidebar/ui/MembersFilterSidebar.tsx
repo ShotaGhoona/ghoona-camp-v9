@@ -1,6 +1,6 @@
 'use client';
 
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
 
 import { cn } from '@/shared/ui/shadcn/lib/utils';
 import { Button } from '@/shared/ui/shadcn/ui/button';
@@ -14,6 +14,7 @@ import { useInterests } from '@/features/domain/user/get-interests/lib/use-inter
 import type { MembersFilterState } from '../model/types';
 import { initialFilterState, isFilterActive } from '../model/types';
 import { useTagSearch, useTitleSearch } from '../lib/use-tag-search';
+import { useExpandableTags } from '../lib/use-expandable-tags';
 import { TagSearchInput } from './components/TagSearchInput';
 
 interface MembersFilterSidebarProps {
@@ -38,6 +39,16 @@ export function MembersFilterSidebar({
   const titleSearch = useTitleSearch(TITLE_MASTER);
   const skillSearch = useTagSearch(skills);
   const interestSearch = useTagSearch(interests);
+
+  // 展開可能タグフック
+  const skillsExpandable = useExpandableTags({
+    tags: skillSearch.filteredTags,
+    selectedTags: filter.selectedSkills,
+  });
+  const interestsExpandable = useExpandableTags({
+    tags: interestSearch.filteredTags,
+    selectedTags: filter.selectedInterests,
+  });
 
   const handleSkillToggle = (skill: string) => {
     const newSkills = filter.selectedSkills.includes(skill)
@@ -145,19 +156,43 @@ export function MembersFilterSidebar({
               />
             </div>
             <Card variant="inset" className="py-3">
-              <CardContent className="flex flex-wrap gap-2 px-3">
-                {skillSearch.filteredTags.map((skill) => (
-                  <Badge
-                    key={skill}
-                    variant={
-                      filter.selectedSkills.includes(skill) ? 'default' : 'outline'
-                    }
-                    className="cursor-pointer transition-colors"
-                    onClick={() => handleSkillToggle(skill)}
+              <CardContent className="flex flex-col gap-2 px-3">
+                <div className="flex flex-wrap gap-2">
+                  {skillsExpandable.displayTags.map((skill) => (
+                    <Badge
+                      key={skill}
+                      variant={
+                        filter.selectedSkills.includes(skill)
+                          ? 'default'
+                          : 'outline'
+                      }
+                      className="cursor-pointer transition-colors"
+                      onClick={() => handleSkillToggle(skill)}
+                    >
+                      {skill}
+                    </Badge>
+                  ))}
+                  {skillsExpandable.shouldShowExpandButton && (
+                    <button
+                      type="button"
+                      onClick={skillsExpandable.expand}
+                      className="inline-flex items-center gap-1 rounded-full border border-dashed border-muted-foreground/50 px-3 py-0.5 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                    >
+                      他{skillsExpandable.hiddenCount}件
+                      <ChevronDown className="size-3" />
+                    </button>
+                  )}
+                </div>
+                {skillsExpandable.shouldShowCollapseButton && (
+                  <button
+                    type="button"
+                    onClick={skillsExpandable.collapse}
+                    className="inline-flex items-center justify-center gap-1 text-xs text-muted-foreground transition-colors hover:text-primary"
                   >
-                    {skill}
-                  </Badge>
-                ))}
+                    閉じる
+                    <ChevronUp className="size-3" />
+                  </button>
+                )}
                 {skillSearch.filteredTags.length === 0 && (
                   <span className="text-sm text-muted-foreground">
                     該当するスキルがありません
@@ -186,21 +221,43 @@ export function MembersFilterSidebar({
               />
             </div>
             <Card variant="inset" className="py-3">
-              <CardContent className="flex flex-wrap gap-2 px-3">
-                {interestSearch.filteredTags.map((interest) => (
-                  <Badge
-                    key={interest}
-                    variant={
-                      filter.selectedInterests.includes(interest)
-                        ? 'default'
-                        : 'outline'
-                    }
-                    className="cursor-pointer transition-colors"
-                    onClick={() => handleInterestToggle(interest)}
+              <CardContent className="flex flex-col gap-2 px-3">
+                <div className="flex flex-wrap gap-2">
+                  {interestsExpandable.displayTags.map((interest) => (
+                    <Badge
+                      key={interest}
+                      variant={
+                        filter.selectedInterests.includes(interest)
+                          ? 'default'
+                          : 'outline'
+                      }
+                      className="cursor-pointer transition-colors"
+                      onClick={() => handleInterestToggle(interest)}
+                    >
+                      {interest}
+                    </Badge>
+                  ))}
+                  {interestsExpandable.shouldShowExpandButton && (
+                    <button
+                      type="button"
+                      onClick={interestsExpandable.expand}
+                      className="inline-flex items-center gap-1 rounded-full border border-dashed border-muted-foreground/50 px-3 py-0.5 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                    >
+                      他{interestsExpandable.hiddenCount}件
+                      <ChevronDown className="size-3" />
+                    </button>
+                  )}
+                </div>
+                {interestsExpandable.shouldShowCollapseButton && (
+                  <button
+                    type="button"
+                    onClick={interestsExpandable.collapse}
+                    className="inline-flex items-center justify-center gap-1 text-xs text-muted-foreground transition-colors hover:text-primary"
                   >
-                    {interest}
-                  </Badge>
-                ))}
+                    閉じる
+                    <ChevronUp className="size-3" />
+                  </button>
+                )}
                 {interestSearch.filteredTags.length === 0 && (
                   <span className="text-sm text-muted-foreground">
                     該当する興味がありません
