@@ -7,8 +7,9 @@ import { Button } from '@/shared/ui/shadcn/ui/button';
 import { Badge } from '@/shared/ui/shadcn/ui/badge';
 import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
 import { Card, CardContent } from '@/shared/ui/shadcn/ui/card';
-import { ALL_SKILLS, ALL_INTERESTS } from '@/shared/dummy-data/members/members';
 import { TITLE_MASTER } from '@/shared/types/title/title';
+import { useSkills } from '@/features/domain/user/get-skills/lib/use-skills';
+import { useInterests } from '@/features/domain/user/get-interests/lib/use-interests';
 
 import type { MembersFilterState } from '../model/types';
 import { initialFilterState, isFilterActive } from '../model/types';
@@ -26,10 +27,17 @@ export function MembersFilterSidebar({
   filter,
   onFilterChange,
 }: MembersFilterSidebarProps) {
+  // APIからスキル・興味一覧を取得
+  const { data: skillsData } = useSkills();
+  const { data: interestsData } = useInterests();
+
+  const skills = skillsData?.data.skills ?? [];
+  const interests = interestsData?.data.interests ?? [];
+
   // タグ検索フック
   const titleSearch = useTitleSearch(TITLE_MASTER);
-  const skillSearch = useTagSearch(ALL_SKILLS);
-  const interestSearch = useTagSearch(ALL_INTERESTS);
+  const skillSearch = useTagSearch(skills);
+  const interestSearch = useTagSearch(interests);
 
   const handleSkillToggle = (skill: string) => {
     const newSkills = filter.selectedSkills.includes(skill)

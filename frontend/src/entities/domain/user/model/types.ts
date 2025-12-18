@@ -208,3 +208,25 @@ export type DeleteRivalResponse = {
   message: string;
   timestamp: string;
 };
+
+// ========================================
+// スキル・興味一覧（GET /api/v1/users/skills, /interests）
+// ========================================
+
+/** スキル一覧レスポンス */
+export type SkillsListResponse = {
+  data: {
+    skills: string[];
+  };
+  message: string;
+  timestamp: string;
+};
+
+/** 興味・関心一覧レスポンス */
+export type InterestsListResponse = {
+  data: {
+    interests: string[];
+  };
+  message: string;
+  timestamp: string;
+};

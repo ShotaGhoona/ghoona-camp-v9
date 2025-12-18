@@ -99,6 +99,32 @@ backend/app/
 | `POST /api/v1/auth/logout` | ログアウト（Cookie削除） |
 | `GET /api/v1/auth/me` | 現在のユーザー情報取得 |
 
+### スキル・興味一覧API（フィルター選択肢用）
+
+#### GET /api/v1/users/skills
+
+登録されているスキル一覧を取得（ユニーク、アルファベット順）
+
+**レスポンス:**
+```json
+{
+  "data": { "skills": ["AWS", "JavaScript", "React", ...] },
+  "message": "success"
+}
+```
+
+#### GET /api/v1/users/interests
+
+登録されている興味・関心一覧を取得（ユニーク、アルファベット順）
+
+**レスポンス:**
+```json
+{
+  "data": { "interests": ["AI/機械学習", "Web開発", ...] },
+  "message": "success"
+}
+```
+
 ### ライバルAPI
 
 **制約:** 最大3人まで、本人のみ操作可能
@@ -170,6 +196,8 @@ backend/app/
 - `add_rival()` - ライバル追加
 - `delete_rival()` - ライバル削除
 - `get_rival_by_id()` - ライバル関係ID検索
+- `get_all_skills()` - スキル一覧取得（unnest + distinct）
+- `get_all_interests()` - 興味一覧取得（unnest + distinct）
 
 **ドメイン例外:**
 - `UserNotFoundError` - ユーザー不在
@@ -213,11 +241,14 @@ backend/app/
 - `RivalsListDTO` - ライバル一覧
 - `AddRivalInputDTO` / `AddRivalResultDTO` - ライバル追加
 - `DeleteRivalResultDTO` - ライバル削除
+- `SkillsListDTO` / `InterestsListDTO` - スキル・興味一覧
 
-**Usecaseメソッド（ライバル）:**
+**Usecaseメソッド:**
 - `get_rivals()` - ライバル一覧取得
 - `add_rival()` - ライバル追加
 - `delete_rival()` - ライバル削除
+- `get_all_skills()` - スキル一覧取得
+- `get_all_interests()` - 興味一覧取得
 
 **エラーハンドリング:**
 - Usecaseでドメイン例外を投げる

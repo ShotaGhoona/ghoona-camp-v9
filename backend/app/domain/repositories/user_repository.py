@@ -337,3 +337,27 @@ class IUserRepository(ABC):
             tuple[UUID, UUID] | None: (user_id, rival_user_id)のタプル、存在しない場合はNone
         """
         pass
+
+    # ========================================
+    # スキル・興味一覧
+    # ========================================
+
+    @abstractmethod
+    def get_all_skills(self) -> list[str]:
+        """
+        登録されている全スキルのユニーク一覧を取得
+
+        Returns:
+            list[str]: スキル一覧（重複なし、アルファベット順）
+        """
+        pass
+
+    @abstractmethod
+    def get_all_interests(self) -> list[str]:
+        """
+        登録されている全興味・関心のユニーク一覧を取得
+
+        Returns:
+            list[str]: 興味・関心一覧（重複なし、アルファベット順）
+        """
+        pass

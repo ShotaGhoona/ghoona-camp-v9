@@ -199,3 +199,20 @@ class DeleteRivalResultDTO(BaseModel):
 
     class Config:
         populate_by_name = True
+
+
+# ========================================
+# スキル・興味一覧
+# ========================================
+
+
+class SkillsListDTO(BaseModel):
+    """スキル一覧DTO"""
+
+    skills: list[str]
+
+
+class InterestsListDTO(BaseModel):
+    """興味・関心一覧DTO"""
+
+    interests: list[str]

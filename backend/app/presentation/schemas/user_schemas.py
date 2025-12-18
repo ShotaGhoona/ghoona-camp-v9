@@ -222,3 +222,36 @@ class DeleteRivalAPIResponse(BaseModel):
     data: DeleteRivalDataResponse
     message: str = 'ライバルを解除しました'
     timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+
+
+# ========================================
+# スキル・興味一覧
+# ========================================
+
+
+class SkillsListDataResponse(BaseModel):
+    """スキル一覧データレスポンス"""
+
+    skills: list[str]
+
+
+class SkillsListAPIResponse(BaseModel):
+    """スキル一覧APIレスポンス"""
+
+    data: SkillsListDataResponse
+    message: str = 'success'
+    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+
+
+class InterestsListDataResponse(BaseModel):
+    """興味・関心一覧データレスポンス"""
+
+    interests: list[str]
+
+
+class InterestsListAPIResponse(BaseModel):
+    """興味・関心一覧APIレスポンス"""
+
+    data: InterestsListDataResponse
+    message: str = 'success'
+    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())

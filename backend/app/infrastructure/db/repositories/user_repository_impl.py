@@ -547,3 +547,33 @@ class UserRepositoryImpl(IUserRepository):
         if rival_model is None:
             return None
         return (rival_model.user_id, rival_model.rival_user_id)
+
+    def get_all_skills(self) -> list[str]:
+        """登録されている全スキルのユニーク一覧を取得"""
+        from sqlalchemy import func
+
+        # ARRAY型のskillsカラムをunnestで展開し、ユニークな値を取得
+        result = (
+            self.session.query(func.unnest(UserMetadataModel.skills).label('skill'))
+            .filter(UserMetadataModel.skills.isnot(None))
+            .distinct()
+            .order_by('skill')
+            .all()
+        )
+        return [row.skill for row in result if row.skill]
+
+    def get_all_interests(self) -> list[str]:
+        """登録されている全興味・関心のユニーク一覧を取得"""
+        from sqlalchemy import func
+
+        # ARRAY型のinterestsカラムをunnestで展開し、ユニークな値を取得
+        result = (
+            self.session.query(
+                func.unnest(UserMetadataModel.interests).label('interest'),
+            )
+            .filter(UserMetadataModel.interests.isnot(None))
+            .distinct()
+            .order_by('interest')
+            .all()
+        )
+        return [row.interest for row in result if row.interest]

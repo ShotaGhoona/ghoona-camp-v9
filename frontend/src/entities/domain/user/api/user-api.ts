@@ -17,6 +17,8 @@ import type {
   AddRivalRequest,
   AddRivalResponse,
   DeleteRivalResponse,
+  SkillsListResponse,
+  InterestsListResponse,
 } from '../model/types';
 
 export const userApi = {
@@ -113,6 +115,24 @@ export const userApi = {
     const response = await httpClient.delete<DeleteRivalResponse>(
       `/api/v1/users/${userId}/rivals/${rivalId}`,
     );
+    return response.data;
+  },
+
+  // ========================================
+  // スキル・興味一覧
+  // ========================================
+
+  /** スキル一覧取得 */
+  getSkills: async (): Promise<SkillsListResponse> => {
+    const response =
+      await httpClient.get<SkillsListResponse>('/api/v1/users/skills');
+    return response.data;
+  },
+
+  /** 興味・関心一覧取得 */
+  getInterests: async (): Promise<InterestsListResponse> => {
+    const response =
+      await httpClient.get<InterestsListResponse>('/api/v1/users/interests');
     return response.data;
   },
 };

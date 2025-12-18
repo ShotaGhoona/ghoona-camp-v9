@@ -22,7 +22,9 @@ frontend/src/
 │   ├── update-profile/lib/use-update-profile.ts  # プロフィール更新hook
 │   ├── get-rivals/lib/use-rivals.ts         # ライバル一覧取得hook
 │   ├── add-rival/lib/use-add-rival.ts       # ライバル追加hook
-│   └── delete-rival/lib/use-delete-rival.ts # ライバル削除hook
+│   ├── delete-rival/lib/use-delete-rival.ts # ライバル削除hook
+│   ├── get-skills/lib/use-skills.ts         # スキル一覧取得hook
+│   └── get-interests/lib/use-interests.ts   # 興味一覧取得hook
 ├── page-components/members/home/
 │   ├── ui/MembersHomeContainer.tsx
 │   └── ui-block/gallery-view/ui/
@@ -94,6 +96,17 @@ type RivalsListResponse = {
 type AddRivalRequest = { rivalUserId };
 ```
 
+**スキル・興味一覧用:**
+```typescript
+type SkillsListResponse = {
+  data: { skills: string[] }
+};
+
+type InterestsListResponse = {
+  data: { interests: string[] }
+};
+```
+
 ### APIクライアント（user-api.ts）
 
 | メソッド | エンドポイント | 説明 |
@@ -107,6 +120,8 @@ type AddRivalRequest = { rivalUserId };
 | `getRivals` | GET /api/v1/users/{id}/rivals | ライバル一覧取得 |
 | `addRival` | POST /api/v1/users/{id}/rivals | ライバル追加 |
 | `deleteRival` | DELETE /api/v1/users/{id}/rivals/{rivalId} | ライバル削除 |
+| `getSkills` | GET /api/v1/users/skills | スキル一覧取得 |
+| `getInterests` | GET /api/v1/users/interests | 興味一覧取得 |
 
 ## Feature層
 
@@ -122,6 +137,8 @@ type AddRivalRequest = { rivalUserId };
 | `useRivals` | ライバル一覧取得 | useQuery |
 | `useAddRival` | ライバル追加 | useMutation |
 | `useDeleteRival` | ライバル削除 | useMutation |
+| `useSkills` | スキル一覧取得 | useQuery（30分キャッシュ） |
+| `useInterests` | 興味一覧取得 | useQuery（30分キャッシュ） |
 
 ### 統一パターン
 
@@ -168,3 +185,8 @@ export function use{Feature}() {
 ### キャッシュ無効化
 - プロフィール更新成功時に`['user', userId]`と`['users']`を無効化
 - ライバル追加/削除成功時に`['rivals', userId]`を無効化
+
+### フィルターサイドバー連携
+- `MembersFilterSidebar`で`useSkills()`、`useInterests()`を使用
+- ダミーデータ(`ALL_SKILLS`, `ALL_INTERESTS`)からAPIデータに移行
+- フィルター選択肢がDBの実データから動的に取得される

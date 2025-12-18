@@ -31,11 +31,15 @@ from app.presentation.schemas.user_schemas import (
     DeleteRivalAPIResponse,
     DeleteRivalDataResponse,
     ErrorResponse,
+    InterestsListAPIResponse,
+    InterestsListDataResponse,
     PaginationResponse,
     RivalResponse,
     RivalsListAPIResponse,
     RivalsListDataResponse,
     RivalUserResponse,
+    SkillsListAPIResponse,
+    SkillsListDataResponse,
     SocialLinkResponse,
     UpdateUserProfileAPIResponse,
     UpdateUserProfileRequest,
@@ -48,6 +52,60 @@ from app.presentation.schemas.user_schemas import (
 )
 
 router = APIRouter(prefix='/users', tags=['users'])
+
+
+# ========================================
+# スキル・興味一覧（フィルター選択肢用）
+# ========================================
+
+
+@router.get(
+    '/skills',
+    response_model=SkillsListAPIResponse,
+    responses={
+        401: {'model': ErrorResponse, 'description': '認証エラー'},
+    },
+)
+def get_skills(
+    user_usecase: UserUsecase = Depends(get_user_usecase),
+    _current_user: User = Depends(get_current_user_from_cookie),
+) -> SkillsListAPIResponse:
+    """
+    登録されているスキル一覧を取得
+
+    フィルター選択肢で使用。全ユーザーが登録しているスキルのユニーク一覧を返す。
+    """
+    result = user_usecase.get_all_skills()
+    return SkillsListAPIResponse(
+        data=SkillsListDataResponse(skills=result.skills),
+    )
+
+
+@router.get(
+    '/interests',
+    response_model=InterestsListAPIResponse,
+    responses={
+        401: {'model': ErrorResponse, 'description': '認証エラー'},
+    },
+)
+def get_interests(
+    user_usecase: UserUsecase = Depends(get_user_usecase),
+    _current_user: User = Depends(get_current_user_from_cookie),
+) -> InterestsListAPIResponse:
+    """
+    登録されている興味・関心一覧を取得
+
+    フィルター選択肢で使用。全ユーザーが登録している興味・関心のユニーク一覧を返す。
+    """
+    result = user_usecase.get_all_interests()
+    return InterestsListAPIResponse(
+        data=InterestsListDataResponse(interests=result.interests),
+    )
+
+
+# ========================================
+# メンバー一覧・詳細
+# ========================================
 
 
 @router.get(

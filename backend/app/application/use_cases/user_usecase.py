@@ -8,6 +8,7 @@ from app.application.schemas.user_schemas import (
     AddRivalInputDTO,
     AddRivalResultDTO,
     DeleteRivalResultDTO,
+    InterestsListDTO,
     LoginInputDTO,
     LoginOutputDTO,
     LogoutOutputDTO,
@@ -16,6 +17,7 @@ from app.application.schemas.user_schemas import (
     RivalDTO,
     RivalsListDTO,
     RivalUserDTO,
+    SkillsListDTO,
     SocialLinkDTO,
     UpdateUserProfileInputDTO,
     UserDetailDTO,
@@ -432,3 +434,17 @@ class UserUsecase:
         )
 
         return DeleteRivalResultDTO(remaining_slots=remaining_slots)
+
+    # ========================================
+    # スキル・興味一覧
+    # ========================================
+
+    def get_all_skills(self) -> SkillsListDTO:
+        """登録されている全スキルのユニーク一覧を取得"""
+        skills = self.user_repository.get_all_skills()
+        return SkillsListDTO(skills=skills)
+
+    def get_all_interests(self) -> InterestsListDTO:
+        """登録されている全興味・関心のユニーク一覧を取得"""
+        interests = self.user_repository.get_all_interests()
+        return InterestsListDTO(interests=interests)
