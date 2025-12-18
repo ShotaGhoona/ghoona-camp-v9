@@ -79,8 +79,12 @@ export function TitleJourneyProgress({
         <div>
           <div className='h-2 overflow-hidden rounded-full bg-muted/50 backdrop-blur-sm'>
             <div
-              className='h-full rounded-full bg-gradient-to-r from-violet-400 via-emerald-400 via-orange-400 via-red-400 via-30% via-50% via-70% to-amber-400 transition-all duration-700'
-              style={{ width: `${progressPercentage}%` }}
+              className='h-full rounded-full transition-all duration-700'
+              style={{
+                width: `${progressPercentage}%`,
+                background:
+                  'linear-gradient(to right, #a78bfa 0%, #34d399 30%, #fb923c 50%, #f87171 70%, #fbbf24 100%)',
+              }}
             />
           </div>
           <div className='mt-1.5 flex items-center justify-between text-xs text-muted-foreground'>

@@ -80,8 +80,11 @@ export function TimelineViewWidget<T>({
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
   // 月の範囲
-  const monthStart = new Date(year, month - 1, 1);
-  const monthEnd = new Date(year, month - 1, daysInMonth);
+  const monthStart = useMemo(() => new Date(year, month - 1, 1), [year, month]);
+  const monthEnd = useMemo(
+    () => new Date(year, month - 1, daysInMonth),
+    [year, month, daysInMonth],
+  );
 
   // 今日の日付
   const today = useMemo(() => getToday(), []);
