@@ -5,11 +5,17 @@ from uuid import UUID
 
 from app.application.interfaces.security_service import ISecurityService
 from app.application.schemas.user_schemas import (
+    AddRivalInputDTO,
+    AddRivalResultDTO,
+    DeleteRivalResultDTO,
     LoginInputDTO,
     LoginOutputDTO,
     LogoutOutputDTO,
     MeOutputDTO,
     PaginationDTO,
+    RivalDTO,
+    RivalsListDTO,
+    RivalUserDTO,
     SocialLinkDTO,
     UpdateUserProfileInputDTO,
     UserDetailDTO,
@@ -20,11 +26,17 @@ from app.domain.exceptions.auth import InvalidCredentialsError
 from app.domain.exceptions.auth import UserNotFoundError as AuthUserNotFoundError
 from app.domain.exceptions.user import (
     ForbiddenError,
+    RivalAlreadyExistsError,
+    RivalLimitExceededError,
+    RivalNotFoundError,
+    SelfRivalError,
     UsernameAlreadyExistsError,
     UserNotFoundError,
 )
 from app.domain.repositories.user_repository import (
+    MAX_RIVALS,
     IUserRepository,
+    Rival,
     SocialLinkInput,
     UserListItem,
     UserProfileUpdateData,
@@ -268,3 +280,155 @@ class UserUsecase:
 
         logger.info('プロフィール更新成功: user_id=%s', user_id)
         return self._to_user_detail_dto(updated_user)
+
+    # ========================================
+    # ライバル
+    # ========================================
+
+    def get_rivals(self, user_id: UUID, current_user_id: str) -> RivalsListDTO:
+        """ユーザーのライバル一覧を取得"""
+        # 権限チェック: 本人のみ取得可能
+        if str(user_id) != current_user_id:
+            logger.warning(
+                'ライバル一覧取得権限エラー: user_id=%s, current_user_id=%s',
+                user_id,
+                current_user_id,
+            )
+            raise ForbiddenError()
+
+        # ユーザー存在確認
+        user = self.user_repository.get_by_id(user_id)
+        if user is None:
+            raise UserNotFoundError()
+
+        # リポジトリからデータ取得
+        rivals_data = self.user_repository.get_rivals(user_id)
+
+        # DTOに変換
+        rivals_dto = [self._to_rival_dto(rival) for rival in rivals_data.rivals]
+
+        return RivalsListDTO(
+            rivals=rivals_dto,
+            max_rivals=rivals_data.max_rivals,
+            remaining_slots=rivals_data.remaining_slots,
+        )
+
+    def _to_rival_dto(self, rival: Rival) -> RivalDTO:
+        """RivalをRivalDTOに変換"""
+        rival_user_dto = RivalUserDTO(
+            id=str(rival.rival_user.id),
+            username=rival.rival_user.username,
+            avatar_url=rival.rival_user.avatar_url,
+            display_name=rival.rival_user.display_name,
+            tagline=rival.rival_user.tagline,
+            total_attendance_days=rival.rival_user.total_attendance_days,
+            current_streak_days=rival.rival_user.current_streak_days,
+            max_streak_days=rival.rival_user.max_streak_days,
+            current_title_level=rival.rival_user.current_title_level,
+        )
+
+        return RivalDTO(
+            id=str(rival.id),
+            rival_user=rival_user_dto,
+            created_at=rival.created_at,
+        )
+
+    def add_rival(
+        self,
+        user_id: UUID,
+        current_user_id: str,
+        input_dto: AddRivalInputDTO,
+    ) -> AddRivalResultDTO:
+        """ライバルを追加"""
+        # 権限チェック: 本人のみ追加可能
+        if str(user_id) != current_user_id:
+            logger.warning(
+                'ライバル追加権限エラー: user_id=%s, current_user_id=%s',
+                user_id,
+                current_user_id,
+            )
+            raise ForbiddenError()
+
+        rival_user_id = UUID(input_dto.rival_user_id)
+
+        # 自分自身チェック
+        if user_id == rival_user_id:
+            raise SelfRivalError()
+
+        # ユーザー存在確認（自分）
+        user = self.user_repository.get_by_id(user_id)
+        if user is None:
+            raise UserNotFoundError()
+
+        # ライバルユーザー存在確認
+        rival_user = self.user_repository.get_by_id(rival_user_id)
+        if rival_user is None:
+            raise UserNotFoundError()
+
+        # 重複チェック
+        if self.user_repository.exists_rival(user_id, rival_user_id):
+            raise RivalAlreadyExistsError()
+
+        # 上限チェック
+        current_count = self.user_repository.count_rivals(user_id)
+        if current_count >= MAX_RIVALS:
+            raise RivalLimitExceededError()
+
+        # リポジトリで追加
+        rival = self.user_repository.add_rival(user_id, rival_user_id)
+        remaining_slots = MAX_RIVALS - (current_count + 1)
+
+        logger.info(
+            'ライバル追加成功: user_id=%s, rival_user_id=%s',
+            user_id,
+            rival_user_id,
+        )
+
+        return AddRivalResultDTO(
+            rival=self._to_rival_dto(rival),
+            remaining_slots=remaining_slots,
+        )
+
+    def delete_rival(
+        self,
+        user_id: UUID,
+        rival_id: UUID,
+        current_user_id: str,
+    ) -> DeleteRivalResultDTO:
+        """ライバル関係を削除"""
+        # ライバル関係の存在確認とuser_id取得
+        rival_data = self.user_repository.get_rival_by_id(rival_id)
+        if rival_data is None:
+            raise RivalNotFoundError()
+
+        owner_user_id, _ = rival_data
+
+        # 権限チェック: パスのuser_idとライバル関係のuser_idが一致するか
+        if owner_user_id != user_id:
+            raise RivalNotFoundError()
+
+        # 権限チェック: 本人のみ削除可能
+        if str(user_id) != current_user_id:
+            logger.warning(
+                'ライバル削除権限エラー: user_id=%s, current_user_id=%s',
+                user_id,
+                current_user_id,
+            )
+            raise ForbiddenError()
+
+        # リポジトリで削除
+        deleted = self.user_repository.delete_rival(user_id, rival_id)
+        if not deleted:
+            raise RivalNotFoundError()
+
+        # 残りスロット数を計算
+        current_count = self.user_repository.count_rivals(user_id)
+        remaining_slots = MAX_RIVALS - current_count
+
+        logger.info(
+            'ライバル削除成功: user_id=%s, rival_id=%s',
+            user_id,
+            rival_id,
+        )
+
+        return DeleteRivalResultDTO(remaining_slots=remaining_slots)

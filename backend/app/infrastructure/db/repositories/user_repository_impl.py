@@ -2,26 +2,31 @@
 
 from uuid import UUID
 
-from sqlalchemy import func, or_
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.domain.entities.user import User
 from app.domain.repositories.user_repository import (
+    MAX_RIVALS,
     IUserRepository,
     PaginatedUserList,
+    Rival,
+    RivalListWithSlots,
+    RivalUser,
     UserListItem,
     UserProfileUpdateData,
     UserSearchFilter,
     UserWithDetails,
 )
+from app.infrastructure.db.models.attendance_model import AttendanceStatisticsModel
+from app.infrastructure.db.models.title_model import TitleAchievementModel
 from app.infrastructure.db.models.user_model import (
     UserMetadataModel,
     UserModel,
+    UserRivalModel,
     UserSocialLinkModel,
     UserVisionModel,
 )
-from app.infrastructure.db.models.attendance_model import AttendanceStatisticsModel
-from app.infrastructure.db.models.title_model import TitleAchievementModel
 
 
 class UserRepositoryImpl(IUserRepository):
@@ -401,3 +406,144 @@ class UserRepositoryImpl(IUserRepository):
             created_at=user_model.created_at,
             updated_at=user_model.updated_at,
         )
+
+    # ========================================
+    # ライバル関連
+    # ========================================
+
+    def get_rivals(self, user_id: UUID) -> RivalListWithSlots:
+        """ユーザーのライバル一覧を取得"""
+        # ライバル関係を取得
+        rival_models = (
+            self.session.query(UserRivalModel)
+            .filter(UserRivalModel.user_id == user_id)
+            .order_by(UserRivalModel.created_at.desc())
+            .all()
+        )
+
+        rivals = []
+        for rival_model in rival_models:
+            rival_user_data = self._get_rival_user_data(rival_model.rival_user_id)
+            if rival_user_data is not None:
+                rivals.append(
+                    Rival(
+                        id=rival_model.id,
+                        rival_user=rival_user_data,
+                        created_at=rival_model.created_at.isoformat(),
+                    )
+                )
+
+        current_count = len(rivals)
+        remaining_slots = MAX_RIVALS - current_count
+
+        return RivalListWithSlots(
+            rivals=rivals,
+            max_rivals=MAX_RIVALS,
+            remaining_slots=remaining_slots,
+        )
+
+    def _get_rival_user_data(self, rival_user_id: UUID) -> RivalUser | None:
+        """ライバルユーザーの情報を取得"""
+        # ユーザー基本情報
+        user_model = (
+            self.session.query(UserModel)
+            .filter(UserModel.id == rival_user_id)
+            .filter(UserModel.is_active == True)
+            .first()
+        )
+        if user_model is None:
+            return None
+
+        # メタデータ
+        metadata = (
+            self.session.query(UserMetadataModel)
+            .filter(UserMetadataModel.user_id == rival_user_id)
+            .first()
+        )
+
+        # 参加統計
+        stats = (
+            self.session.query(AttendanceStatisticsModel)
+            .filter(AttendanceStatisticsModel.user_id == rival_user_id)
+            .first()
+        )
+
+        # 現在の称号
+        current_title = (
+            self.session.query(TitleAchievementModel)
+            .filter(TitleAchievementModel.user_id == rival_user_id)
+            .filter(TitleAchievementModel.is_current == True)
+            .first()
+        )
+
+        return RivalUser(
+            id=user_model.id,
+            username=user_model.username,
+            avatar_url=user_model.avatar_url,
+            display_name=metadata.display_name if metadata else None,
+            tagline=metadata.tagline if metadata else None,
+            total_attendance_days=stats.total_attendance_days if stats else 0,
+            current_streak_days=stats.current_streak_days if stats else 0,
+            max_streak_days=stats.max_streak_days if stats else 0,
+            current_title_level=current_title.title_level if current_title else 1,
+        )
+
+    def count_rivals(self, user_id: UUID) -> int:
+        """ユーザーのライバル数を取得"""
+        return (
+            self.session.query(UserRivalModel)
+            .filter(UserRivalModel.user_id == user_id)
+            .count()
+        )
+
+    def exists_rival(self, user_id: UUID, rival_user_id: UUID) -> bool:
+        """ライバル関係が存在するか確認"""
+        return (
+            self.session.query(UserRivalModel)
+            .filter(UserRivalModel.user_id == user_id)
+            .filter(UserRivalModel.rival_user_id == rival_user_id)
+            .first()
+            is not None
+        )
+
+    def add_rival(self, user_id: UUID, rival_user_id: UUID) -> Rival:
+        """ライバルを追加"""
+        rival_model = UserRivalModel(
+            user_id=user_id,
+            rival_user_id=rival_user_id,
+        )
+        self.session.add(rival_model)
+        self.session.flush()
+
+        # ライバルユーザー情報を取得
+        rival_user_data = self._get_rival_user_data(rival_user_id)
+        if rival_user_data is None:
+            raise ValueError(f'Rival user {rival_user_id} not found')
+
+        return Rival(
+            id=rival_model.id,
+            rival_user=rival_user_data,
+            created_at=rival_model.created_at.isoformat(),
+        )
+
+    def delete_rival(self, user_id: UUID, rival_id: UUID) -> bool:
+        """ライバル関係を削除"""
+        deleted_count = (
+            self.session.query(UserRivalModel)
+            .filter(UserRivalModel.id == rival_id)
+            .filter(UserRivalModel.user_id == user_id)
+            .delete()
+        )
+        self.session.flush()
+        return deleted_count > 0
+
+    def get_rival_by_id(self, rival_id: UUID) -> tuple[UUID, UUID] | None:
+        """ライバル関係IDからuser_idとrival_user_idを取得"""
+        rival_model = (
+            self.session.query(UserRivalModel)
+            .filter(UserRivalModel.id == rival_id)
+            .first()
+        )
+        if rival_model is None:
+            return None
+        return (rival_model.user_id, rival_model.rival_user_id)

@@ -2,7 +2,7 @@
 
 ## 概要
 
-ユーザードメインのバックエンドAPI（`GET /users`、`GET /users/{userId}`、`PUT /users/{userId}`）および認証機能をオニオンアーキテクチャに従って実装。
+ユーザードメインのバックエンドAPI（`GET /users`、`GET /users/{userId}`、`PUT /users/{userId}`）、認証機能、およびライバル機能をオニオンアーキテクチャに従って実装。
 
 ## 変更ファイル
 
@@ -99,6 +99,50 @@ backend/app/
 | `POST /api/v1/auth/logout` | ログアウト（Cookie削除） |
 | `GET /api/v1/auth/me` | 現在のユーザー情報取得 |
 
+### ライバルAPI
+
+**制約:** 最大3人まで、本人のみ操作可能
+
+#### GET /api/v1/users/{user_id}/rivals
+
+ライバル一覧取得
+
+**レスポンス:**
+```json
+{
+  "data": {
+    "rivals": [{ "id", "rivalUser": {...}, "createdAt" }],
+    "maxRivals": 3,
+    "remainingSlots": 2
+  }
+}
+```
+
+#### POST /api/v1/users/{user_id}/rivals
+
+ライバル追加（201 Created）
+
+**リクエストボディ:**
+| フィールド | 型 | 必須 | 説明 |
+|-----------|-----|------|------|
+| `rivalUserId` | string (UUID) | ✅ | ライバルに設定するユーザーID |
+
+**エラーレスポンス:**
+- `400`: 自分自身を指定
+- `401`: 未認証
+- `403`: 権限なし
+- `404`: ユーザー不在
+- `409`: 既にライバル登録済み / 上限（3人）超過
+
+#### DELETE /api/v1/users/{user_id}/rivals/{rival_id}
+
+ライバル関係を削除
+
+**エラーレスポンス:**
+- `401`: 未認証
+- `403`: 権限なし
+- `404`: ライバル関係不在
+
 ## 実装詳細
 
 ### Domain層
@@ -110,18 +154,32 @@ backend/app/
 - `UserWithDetails` - 詳細用データ（全フィールド）
 - `SocialLinkInput` - SNSリンク入力
 - `UserProfileUpdateData` - プロフィール更新データ
+- `RivalUser` - ライバルユーザー情報（比較表示用）
+- `Rival` - ライバル関係
+- `RivalListWithSlots` - ライバル一覧（スロット情報付き）
+- `MAX_RIVALS = 3` - ライバル上限定数
 
 **リポジトリインターフェース:**
 - `get_users_list()` - 一覧取得
 - `get_user_detail_by_id()` - 詳細取得
 - `get_by_username()` - ユーザー名で取得
 - `update_user_profile()` - プロフィール更新
+- `get_rivals()` - ライバル一覧取得
+- `count_rivals()` - ライバル数取得
+- `exists_rival()` - ライバル存在確認
+- `add_rival()` - ライバル追加
+- `delete_rival()` - ライバル削除
+- `get_rival_by_id()` - ライバル関係ID検索
 
 **ドメイン例外:**
 - `UserNotFoundError` - ユーザー不在
 - `UsernameAlreadyExistsError` - ユーザー名重複
 - `ForbiddenError` - 権限エラー
 - `InvalidCredentialsError` - 認証失敗
+- `RivalNotFoundError` - ライバル関係不在
+- `RivalAlreadyExistsError` - 重複登録
+- `RivalLimitExceededError` - 上限超過
+- `SelfRivalError` - 自分自身を指定
 
 ### Infrastructure層
 
@@ -142,12 +200,24 @@ backend/app/
 - skills/interests: ARRAY overlap（OR検索）
 - title_levels: IN検索
 
+**ライバルクエリ（5テーブル結合）:**
+- user_rivals, users, user_metadata, attendance_statistics, title_achievements
+
 ### Application層
 
 **DTO:**
 - `UserListItemDTO` / `UserDetailDTO` - 一覧・詳細
 - `LoginInputDTO` / `LoginOutputDTO` - ログイン
 - `UpdateUserProfileInputDTO` - プロフィール更新
+- `RivalUserDTO` / `RivalDTO` - ライバル情報
+- `RivalsListDTO` - ライバル一覧
+- `AddRivalInputDTO` / `AddRivalResultDTO` - ライバル追加
+- `DeleteRivalResultDTO` - ライバル削除
+
+**Usecaseメソッド（ライバル）:**
+- `get_rivals()` - ライバル一覧取得
+- `add_rival()` - ライバル追加
+- `delete_rival()` - ライバル削除
 
 **エラーハンドリング:**
 - Usecaseでドメイン例外を投げる
@@ -163,3 +233,6 @@ backend/app/
 - `docs/requirements/api/user/get-users.md`
 - `docs/requirements/api/user/get-user-by-id.md`
 - `docs/requirements/api/user/put-user.md`
+- `docs/requirements/api/user/get-rivals.md`
+- `docs/requirements/api/user/post-rival.md`
+- `docs/requirements/api/user/delete-rival.md`

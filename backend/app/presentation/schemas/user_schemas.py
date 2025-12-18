@@ -144,3 +144,81 @@ class UpdateUserProfileAPIResponse(BaseModel):
     data: UserDetailDataResponse
     message: str = 'プロフィールを更新しました'
     timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+
+
+# ========================================
+# ライバル関連
+# ========================================
+
+
+class RivalUserResponse(BaseModel):
+    """ライバルユーザーレスポンス（比較表示用）"""
+
+    id: str
+    username: str | None
+    avatarUrl: str | None
+    displayName: str | None
+    tagline: str | None
+    totalAttendanceDays: int
+    currentStreakDays: int
+    maxStreakDays: int
+    currentTitleLevel: int
+
+
+class RivalResponse(BaseModel):
+    """ライバルレスポンス"""
+
+    id: str
+    rivalUser: RivalUserResponse
+    createdAt: str
+
+
+class RivalsListDataResponse(BaseModel):
+    """ライバル一覧データレスポンス"""
+
+    rivals: list[RivalResponse]
+    maxRivals: int
+    remainingSlots: int
+
+
+class RivalsListAPIResponse(BaseModel):
+    """ライバル一覧APIレスポンス"""
+
+    data: RivalsListDataResponse
+    message: str = 'success'
+    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+
+
+class AddRivalRequest(BaseModel):
+    """ライバル追加リクエスト"""
+
+    rivalUserId: str = Field(..., description='ライバルに設定するユーザーID')
+
+
+class AddRivalDataResponse(BaseModel):
+    """ライバル追加データレスポンス"""
+
+    rival: RivalResponse
+    remainingSlots: int
+
+
+class AddRivalAPIResponse(BaseModel):
+    """ライバル追加APIレスポンス"""
+
+    data: AddRivalDataResponse
+    message: str = 'ライバルを追加しました'
+    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+
+
+class DeleteRivalDataResponse(BaseModel):
+    """ライバル削除データレスポンス"""
+
+    remainingSlots: int
+
+
+class DeleteRivalAPIResponse(BaseModel):
+    """ライバル削除APIレスポンス"""
+
+    data: DeleteRivalDataResponse
+    message: str = 'ライバルを解除しました'
+    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())

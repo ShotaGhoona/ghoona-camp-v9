@@ -5,6 +5,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.application.schemas.user_schemas import (
+    AddRivalInputDTO,
     SocialLinkInputDTO,
     UpdateUserProfileInputDTO,
 )
@@ -12,6 +13,10 @@ from app.application.use_cases.user_usecase import UserUsecase
 from app.di.user import get_user_usecase
 from app.domain.exceptions.user import (
     ForbiddenError,
+    RivalAlreadyExistsError,
+    RivalLimitExceededError,
+    RivalNotFoundError,
+    SelfRivalError,
     UsernameAlreadyExistsError,
     UserNotFoundError,
 )
@@ -20,8 +25,17 @@ from app.infrastructure.security.security_service_impl import (
     get_current_user_from_cookie,
 )
 from app.presentation.schemas.user_schemas import (
+    AddRivalAPIResponse,
+    AddRivalDataResponse,
+    AddRivalRequest,
+    DeleteRivalAPIResponse,
+    DeleteRivalDataResponse,
     ErrorResponse,
     PaginationResponse,
+    RivalResponse,
+    RivalsListAPIResponse,
+    RivalsListDataResponse,
+    RivalUserResponse,
     SocialLinkResponse,
     UpdateUserProfileAPIResponse,
     UpdateUserProfileRequest,
@@ -286,4 +300,209 @@ def update_user_profile(
 
     return UpdateUserProfileAPIResponse(
         data=UserDetailDataResponse(user=user_response)
+    )
+
+
+# ========================================
+# ライバル関連
+# ========================================
+
+
+def _to_rival_response(rival_dto) -> RivalResponse:
+    """ライバルDTOをレスポンスに変換"""
+    return RivalResponse(
+        id=rival_dto.id,
+        rivalUser=RivalUserResponse(
+            id=rival_dto.rival_user.id,
+            username=rival_dto.rival_user.username,
+            avatarUrl=rival_dto.rival_user.avatar_url,
+            displayName=rival_dto.rival_user.display_name,
+            tagline=rival_dto.rival_user.tagline,
+            totalAttendanceDays=rival_dto.rival_user.total_attendance_days,
+            currentStreakDays=rival_dto.rival_user.current_streak_days,
+            maxStreakDays=rival_dto.rival_user.max_streak_days,
+            currentTitleLevel=rival_dto.rival_user.current_title_level,
+        ),
+        createdAt=rival_dto.created_at,
+    )
+
+
+@router.get(
+    '/{user_id}/rivals',
+    response_model=RivalsListAPIResponse,
+    responses={
+        401: {'model': ErrorResponse, 'description': '認証エラー'},
+        403: {'model': ErrorResponse, 'description': '権限エラー'},
+    },
+)
+def get_rivals(
+    user_id: UUID,
+    current_user: User = Depends(get_current_user_from_cookie),
+    user_usecase: UserUsecase = Depends(get_user_usecase),
+) -> RivalsListAPIResponse:
+    """
+    ユーザーのライバル一覧を取得
+
+    本人のみ取得可能。最大3人まで。
+    """
+    try:
+        result = user_usecase.get_rivals(
+            user_id=user_id,
+            current_user_id=current_user.id,
+        )
+    except ForbiddenError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                'code': 'FORBIDDEN',
+                'message': 'このユーザーのライバル一覧を取得する権限がありません',
+            },
+        ) from e
+    except UserNotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                'code': 'NOT_FOUND',
+                'message': '指定されたユーザーが見つかりません',
+            },
+        ) from e
+
+    rivals_response = [_to_rival_response(rival) for rival in result.rivals]
+
+    return RivalsListAPIResponse(
+        data=RivalsListDataResponse(
+            rivals=rivals_response,
+            maxRivals=result.max_rivals,
+            remainingSlots=result.remaining_slots,
+        )
+    )
+
+
+@router.post(
+    '/{user_id}/rivals',
+    response_model=AddRivalAPIResponse,
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        400: {'model': ErrorResponse, 'description': 'バリデーションエラー'},
+        401: {'model': ErrorResponse, 'description': '認証エラー'},
+        403: {'model': ErrorResponse, 'description': '権限エラー'},
+        404: {'model': ErrorResponse, 'description': 'ユーザーが見つからない'},
+        409: {'model': ErrorResponse, 'description': '重複または上限超過'},
+    },
+)
+def add_rival(
+    user_id: UUID,
+    request: AddRivalRequest,
+    current_user: User = Depends(get_current_user_from_cookie),
+    user_usecase: UserUsecase = Depends(get_user_usecase),
+) -> AddRivalAPIResponse:
+    """
+    ライバルを追加
+
+    本人のみ追加可能。最大3人まで。
+    """
+    input_dto = AddRivalInputDTO(rival_user_id=request.rivalUserId)
+
+    try:
+        result = user_usecase.add_rival(
+            user_id=user_id,
+            current_user_id=current_user.id,
+            input_dto=input_dto,
+        )
+    except SelfRivalError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                'code': 'VALIDATION_ERROR',
+                'message': '自分自身をライバルに設定することはできません',
+            },
+        ) from e
+    except ForbiddenError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                'code': 'FORBIDDEN',
+                'message': 'このユーザーのライバルを追加する権限がありません',
+            },
+        ) from e
+    except UserNotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                'code': 'NOT_FOUND',
+                'message': '指定されたユーザーが見つかりません',
+            },
+        ) from e
+    except RivalAlreadyExistsError as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={
+                'code': 'CONFLICT',
+                'message': 'このユーザーは既にライバルに設定されています',
+            },
+        ) from e
+    except RivalLimitExceededError as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={
+                'code': 'RIVAL_LIMIT_EXCEEDED',
+                'message': 'ライバルは最大3人までです',
+            },
+        ) from e
+
+    return AddRivalAPIResponse(
+        data=AddRivalDataResponse(
+            rival=_to_rival_response(result.rival),
+            remainingSlots=result.remaining_slots,
+        )
+    )
+
+
+@router.delete(
+    '/{user_id}/rivals/{rival_id}',
+    response_model=DeleteRivalAPIResponse,
+    responses={
+        401: {'model': ErrorResponse, 'description': '認証エラー'},
+        403: {'model': ErrorResponse, 'description': '権限エラー'},
+        404: {'model': ErrorResponse, 'description': 'ライバル関係が見つからない'},
+    },
+)
+def delete_rival(
+    user_id: UUID,
+    rival_id: UUID,
+    current_user: User = Depends(get_current_user_from_cookie),
+    user_usecase: UserUsecase = Depends(get_user_usecase),
+) -> DeleteRivalAPIResponse:
+    """
+    ライバル関係を削除
+
+    本人のみ削除可能。
+    """
+    try:
+        result = user_usecase.delete_rival(
+            user_id=user_id,
+            rival_id=rival_id,
+            current_user_id=current_user.id,
+        )
+    except ForbiddenError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                'code': 'FORBIDDEN',
+                'message': 'このライバル関係を解除する権限がありません',
+            },
+        ) from e
+    except RivalNotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                'code': 'NOT_FOUND',
+                'message': '指定されたライバル関係が見つかりません',
+            },
+        ) from e
+
+    return DeleteRivalAPIResponse(
+        data=DeleteRivalDataResponse(
+            remainingSlots=result.remaining_slots,
+        )
     )

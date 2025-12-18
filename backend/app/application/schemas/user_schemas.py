@@ -130,3 +130,72 @@ class UpdateUserProfileInputDTO(BaseModel):
     vision: str | None = Field(None, description='ビジョン・将来の目標')
     is_vision_public: bool | None = Field(None, description='ビジョンの公開設定')
     social_links: list[SocialLinkInputDTO] | None = Field(None, description='SNSリンク一覧')
+
+
+# ========================================
+# ライバル関連DTO
+# ========================================
+
+
+class RivalUserDTO(BaseModel):
+    """ライバルユーザーDTO（比較表示用）"""
+
+    id: str
+    username: str | None
+    avatar_url: str | None = Field(alias='avatarUrl')
+    display_name: str | None = Field(alias='displayName')
+    tagline: str | None
+    total_attendance_days: int = Field(alias='totalAttendanceDays')
+    current_streak_days: int = Field(alias='currentStreakDays')
+    max_streak_days: int = Field(alias='maxStreakDays')
+    current_title_level: int = Field(alias='currentTitleLevel')
+
+    class Config:
+        populate_by_name = True
+
+
+class RivalDTO(BaseModel):
+    """ライバルDTO"""
+
+    id: str
+    rival_user: RivalUserDTO = Field(alias='rivalUser')
+    created_at: str = Field(alias='createdAt')
+
+    class Config:
+        populate_by_name = True
+
+
+class RivalsListDTO(BaseModel):
+    """ライバル一覧DTO"""
+
+    rivals: list[RivalDTO]
+    max_rivals: int = Field(alias='maxRivals')
+    remaining_slots: int = Field(alias='remainingSlots')
+
+    class Config:
+        populate_by_name = True
+
+
+class AddRivalInputDTO(BaseModel):
+    """ライバル追加入力DTO"""
+
+    rival_user_id: str = Field(..., description='ライバルに設定するユーザーID')
+
+
+class AddRivalResultDTO(BaseModel):
+    """ライバル追加結果DTO"""
+
+    rival: RivalDTO
+    remaining_slots: int = Field(alias='remainingSlots')
+
+    class Config:
+        populate_by_name = True
+
+
+class DeleteRivalResultDTO(BaseModel):
+    """ライバル削除結果DTO"""
+
+    remaining_slots: int = Field(alias='remainingSlots')
+
+    class Config:
+        populate_by_name = True

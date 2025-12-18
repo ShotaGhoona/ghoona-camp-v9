@@ -88,6 +88,46 @@ class UserProfileUpdateData:
     social_links: list[SocialLinkInput] | None = None
 
 
+# ========================================
+# ライバル関連
+# ========================================
+
+MAX_RIVALS = 3
+
+
+@dataclass
+class RivalUser:
+    """ライバルユーザー情報（比較表示用）"""
+
+    id: UUID
+    username: str | None
+    avatar_url: str | None
+    display_name: str | None
+    tagline: str | None
+    total_attendance_days: int
+    current_streak_days: int
+    max_streak_days: int
+    current_title_level: int
+
+
+@dataclass
+class Rival:
+    """ライバル関係"""
+
+    id: UUID
+    rival_user: RivalUser
+    created_at: str
+
+
+@dataclass
+class RivalListWithSlots:
+    """ライバル一覧（スロット情報付き）"""
+
+    rivals: list[Rival]
+    max_rivals: int
+    remaining_slots: int
+
+
 class IUserRepository(ABC):
     """ユーザーリポジトリのインターフェース"""
 
@@ -210,5 +250,90 @@ class IUserRepository(ABC):
 
         Returns:
             Optional[UserWithDetails]: 更新後のユーザー詳細情報（存在しない場合はNone）
+        """
+        pass
+
+    # ========================================
+    # ライバル関連
+    # ========================================
+
+    @abstractmethod
+    def get_rivals(self, user_id: UUID) -> RivalListWithSlots:
+        """
+        ユーザーのライバル一覧を取得
+
+        Args:
+            user_id: ユーザーID
+
+        Returns:
+            RivalListWithSlots: ライバル一覧（スロット情報付き）
+        """
+        pass
+
+    @abstractmethod
+    def count_rivals(self, user_id: UUID) -> int:
+        """
+        ユーザーのライバル数を取得
+
+        Args:
+            user_id: ユーザーID
+
+        Returns:
+            int: ライバル数
+        """
+        pass
+
+    @abstractmethod
+    def exists_rival(self, user_id: UUID, rival_user_id: UUID) -> bool:
+        """
+        ライバル関係が存在するか確認
+
+        Args:
+            user_id: ユーザーID
+            rival_user_id: ライバルユーザーID
+
+        Returns:
+            bool: 存在する場合True
+        """
+        pass
+
+    @abstractmethod
+    def add_rival(self, user_id: UUID, rival_user_id: UUID) -> Rival:
+        """
+        ライバルを追加
+
+        Args:
+            user_id: ユーザーID
+            rival_user_id: ライバルユーザーID
+
+        Returns:
+            Rival: 追加されたライバル情報
+        """
+        pass
+
+    @abstractmethod
+    def delete_rival(self, user_id: UUID, rival_id: UUID) -> bool:
+        """
+        ライバル関係を削除
+
+        Args:
+            user_id: ユーザーID
+            rival_id: ライバル関係ID
+
+        Returns:
+            bool: 削除成功の場合True
+        """
+        pass
+
+    @abstractmethod
+    def get_rival_by_id(self, rival_id: UUID) -> tuple[UUID, UUID] | None:
+        """
+        ライバル関係IDからuser_idとrival_user_idを取得
+
+        Args:
+            rival_id: ライバル関係ID
+
+        Returns:
+            tuple[UUID, UUID] | None: (user_id, rival_user_id)のタプル、存在しない場合はNone
         """
         pass
