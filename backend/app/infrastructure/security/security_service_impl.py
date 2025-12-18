@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, Request, status
 from jose import JWTError, jwt
@@ -26,9 +26,9 @@ class SecurityServiceImpl(ISecurityService):
     ) -> str:
         """アクセストークンを生成"""
         if expires_delta:
-            expire = datetime.now(timezone.utc) + expires_delta
+            expire = datetime.now(UTC) + expires_delta
         else:
-            expire = datetime.now(timezone.utc) + timedelta(days=7)
+            expire = datetime.now(UTC) + timedelta(days=7)
 
         to_encode = {'user_id': user_id, 'exp': expire}
         settings = get_settings()

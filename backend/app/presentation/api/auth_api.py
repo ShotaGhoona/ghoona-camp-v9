@@ -29,11 +29,11 @@ def login(
 
     try:
         output_dto = user_usecase.login(input_dto)
-    except InvalidCredentialsError:
+    except InvalidCredentialsError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='メールアドレスまたはパスワードが正しくありません',
-        )
+        ) from e
 
     # Cookieにアクセストークンを設定
     response.set_cookie(
@@ -73,11 +73,11 @@ def get_me(
     """現在のユーザー情報取得エンドポイント"""
     try:
         output_dto = user_usecase.get_me(user_id=current_user.id)
-    except UserNotFoundError:
+    except UserNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='ユーザーが見つかりません',
-        )
+        ) from e
 
     return MeResponse(
         id=output_dto.id,

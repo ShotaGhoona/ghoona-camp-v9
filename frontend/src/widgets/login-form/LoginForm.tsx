@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useLogin } from '@/features/domain/user/login/lib/use-login';
-import { type LoginFormData } from '@/features/domain/user/login/model/types';
+import type { LoginRequest } from '@/entities/domain/user/model/types';
 import { Button } from '@/shared/ui/shadcn/ui/button';
 import { Input } from '@/shared/ui/shadcn/ui/input';
 import { Label } from '@/shared/ui/shadcn/ui/label';
@@ -21,7 +21,7 @@ export function LoginForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const credentials: LoginFormData = { email, password };
+    const credentials: LoginRequest = { email, password };
     loginMutation.mutate(credentials);
   };
 

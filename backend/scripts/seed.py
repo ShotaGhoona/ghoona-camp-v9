@@ -385,8 +385,6 @@ def generate_user(index: int) -> dict:
             })
 
     # メールアドレス生成
-    email_base = f'{last_name.lower()}.{first_name.lower()}'.replace(' ', '')
-    # ローマ字変換（簡易版）
     email = f'user{index:03d}@example.com'
 
     return {

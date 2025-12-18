@@ -47,9 +47,14 @@ ignore = [
 
 # ファイルごとの除外ルール
 [tool.ruff.lint.per-file-ignores]
-"alembic/versions/*.py" = ["E501"]  # マイグレーションファイルは長い行を許可
+"alembic/versions/*.py" = ["E501", "W291", "UP035", "I001", "UP007"]  # マイグレーションファイルは自動生成
+"alembic/env.py" = ["F401", "E402", "I001"]  # Alembicのモデル認識用インポート
 "tests/**/*.py" = ["S101"]  # テストでのassertを許可
 "scripts/check_onion_architecture.py" = ["C90"]
+"scripts/seed.py" = ["S311", "C901"]  # シードスクリプトはrandomで問題ない, 複雑度許容
+"app/domain/entities/__init__.py" = ["I001"]  # エンティティのグループ化されたインポート
+"app/infrastructure/db/models/__init__.py" = ["I001"]  # モデルのグループ化されたインポート
+"app/infrastructure/db/repositories/*.py" = ["E712", "C901"]  # SQLAlchemyの == True 比較、複雑度許容
 
 [tool.ruff.lint.isort]
 # インポートのソート設定

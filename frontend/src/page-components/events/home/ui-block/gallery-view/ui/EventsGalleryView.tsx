@@ -23,7 +23,6 @@ export function EventsGalleryView({
       )}
       defaultGridColumns={6}
       gridColumnOptions={[3, 4, 5, 6]}
-      defaultPageSize={20}
       pageSizeOptions={[20, 40, 60]}
     />
   );
