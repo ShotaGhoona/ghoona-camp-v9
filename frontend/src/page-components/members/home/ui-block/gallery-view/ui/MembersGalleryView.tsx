@@ -1,19 +1,26 @@
 'use client';
 
-import type { MemberItem } from '@/shared/dummy-data/members/members';
+import type { UserListItem } from '@/entities/domain/user/model/types';
 import { GalleryViewWidget } from '@/widgets/view/gallery-view/ui/GalleryViewWidget';
 
 import { MemberCard } from './components/MemberCard';
+import { MembersGallerySkeleton } from './skeleton/MembersGallerySkeleton';
 
 interface MembersGalleryViewProps {
-  members: MemberItem[];
-  onMemberClick?: (member: MemberItem) => void;
+  members: UserListItem[];
+  onMemberClick?: (member: UserListItem) => void;
+  isLoading?: boolean;
 }
 
 export function MembersGalleryView({
   members,
   onMemberClick,
+  isLoading,
 }: MembersGalleryViewProps) {
+  if (isLoading) {
+    return <MembersGallerySkeleton />;
+  }
+
   return (
     <GalleryViewWidget
       data={members}

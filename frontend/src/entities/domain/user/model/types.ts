@@ -1,0 +1,82 @@
+/**
+ * User Entity - 型定義
+ * バックエンドAPIレスポンスに基づく
+ */
+
+import type { Pagination } from '@/shared/types/api/pagination';
+
+// ========================================
+// 一覧用（GET /api/v1/users）
+// ========================================
+
+export type UserListItem = {
+  id: string;
+  avatarUrl: string | null;
+  displayName: string | null;
+  tagline: string | null;
+  currentTitleLevel: number;
+};
+
+// ========================================
+// 詳細用（GET /api/v1/users/{userId}）
+// ========================================
+
+export type SocialLink = {
+  id: string;
+  platform: string;
+  url: string;
+  title: string | null;
+};
+
+export type UserDetail = {
+  id: string;
+  username: string | null;
+  avatarUrl: string | null;
+  displayName: string | null;
+  tagline: string | null;
+  bio: string | null;
+  skills: string[];
+  interests: string[];
+  vision: string | null;
+  isVisionPublic: boolean;
+  socialLinks: SocialLink[];
+  totalAttendanceDays: number;
+  currentStreakDays: number;
+  maxStreakDays: number;
+  currentTitleLevel: number;
+  joinedAt: string;
+};
+
+// ========================================
+// APIレスポンス
+// ========================================
+
+export type UsersListResponse = {
+  data: {
+    users: UserListItem[];
+    pagination: Pagination;
+  };
+  message: string;
+  timestamp: string;
+};
+
+export type UserDetailResponse = {
+  data: {
+    user: UserDetail;
+  };
+  message: string;
+  timestamp: string;
+};
+
+// ========================================
+// 検索パラメータ
+// ========================================
+
+export type UserSearchParams = {
+  search?: string;
+  skills?: string;
+  interests?: string;
+  title_levels?: string;
+  limit?: number;
+  offset?: number;
+};

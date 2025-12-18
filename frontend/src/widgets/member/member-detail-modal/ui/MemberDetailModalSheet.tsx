@@ -10,9 +10,10 @@ import {
   TooltipTrigger,
 } from '@/shared/ui/shadcn/ui/tooltip';
 
-import { dummyMembers } from '@/shared/dummy-data/members/members';
+import { useUserDetail } from '@/features/domain/user/get-user-detail/lib/use-user-detail';
 import { useViewMode, type ViewMode } from '../lib/use-view-mode';
 import { MemberDetailContent } from './MemberDetailContent';
+import { MemberDetailSkeleton } from './skeleton/MemberDetailSkeleton';
 
 interface MemberDetailModalSheetProps {
   memberId: string | null;
@@ -29,19 +30,14 @@ export function MemberDetailModalSheet({
 }: MemberDetailModalSheetProps) {
   const { viewMode, toggleViewMode, isModal } = useViewMode(defaultViewMode);
 
-  // ダミーデータからメンバーを取得
-  const member = memberId
-    ? dummyMembers.find((m) => m.id === memberId)
-    : null;
+  // APIからユーザー詳細を取得
+  const { data, isLoading } = useUserDetail(memberId);
+  const user = data?.data.user ?? null;
 
   const handleSetRival = () => {
     // TODO: API呼び出し
-    alert(`${member?.displayName}をライバルに設定しました（未実装）`);
+    alert(`${user?.displayName}をライバルに設定しました（未実装）`);
   };
-
-  if (!member) {
-    return null;
-  }
 
   // 切り替えボタン
   const ViewModeToggle = (
@@ -75,7 +71,11 @@ export function MemberDetailModalSheet({
         >
           {ViewModeToggle}
           <div className="max-h-[85vh]">
-            <MemberDetailContent member={member} onSetRival={handleSetRival} />
+            {isLoading || !user ? (
+              <MemberDetailSkeleton />
+            ) : (
+              <MemberDetailContent user={user} onSetRival={handleSetRival} />
+            )}
           </div>
         </DialogContent>
       </Dialog>
@@ -91,7 +91,11 @@ export function MemberDetailModalSheet({
         showCloseButton={false}
       >
         {ViewModeToggle}
-        <MemberDetailContent member={member} onSetRival={handleSetRival} />
+        {isLoading || !user ? (
+          <MemberDetailSkeleton />
+        ) : (
+          <MemberDetailContent user={user} onSetRival={handleSetRival} />
+        )}
       </SheetContent>
     </Sheet>
   );

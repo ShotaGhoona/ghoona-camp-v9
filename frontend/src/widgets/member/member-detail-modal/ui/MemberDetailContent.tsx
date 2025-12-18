@@ -18,18 +18,20 @@ import {
   TooltipTrigger,
 } from '@/shared/ui/shadcn/ui/tooltip';
 
-import type { MemberItem } from '@/shared/dummy-data/members/members';
-import { getSnsIcon, getSnsLabel } from '@/shared/types/user/sns';
+import type { UserDetail } from '@/entities/domain/user/model/types';
+import { getSnsIcon, getSnsLabel, type SnsPlatform } from '@/shared/types/user/sns';
+import { getTitleByLevel, type TitleLevel } from '@/shared/types/title/title';
 
 interface MemberDetailContentProps {
-  member: MemberItem;
+  user: UserDetail;
   onSetRival?: () => void;
 }
 
 export function MemberDetailContent({
-  member,
+  user,
   onSetRival,
 }: MemberDetailContentProps) {
+  const currentTitle = getTitleByLevel(user.currentTitleLevel as TitleLevel);
   return (
     <div className="flex h-full flex-col">
       <ScrollArea className="flex-1">
@@ -40,10 +42,10 @@ export function MemberDetailContent({
         <div className="h-24 bg-gradient-to-br from-primary via-primary/40 to-primary/5" />
 
         {/* ソーシャルリンク - 左上 */}
-        {member.socialLinks.length > 0 && (
+        {user.socialLinks.length > 0 && (
           <div className="absolute left-3 top-3 flex gap-1.5">
-            {member.socialLinks.map((link) => {
-              const Icon = getSnsIcon(link.platform);
+            {user.socialLinks.map((link) => {
+              const Icon = getSnsIcon(link.platform as SnsPlatform);
               return (
                 <Tooltip key={link.url}>
                   <TooltipTrigger asChild>
@@ -56,7 +58,7 @@ export function MemberDetailContent({
                       <Icon className="size-4" />
                     </a>
                   </TooltipTrigger>
-                  <TooltipContent>{getSnsLabel(link.platform)}</TooltipContent>
+                  <TooltipContent>{getSnsLabel(link.platform as SnsPlatform)}</TooltipContent>
                 </Tooltip>
               );
             })}
@@ -66,10 +68,10 @@ export function MemberDetailContent({
         {/* アバター */}
         <div className="absolute left-1/2 top-12 -translate-x-1/2">
           <div className="size-24 overflow-hidden rounded-full bg-background shadow-raised">
-            {member.avatarUrl ? (
+            {user.avatarUrl ? (
               <img
-                src={member.avatarUrl}
-                alt={member.displayName}
+                src={user.avatarUrl}
+                alt={user.displayName ?? ''}
                 className="size-full object-cover"
               />
             ) : (
@@ -85,20 +87,20 @@ export function MemberDetailContent({
       <div className="mt-14 space-y-5 px-6 pb-6">
         {/* 名前 & タグライン */}
         <div className="text-center">
-          <h2 className="text-xl font-bold">{member.displayName}</h2>
-          {member.tagline && (
+          <h2 className="text-xl font-bold">{user.displayName}</h2>
+          {user.tagline && (
             <p className="mt-1 text-sm text-muted-foreground">
-              {member.tagline}
+              {user.tagline}
             </p>
           )}
         </div>
 
         {/* 称号 */}
-        {member.currentTitle && (
+        {currentTitle && (
           <div className="flex justify-center">
             <Badge variant="default" className="gap-1.5 px-3 py-1">
               <Trophy className="size-3.5" />
-              {member.currentTitle.nameJp}
+              {currentTitle.nameJp}
             </Badge>
           </div>
         )}
@@ -108,45 +110,45 @@ export function MemberDetailContent({
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 text-lg font-bold text-primary">
               <Calendar className="size-4" />
-              {member.totalAttendanceDays}
+              {user.totalAttendanceDays}
             </div>
             <p className="text-xs text-muted-foreground">総参加日数</p>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 text-lg font-bold text-orange-500">
               <Flame className="size-4" />
-              {member.currentStreakDays}
+              {user.currentStreakDays}
             </div>
             <p className="text-xs text-muted-foreground">連続日数</p>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 text-lg font-bold text-amber-500">
               <Sparkles className="size-4" />
-              {member.maxStreakDays}
+              {user.maxStreakDays}
             </div>
             <p className="text-xs text-muted-foreground">最大連続</p>
           </div>
         </div>
 
         {/* 自己紹介 */}
-        {member.bio && (
+        {user.bio && (
           <div>
             <h3 className="mb-2 text-sm font-semibold text-muted-foreground">
               自己紹介
             </h3>
-            <p className="text-sm leading-relaxed">{member.bio}</p>
+            <p className="text-sm leading-relaxed">{user.bio}</p>
           </div>
         )}
 
         {/* ビジョン */}
-        {member.vision && member.isVisionPublic && (
+        {user.vision && user.isVisionPublic && (
           <div>
             <h3 className="mb-2 text-sm font-semibold text-muted-foreground">
               ビジョン
             </h3>
             <div className="rounded-lg bg-primary/5 px-4 py-3 text-center">
               <p className="text-base font-medium leading-relaxed text-primary">
-                &ldquo;{member.vision}&rdquo;
+                &ldquo;{user.vision}&rdquo;
               </p>
             </div>
           </div>
@@ -155,13 +157,13 @@ export function MemberDetailContent({
         <Separator />
 
         {/* スキル */}
-        {member.skills.length > 0 && (
+        {user.skills.length > 0 && (
           <div>
             <h3 className="mb-2 text-sm font-semibold text-muted-foreground">
               スキル
             </h3>
             <div className="flex flex-wrap gap-1.5">
-              {member.skills.map((skill) => (
+              {user.skills.map((skill) => (
                 <Badge key={skill} variant="outline" className="text-xs">
                   {skill}
                 </Badge>
@@ -171,13 +173,13 @@ export function MemberDetailContent({
         )}
 
         {/* 興味・関心 */}
-        {member.interests.length > 0 && (
+        {user.interests.length > 0 && (
           <div>
             <h3 className="mb-2 text-sm font-semibold text-muted-foreground">
               興味・関心
             </h3>
             <div className="flex flex-wrap gap-1.5">
-              {member.interests.map((interest) => (
+              {user.interests.map((interest) => (
                 <Badge key={interest} variant="outline" className="text-xs">
                   {interest}
                 </Badge>

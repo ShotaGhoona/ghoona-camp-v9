@@ -4,12 +4,12 @@ import { Eye, Trophy, User } from 'lucide-react';
 
 import { Badge } from '@/shared/ui/shadcn/ui/badge';
 import { Card } from '@/shared/ui/shadcn/ui/card';
-
-import type { MemberItem } from '@/shared/dummy-data/members/members';
+import { getTitleByLevel, type TitleLevel } from '@/shared/types/title/title';
+import type { UserListItem } from '@/entities/domain/user/model/types';
 
 interface MemberCardProps {
-  member: MemberItem;
-  onClick?: (member: MemberItem) => void;
+  member: UserListItem;
+  onClick?: (member: UserListItem) => void;
 }
 
 export function MemberCard({ member, onClick }: MemberCardProps) {
@@ -79,14 +79,14 @@ export function MemberCard({ member, onClick }: MemberCardProps) {
       </div>
 
       {/* 称号バッジ - ホバー時にフェードアウト */}
-      {member.currentTitle && (
+      {member.currentTitleLevel && (
         <div className="relative z-10 flex justify-center px-4 pt-2 transition-all duration-500 ease-out group-hover:opacity-0">
           <Badge
             variant="default"
             className="gap-1 text-xs"
           >
             <Trophy className="size-3" />
-            {member.currentTitle.nameJp}
+            {getTitleByLevel(member.currentTitleLevel as TitleLevel).nameJp}
           </Badge>
         </div>
       )}
