@@ -16,10 +16,8 @@ import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
 import { Separator } from '@/shared/ui/shadcn/ui/separator';
 
 import type { GoalItem } from '@/entities/domain/goal/model/types';
-import {
-  getRemainingDays,
-  getProgressPercent,
-} from '@/entities/domain/goal/model/types';
+import { getProgressPercent } from '@/entities/domain/goal/utils/get-progress-percent';
+import { getRemainingDays } from '@/entities/domain/goal/utils/get-remaining-days';
 import { useDeleteGoal } from '@/features/domain/goal/delete-goal/lib/use-delete-goal';
 
 interface GoalDetailContentProps {

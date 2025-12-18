@@ -4,7 +4,7 @@ import { User } from 'lucide-react';
 
 import { Badge } from '@/shared/ui/shadcn/ui/badge';
 
-import type { GoalItem } from '@/shared/dummy-data/goals/goals';
+import type { GoalItem } from '@/entities/domain/goal/model/types';
 
 interface GoalCompareItemProps {
   goal: GoalItem;
@@ -19,7 +19,7 @@ export function GoalCompareItem({ goal }: GoalCompareItemProps) {
           {goal.creator.avatarUrl ? (
             <img
               src={goal.creator.avatarUrl}
-              alt={goal.creator.displayName}
+              alt={goal.creator.displayName ?? ''}
               className='size-full object-cover'
             />
           ) : (
@@ -33,7 +33,7 @@ export function GoalCompareItem({ goal }: GoalCompareItemProps) {
         <div className='min-w-0 flex-1'>
           <div className='flex items-center gap-2'>
             <span className='text-xs text-muted-foreground'>
-              {goal.creator.displayName}
+              {goal.creator.displayName ?? '名前未設定'}
             </span>
             <Badge
               variant={goal.isActive ? 'default' : 'outline'}

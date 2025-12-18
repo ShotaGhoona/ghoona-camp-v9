@@ -6,7 +6,7 @@ import { Badge } from '@/shared/ui/shadcn/ui/badge';
 import { Card } from '@/shared/ui/shadcn/ui/card';
 
 import type { GoalItem } from '@/entities/domain/goal/model/types';
-import { getRemainingDays } from '@/entities/domain/goal/model/types';
+import { getRemainingDays } from '@/entities/domain/goal/utils/get-remaining-days';
 
 interface SidebarGoalCardProps {
   goal: GoalItem;

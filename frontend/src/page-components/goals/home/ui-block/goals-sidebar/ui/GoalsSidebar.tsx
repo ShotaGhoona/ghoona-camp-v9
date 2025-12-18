@@ -1,6 +1,6 @@
 'use client';
 
-import { Target, Users, Loader2 } from 'lucide-react';
+import { Target, Users } from 'lucide-react';
 
 import { Card } from '@/shared/ui/shadcn/ui/card';
 import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
@@ -8,6 +8,7 @@ import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
 import type { GoalItem } from '@/entities/domain/goal/model/types';
 import { usePublicGoals } from '@/features/domain/goal/get-public-goals/lib/use-public-goals';
 import { SidebarGoalCard } from './components/SidebarGoalCard';
+import { GoalsSidebarSkeleton } from './skeleton/GoalsSidebarSkeleton';
 
 interface GoalsSidebarProps {
   year: number;
@@ -40,33 +41,30 @@ export function GoalsSidebar({ year, month, onGoalClick }: GoalsSidebarProps) {
       </div>
 
       {/* 目標リスト */}
-      <ScrollArea className='min-h-0 flex-1'>
-        <div className='flex flex-col gap-3 p-4'>
-          {isLoading ? (
-            <div className='flex flex-col items-center justify-center py-8'>
-              <Loader2 className='size-6 animate-spin text-muted-foreground' />
-              <p className='mt-2 text-sm text-muted-foreground'>
-                読み込み中...
-              </p>
-            </div>
-          ) : publicGoals.length === 0 ? (
-            <div className='flex flex-col items-center justify-center py-8 text-center'>
-              <Target className='mb-2 size-8 text-muted-foreground/50' />
-              <p className='text-sm text-muted-foreground'>
-                公開されている目標がありません
-              </p>
-            </div>
-          ) : (
-            publicGoals.map((goal) => (
-              <SidebarGoalCard
-                key={goal.id}
-                goal={goal}
-                onClick={onGoalClick}
-              />
-            ))
-          )}
-        </div>
-      </ScrollArea>
+      {isLoading ? (
+        <GoalsSidebarSkeleton />
+      ) : (
+        <ScrollArea className='min-h-0 flex-1'>
+          <div className='flex flex-col gap-3 p-4'>
+            {publicGoals.length === 0 ? (
+              <div className='flex flex-col items-center justify-center py-8 text-center'>
+                <Target className='mb-2 size-8 text-muted-foreground/50' />
+                <p className='text-sm text-muted-foreground'>
+                  公開されている目標がありません
+                </p>
+              </div>
+            ) : (
+              publicGoals.map((goal) => (
+                <SidebarGoalCard
+                  key={goal.id}
+                  goal={goal}
+                  onClick={onGoalClick}
+                />
+              ))
+            )}
+          </div>
+        </ScrollArea>
+      )}
     </Card>
   );
 }

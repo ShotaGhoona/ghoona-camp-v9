@@ -4,22 +4,27 @@ import { Target } from 'lucide-react';
 
 import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
 
-import {
-  dummyGoals,
-  CURRENT_USER_ID,
-  type GoalItem,
-} from '@/shared/dummy-data/goals/goals';
+import { usePublicGoals } from '@/features/domain/goal/get-public-goals/lib/use-public-goals';
+import { useAppSelector } from '@/store/hooks';
 import { GoalCompareItem } from './components/GoalCompareItem';
-
-/** みんなの公開目標を取得（自分以外） */
-function getPublicGoals(): GoalItem[] {
-  return dummyGoals.filter(
-    (goal) => goal.isPublic && goal.userId !== CURRENT_USER_ID,
-  );
-}
+import { GoalComparePanelSkeleton } from './skeleton/GoalComparePanelSkeleton';
 
 export function GoalComparePanel() {
-  const publicGoals = getPublicGoals();
+  const { user } = useAppSelector((state) => state.auth);
+  const today = new Date();
+  const { data, isLoading } = usePublicGoals({
+    year: today.getFullYear(),
+    month: today.getMonth() + 1,
+  });
+
+  // 自分以外の公開目標
+  const publicGoals = (data?.data?.goals ?? []).filter(
+    (goal) => goal.userId !== user?.id,
+  );
+
+  if (isLoading) {
+    return <GoalComparePanelSkeleton />;
+  }
 
   return (
     <div className='flex h-full'>

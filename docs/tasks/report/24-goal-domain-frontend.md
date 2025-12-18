@@ -13,7 +13,10 @@
 frontend/src/
 ├── entities/domain/goal/
 │   ├── model/types.ts                # 型定義（GoalItem + creator）
-│   └── api/goal-api.ts               # APIクライアント
+│   ├── api/goal-api.ts               # APIクライアント
+│   └── utils/                        # ユーティリティ関数
+│       ├── get-remaining-days.ts     # 残り日数計算
+│       └── get-progress-percent.ts   # 進捗率計算
 ├── features/domain/goal/
 │   ├── get-my-goals/lib/use-my-goals.ts       # 自分の目標一覧取得hook
 │   ├── get-public-goals/lib/use-public-goals.ts  # 公開目標一覧取得hook
@@ -28,7 +31,9 @@ frontend/src/
 │       │   └── GoalDetailContent.tsx          # useDeleteGoal, creator表示
 │       ├── create-goal/ui/
 │       │   ├── CreateGoalModalSheet.tsx       # UIラッパー
-│       │   └── CreateGoalContent.tsx          # useCreateGoal
+│       │   ├── CreateGoalContent.tsx          # useCreateGoal
+│       │   ├── GoalComparePanel.tsx           # usePublicGoals（比較パネル）
+│       │   └── components/GoalCompareItem.tsx # creator表示
 │       ├── edit-goal/ui/
 │       │   ├── EditGoalModalSheet.tsx         # UIラッパー
 │       │   └── EditGoalContent.tsx            # useUpdateGoal, creator表示
@@ -118,13 +123,30 @@ type UpdateGoalRequest = {
 };
 ```
 
-**ユーティリティ関数:**
+### ユーティリティ関数（utils/）
+
+FSDアーキテクチャに準拠し、`model/types.ts`から分離。
+
+**get-remaining-days.ts:**
 ```typescript
+import type { GoalItem } from '../model/types';
+
 // 残り日数計算
-function getRemainingDays(goal: GoalItem): number | null;
+export function getRemainingDays(goal: GoalItem): number | null;
+```
+
+**get-progress-percent.ts:**
+```typescript
+import type { GoalItem } from '../model/types';
 
 // 進捗率計算（期間ベース）
-function getProgressPercent(goal: GoalItem): number | null;
+export function getProgressPercent(goal: GoalItem): number | null;
+```
+
+**使用例:**
+```typescript
+import { getRemainingDays } from '@/entities/domain/goal/utils/get-remaining-days';
+import { getProgressPercent } from '@/entities/domain/goal/utils/get-progress-percent';
 ```
 
 ### APIクライアント（goal-api.ts）
@@ -223,7 +245,8 @@ const goal = goalProp ??
 
 | 変更前 | 変更後 |
 |--------|--------|
-| `@/shared/dummy-data/goals/goals` | `@/entities/domain/goal/model/types` |
+| `@/shared/dummy-data/goals/goals` (型) | `@/entities/domain/goal/model/types` |
+| `@/shared/dummy-data/goals/goals` (utils) | `@/entities/domain/goal/utils/*` |
 | `CURRENT_USER_ID` | `useAppSelector((state) => state.auth)` |
 | `dummyGoals` | `useMyGoals()` / `usePublicGoals()` |
 
@@ -283,3 +306,11 @@ const goal = goalProp ??
 
 - 新規作成のためcreator情報なし
 - Targetアイコンを表示
+
+### GoalComparePanel / GoalCompareItem
+
+- 目標作成時の比較パネル（みんなの目標を見ながら作成）
+- usePublicGoalsで公開目標を取得
+- 自分の目標は除外してフィルタリング
+- アバター画像を表示（なければUserアイコン）
+- displayNameを表示

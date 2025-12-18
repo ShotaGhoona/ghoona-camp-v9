@@ -3,6 +3,8 @@
 import { useMemo, type ReactNode } from 'react';
 import { cn } from '@/shared/ui/shadcn/lib/utils';
 import { ScrollArea, ScrollBar } from '@/shared/ui/shadcn/ui/scroll-area';
+import { NoData } from '@/shared/ui/components/empty-design/ui/NoData';
+import { TimelineViewSkeleton } from './skeleton/TimelineViewSkeleton';
 
 interface TimelineViewWidgetProps<T> {
   /** 表示する年 */
@@ -23,8 +25,8 @@ interface TimelineViewWidgetProps<T> {
   onItemClick?: (item: T) => void;
   /** ユニークなキーを取得する関数 */
   keyExtractor: (item: T) => string | number;
-  /** データが空の時に表示するコンテンツ */
-  emptyContent?: ReactNode;
+  /** ローディング中かどうか */
+  isLoading?: boolean;
   /** 追加のクラス名 */
   className?: string;
   /** 行の高さ（px） */
@@ -71,7 +73,7 @@ export function TimelineViewWidget<T>({
   barRenderer,
   onItemClick,
   keyExtractor,
-  emptyContent,
+  isLoading = false,
   className,
   rowHeight = 64,
   cellWidth = 40,
@@ -135,12 +137,21 @@ export function TimelineViewWidget<T>({
     };
   };
 
+  // ローディング中の場合
+  if (isLoading) {
+    return (
+      <div className={cn('flex min-h-0 flex-1 flex-col', className)}>
+        <TimelineViewSkeleton rowHeight={rowHeight} cellWidth={cellWidth} />
+      </div>
+    );
+  }
+
   // データが空の場合
-  if (filteredData.length === 0 && emptyContent) {
+  if (filteredData.length === 0) {
     return (
       <div className={cn('flex min-h-0 flex-1 flex-col', className)}>
         <div className='flex min-h-0 flex-1 items-center justify-center'>
-          {emptyContent}
+          <NoData />
         </div>
       </div>
     );

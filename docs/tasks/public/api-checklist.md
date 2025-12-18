@@ -26,7 +26,7 @@ Ghoona Camp アプリケーションのAPI実装進捗を追跡するための�
 
 ---
 
-## User Management (7 APIs)
+## User Management (8 APIs)
 
 | # | Method | Endpoint | Backend | Frontend |
 |---|--------|----------|---------|----------|
@@ -45,11 +45,11 @@ Ghoona Camp アプリケーションのAPI実装進捗を追跡するための�
 
 | # | Method | Endpoint | Backend | Frontend |
 |---|--------|----------|---------|----------|
-| 13 | GET | `/goals/me` | [ ] | [ ] |
-| 14 | GET | `/goals/public` | [ ] | [ ] |
-| 15 | POST | `/goals` | [ ] | [ ] |
-| 16 | PUT | `/goals/{goalId}` | [ ] | [ ] |
-| 17 | DELETE | `/goals/{goalId}` | [ ] | [ ] |
+| 13 | GET | `/goals/me` | [x] | [x] |
+| 14 | GET | `/goals/public` | [x] | [x] |
+| 15 | POST | `/goals` | [x] | [x] |
+| 16 | PUT | `/goals/{goalId}` | [x] | [x] |
+| 17 | DELETE | `/goals/{goalId}` | [x] | [x] |
 
 ---
 
@@ -115,14 +115,14 @@ Ghoona Camp アプリケーションのAPI実装進捗を追跡するための�
 | Category | APIs | Backend Done | Frontend Done |
 |----------|------|--------------|---------------|
 | Authentication | 4 | 3/4 | 3/4 |
-| User Management | 7 | 7/7 | 7/7 |
-| Goal Management | 5 | 0/5 | 0/5 |
+| User Management | 8 | 8/8 | 8/8 |
+| Goal Management | 5 | 5/5 | 5/5 |
 | Event Management | 7 | 0/7 | 0/7 |
 | Title Management | 4 | 0/4 | 0/4 |
 | Attendance Management | 5 | 0/5 | 0/5 |
 | Notification Management | 5 | 0/5 | 0/5 |
 | System API | 1 | 0/1 | 0/1 |
-| **Total** | **39** | **10/39** | **10/39** |
+| **Total** | **39** | **16/39** | **16/39** |
 
 ---
 
@@ -130,3 +130,5 @@ Ghoona Camp アプリケーションのAPI実装進捗を追跡するための�
 
 - `docs/tasks/report/21-user-domain-backend.md` - User Domain バックエンド実装レポート
 - `docs/tasks/report/22-user-domain-frontend.md` - User Domain フロントエンド実装レポート
+- `docs/tasks/report/23-goal-domain-backend.md` - Goal Domain バックエンド実装レポート
+- `docs/tasks/report/24-goal-domain-frontend.md` - Goal Domain フロントエンド実装レポート
