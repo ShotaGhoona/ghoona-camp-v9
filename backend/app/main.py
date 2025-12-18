@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.infrastructure.logging.logging import setup_logging
 from app.presentation.api.auth_api import router as auth_router
+from app.presentation.api.goal_api import router as goal_router
 from app.presentation.api.user_api import router as user_router
 
 # ロギングの設定を初期化
@@ -52,6 +53,7 @@ app.add_middleware(
 
 # API ルーターをアプリケーションに含める
 app.include_router(auth_router)
+app.include_router(goal_router, prefix='/api/v1')
 app.include_router(user_router, prefix='/api/v1')
 
 # static ディレクトリが存在する場合のみマウント

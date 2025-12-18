@@ -2,6 +2,11 @@
 
 from pydantic import BaseModel, Field
 
+from app.application.schemas.common import PaginationDTO
+
+# PaginationDTOを再エクスポート（後方互換性のため）
+__all__ = ['PaginationDTO']
+
 
 class UserListItemDTO(BaseModel):
     """ユーザー一覧用DTO（軽量版）"""
@@ -44,18 +49,6 @@ class UserDetailDTO(BaseModel):
     max_streak_days: int = Field(alias='maxStreakDays')
     current_title_level: int = Field(alias='currentTitleLevel')
     joined_at: str = Field(alias='joinedAt')
-
-    class Config:
-        populate_by_name = True
-
-
-class PaginationDTO(BaseModel):
-    """ページネーションDTO"""
-
-    total: int
-    limit: int
-    offset: int
-    has_more: bool = Field(alias='hasMore')
 
     class Config:
         populate_by_name = True

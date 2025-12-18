@@ -1,9 +1,11 @@
 """ユーザー関連のPresentation層スキーマ（リクエスト/レスポンス）"""
 
-from datetime import datetime
-from typing import Any
-
 from pydantic import BaseModel, Field
+
+from app.presentation.schemas.common import BaseAPIResponse, ErrorResponse
+
+# ErrorResponseを再エクスポート（後方互換性のため）
+__all__ = ['ErrorResponse']
 
 
 class UserListItemResponse(BaseModel):
@@ -62,12 +64,10 @@ class UsersListDataResponse(BaseModel):
     pagination: PaginationResponse
 
 
-class UsersListResponse(BaseModel):
+class UsersListResponse(BaseAPIResponse[UsersListDataResponse]):
     """ユーザー一覧APIレスポンス"""
 
-    data: UsersListDataResponse
-    message: str = 'success'
-    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+    pass
 
 
 class UserDetailDataResponse(BaseModel):
@@ -76,27 +76,10 @@ class UserDetailDataResponse(BaseModel):
     user: UserDetailResponse
 
 
-class UserDetailAPIResponse(BaseModel):
+class UserDetailAPIResponse(BaseAPIResponse[UserDetailDataResponse]):
     """ユーザー詳細APIレスポンス"""
 
-    data: UserDetailDataResponse
-    message: str = 'success'
-    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
-
-
-class ErrorDetail(BaseModel):
-    """エラー詳細"""
-
-    code: str
-    message: str
-    details: dict[str, Any] | None = None
-
-
-class ErrorResponse(BaseModel):
-    """エラーレスポンス"""
-
-    error: ErrorDetail
-    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+    pass
 
 
 # ========================================
@@ -138,12 +121,10 @@ class UpdateUserProfileRequest(BaseModel):
     )
 
 
-class UpdateUserProfileAPIResponse(BaseModel):
+class UpdateUserProfileAPIResponse(BaseAPIResponse[UserDetailDataResponse]):
     """プロフィール更新APIレスポンス"""
 
-    data: UserDetailDataResponse
     message: str = 'プロフィールを更新しました'
-    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
 
 
 # ========================================
@@ -181,12 +162,10 @@ class RivalsListDataResponse(BaseModel):
     remainingSlots: int
 
 
-class RivalsListAPIResponse(BaseModel):
+class RivalsListAPIResponse(BaseAPIResponse[RivalsListDataResponse]):
     """ライバル一覧APIレスポンス"""
 
-    data: RivalsListDataResponse
-    message: str = 'success'
-    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+    pass
 
 
 class AddRivalRequest(BaseModel):
@@ -202,12 +181,10 @@ class AddRivalDataResponse(BaseModel):
     remainingSlots: int
 
 
-class AddRivalAPIResponse(BaseModel):
+class AddRivalAPIResponse(BaseAPIResponse[AddRivalDataResponse]):
     """ライバル追加APIレスポンス"""
 
-    data: AddRivalDataResponse
     message: str = 'ライバルを追加しました'
-    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
 
 
 class DeleteRivalDataResponse(BaseModel):
@@ -216,12 +193,10 @@ class DeleteRivalDataResponse(BaseModel):
     remainingSlots: int
 
 
-class DeleteRivalAPIResponse(BaseModel):
+class DeleteRivalAPIResponse(BaseAPIResponse[DeleteRivalDataResponse]):
     """ライバル削除APIレスポンス"""
 
-    data: DeleteRivalDataResponse
     message: str = 'ライバルを解除しました'
-    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
 
 
 # ========================================
@@ -235,12 +210,10 @@ class SkillsListDataResponse(BaseModel):
     skills: list[str]
 
 
-class SkillsListAPIResponse(BaseModel):
+class SkillsListAPIResponse(BaseAPIResponse[SkillsListDataResponse]):
     """スキル一覧APIレスポンス"""
 
-    data: SkillsListDataResponse
-    message: str = 'success'
-    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+    pass
 
 
 class InterestsListDataResponse(BaseModel):
@@ -249,9 +222,7 @@ class InterestsListDataResponse(BaseModel):
     interests: list[str]
 
 
-class InterestsListAPIResponse(BaseModel):
+class InterestsListAPIResponse(BaseAPIResponse[InterestsListDataResponse]):
     """興味・関心一覧APIレスポンス"""
 
-    data: InterestsListDataResponse
-    message: str = 'success'
-    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+    pass
