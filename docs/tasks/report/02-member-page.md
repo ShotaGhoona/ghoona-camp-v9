@@ -38,7 +38,8 @@ frontend/src/page-components/members/home/
 
 frontend/src/widgets/member/member-detail-modal/
 ├── lib/
-│   └── use-view-mode.ts            # モーダル/シート切り替え
+│   ├── use-view-mode.ts            # モーダル/シート切り替え
+│   └── use-rival-action.ts         # ライバル操作ロジック
 └── ui/
     ├── MemberDetailModalSheet.tsx  # モーダル/シート切り替え可能
     └── MemberDetailContent.tsx     # 詳細コンテンツ
@@ -96,7 +97,28 @@ frontend/src/widgets/member/member-detail-modal/
 - SNSリンク（Twitter, Instagram, LinkedIn等）
 - スキルタグ
 - 興味タグ
-- 「ライバルに設定」ボタン（未実装、alert表示）
+- ライバル設定ボタン
+
+### 5. ライバル機能
+
+**lib/use-rival-action.ts:**
+- 認証ユーザーのライバル一覧を取得
+- ライバル追加/削除のmutationを管理
+- ボタン状態（disabled, pending）を計算
+
+**ボタン表示ロジック:**
+| 条件 | 表示 |
+|------|------|
+| 自分自身 | ボタン非表示 |
+| ライバル未登録 | 「ライバルに設定する」（primary） |
+| ライバル登録済 | 「ライバルを解除する」（destructive） |
+| 上限（3人）到達 | 「ライバル枠が上限に達しています」 |
+| 処理中 | ローディングスピナー表示 |
+
+**使用Feature hooks:**
+- `useRivals` - ライバル一覧取得
+- `useAddRival` - ライバル追加
+- `useDeleteRival` - ライバル削除
 
 ## フィルタリングロジック
 

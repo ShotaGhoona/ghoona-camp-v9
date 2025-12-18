@@ -3,10 +3,12 @@
 import {
   Calendar,
   Flame,
+  Loader2,
   Sparkles,
   Swords,
   Trophy,
   User,
+  UserMinus,
 } from 'lucide-react';
 
 import { Badge } from '@/shared/ui/shadcn/ui/badge';
@@ -19,19 +21,33 @@ import {
 } from '@/shared/ui/shadcn/ui/tooltip';
 
 import type { UserDetail } from '@/entities/domain/user/model/types';
-import { getSnsIcon, getSnsLabel, type SnsPlatform } from '@/shared/types/user/sns';
+import {
+  getSnsIcon,
+  getSnsLabel,
+  type SnsPlatform,
+} from '@/shared/types/user/sns';
 import { getTitleByLevel, type TitleLevel } from '@/shared/types/title/title';
+import { useRivalAction } from '../lib/use-rival-action';
 
 interface MemberDetailContentProps {
   user: UserDetail;
-  onSetRival?: () => void;
 }
 
-export function MemberDetailContent({
-  user,
-  onSetRival,
-}: MemberDetailContentProps) {
+export function MemberDetailContent({ user }: MemberDetailContentProps) {
   const currentTitle = getTitleByLevel(user.currentTitleLevel as TitleLevel);
+
+  // ライバル操作ロジック
+  const {
+    isRival,
+    isSelf,
+    isDisabled,
+    isPending,
+    remainingSlots,
+    handleRivalAction,
+  } = useRivalAction({
+    targetUserId: user.id,
+    targetDisplayName: user.displayName,
+  });
   return (
     <div className="flex h-full flex-col">
       <ScrollArea className="flex-1">
@@ -192,16 +208,35 @@ export function MemberDetailContent({
       </ScrollArea>
 
       {/* ライバル設定ボタン */}
-      <div className="border-t bg-background px-6 py-4">
-        <button
-          type="button"
-          onClick={onSetRival}
-          className="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-raised-sm transition-all hover:bg-primary/90"
-        >
-          <Swords className="size-4" />
-          ライバルに設定する
-        </button>
-      </div>
+      {!isSelf && (
+        <div className="border-t bg-background px-6 py-4">
+          {!isRival && remainingSlots <= 0 ? (
+            <p className="text-center text-sm text-muted-foreground">
+              ライバル枠が上限（3人）に達しています
+            </p>
+          ) : (
+            <button
+              type="button"
+              onClick={handleRivalAction}
+              disabled={isDisabled}
+              className={`flex w-full items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium shadow-raised-sm transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
+                isRival
+                  ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                  : 'bg-primary text-primary-foreground hover:bg-primary/90'
+              }`}
+            >
+              {isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : isRival ? (
+                <UserMinus className="size-4" />
+              ) : (
+                <Swords className="size-4" />
+              )}
+              {isRival ? 'ライバルを解除する' : 'ライバルに設定する'}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

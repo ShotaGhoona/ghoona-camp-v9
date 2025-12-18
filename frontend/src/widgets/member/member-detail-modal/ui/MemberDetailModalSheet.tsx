@@ -34,11 +34,6 @@ export function MemberDetailModalSheet({
   const { data, isLoading } = useUserDetail(memberId);
   const user = data?.data.user ?? null;
 
-  const handleSetRival = () => {
-    // TODO: API呼び出し
-    alert(`${user?.displayName}をライバルに設定しました（未実装）`);
-  };
-
   // 切り替えボタン
   const ViewModeToggle = (
     <Tooltip>
@@ -74,7 +69,7 @@ export function MemberDetailModalSheet({
             {isLoading || !user ? (
               <MemberDetailSkeleton />
             ) : (
-              <MemberDetailContent user={user} onSetRival={handleSetRival} />
+              <MemberDetailContent user={user} />
             )}
           </div>
         </DialogContent>
@@ -94,7 +89,7 @@ export function MemberDetailModalSheet({
         {isLoading || !user ? (
           <MemberDetailSkeleton />
         ) : (
-          <MemberDetailContent user={user} onSetRival={handleSetRival} />
+          <MemberDetailContent user={user} />
         )}
       </SheetContent>
     </Sheet>

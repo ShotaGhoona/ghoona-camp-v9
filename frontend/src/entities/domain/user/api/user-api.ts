@@ -13,6 +13,10 @@ import type {
   MeResponse,
   UpdateUserProfileRequest,
   UpdateUserProfileResponse,
+  RivalsListResponse,
+  AddRivalRequest,
+  AddRivalResponse,
+  DeleteRivalResponse,
 } from '../model/types';
 
 export const userApi = {
@@ -73,6 +77,41 @@ export const userApi = {
     const response = await httpClient.put<UpdateUserProfileResponse>(
       `/api/v1/users/${userId}`,
       data,
+    );
+    return response.data;
+  },
+
+  // ========================================
+  // ライバル
+  // ========================================
+
+  /** ライバル一覧取得 */
+  getRivals: async (userId: string): Promise<RivalsListResponse> => {
+    const response = await httpClient.get<RivalsListResponse>(
+      `/api/v1/users/${userId}/rivals`,
+    );
+    return response.data;
+  },
+
+  /** ライバル追加 */
+  addRival: async (
+    userId: string,
+    data: AddRivalRequest,
+  ): Promise<AddRivalResponse> => {
+    const response = await httpClient.post<AddRivalResponse>(
+      `/api/v1/users/${userId}/rivals`,
+      data,
+    );
+    return response.data;
+  },
+
+  /** ライバル削除 */
+  deleteRival: async (
+    userId: string,
+    rivalId: string,
+  ): Promise<DeleteRivalResponse> => {
+    const response = await httpClient.delete<DeleteRivalResponse>(
+      `/api/v1/users/${userId}/rivals/${rivalId}`,
     );
     return response.data;
   },

@@ -149,3 +149,62 @@ export type UpdateUserProfileResponse = {
   message: string;
   timestamp: string;
 };
+
+// ========================================
+// ライバル関連（/api/v1/users/{userId}/rivals）
+// ========================================
+
+/** ライバルユーザー情報（比較表示用） */
+export type RivalUser = {
+  id: string;
+  username: string | null;
+  avatarUrl: string | null;
+  displayName: string | null;
+  tagline: string | null;
+  totalAttendanceDays: number;
+  currentStreakDays: number;
+  maxStreakDays: number;
+  currentTitleLevel: number;
+};
+
+/** ライバル関係 */
+export type Rival = {
+  id: string;
+  rivalUser: RivalUser;
+  createdAt: string;
+};
+
+/** ライバル一覧レスポンス */
+export type RivalsListResponse = {
+  data: {
+    rivals: Rival[];
+    maxRivals: number;
+    remainingSlots: number;
+  };
+  message: string;
+  timestamp: string;
+};
+
+/** ライバル追加リクエスト */
+export type AddRivalRequest = {
+  rivalUserId: string;
+};
+
+/** ライバル追加レスポンス */
+export type AddRivalResponse = {
+  data: {
+    rival: Rival;
+    remainingSlots: number;
+  };
+  message: string;
+  timestamp: string;
+};
+
+/** ライバル削除レスポンス */
+export type DeleteRivalResponse = {
+  data: {
+    remainingSlots: number;
+  };
+  message: string;
+  timestamp: string;
+};

@@ -2,7 +2,7 @@
 
 ## 概要
 
-ユーザードメインのフロントエンド実装。メンバーページのAPI接続、認証機能、プロフィール更新機能をFSD構成で実装。
+ユーザードメインのフロントエンド実装。メンバーページのAPI接続、認証機能、プロフィール更新機能、ライバル機能をFSD構成で実装。
 
 ## 変更ファイル
 
@@ -19,7 +19,10 @@ frontend/src/
 │   ├── get-user-detail/lib/use-user-detail.ts  # 詳細取得hook
 │   ├── login/lib/use-login.ts               # ログインhook
 │   ├── logout/lib/use-logout.ts             # ログアウトhook
-│   └── update-profile/lib/use-update-profile.ts  # プロフィール更新hook
+│   ├── update-profile/lib/use-update-profile.ts  # プロフィール更新hook
+│   ├── get-rivals/lib/use-rivals.ts         # ライバル一覧取得hook
+│   ├── add-rival/lib/use-add-rival.ts       # ライバル追加hook
+│   └── delete-rival/lib/use-delete-rival.ts # ライバル削除hook
 ├── page-components/members/home/
 │   ├── ui/MembersHomeContainer.tsx
 │   └── ui-block/gallery-view/ui/
@@ -75,6 +78,22 @@ type UpdateUserProfileRequest = {
 };
 ```
 
+**ライバル用:**
+```typescript
+type RivalUser = {
+  id, username, avatarUrl, displayName, tagline,
+  totalAttendanceDays, currentStreakDays, maxStreakDays, currentTitleLevel
+};
+
+type Rival = { id, rivalUser: RivalUser, createdAt };
+
+type RivalsListResponse = {
+  data: { rivals[], maxRivals: 3, remainingSlots }
+};
+
+type AddRivalRequest = { rivalUserId };
+```
+
 ### APIクライアント（user-api.ts）
 
 | メソッド | エンドポイント | 説明 |
@@ -85,6 +104,9 @@ type UpdateUserProfileRequest = {
 | `logout` | POST /auth/logout | ログアウト |
 | `getMe` | GET /auth/me | 現在のユーザー取得 |
 | `updateUser` | PUT /api/v1/users/{id} | プロフィール更新 |
+| `getRivals` | GET /api/v1/users/{id}/rivals | ライバル一覧取得 |
+| `addRival` | POST /api/v1/users/{id}/rivals | ライバル追加 |
+| `deleteRival` | DELETE /api/v1/users/{id}/rivals/{rivalId} | ライバル削除 |
 
 ## Feature層
 
@@ -97,6 +119,9 @@ type UpdateUserProfileRequest = {
 | `useLogin` | ログイン | useMutation |
 | `useLogout` | ログアウト | useMutation |
 | `useUpdateProfile` | プロフィール更新 | useMutation |
+| `useRivals` | ライバル一覧取得 | useQuery |
+| `useAddRival` | ライバル追加 | useMutation |
+| `useDeleteRival` | ライバル削除 | useMutation |
 
 ### 統一パターン
 
@@ -142,3 +167,4 @@ export function use{Feature}() {
 
 ### キャッシュ無効化
 - プロフィール更新成功時に`['user', userId]`と`['users']`を無効化
+- ライバル追加/削除成功時に`['rivals', userId]`を無効化
