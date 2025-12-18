@@ -93,20 +93,20 @@ Cookie: access_token=<jwt_token>
 |--------|----------|-------------|--------------|---------|
 | GET | `/users` | 全ユーザーの一覧を取得。メンバー検索 | ✅ | 🔐 |
 | GET | `/users/{userId}` | 指定したユーザーの詳細情報を取得。メタデータ・SNSリンク情報を含む | ❌ | 🔐 |
-| PUT | `/users/{userId}` | ユーザーの基本情報・メタデータを更新。プロフィール設定で使用 | ❌ | 👤 |
-| POST | `/users/{userId}/social-links` | 新しいSNSリンク・外部リンクを追加 | ❌ | 👤 |
-| PUT | `/users/{userId}/social-links/{linkId}` | 既存のSNSリンク・外部リンクを更新 | ❌ | 👤 |
-| DELETE | `/users/{userId}/social-links/{linkId}` | SNSリンク・外部リンクを削除 | ❌ | 👤 |
+| PUT | `/users/{userId}` | ユーザーの基本情報・メタデータ・SNSリンクを更新。プロフィール設定で使用 | ❌ | 👤 |
 | GET | `/users/{userId}/rivals` | ユーザーが設定したライバル一覧を取得（最大3人） | ❌ | 👤 |
 | POST | `/users/{userId}/rivals` | 新しいライバルを追加。ダッシュボードでの比較表示で使用 | ❌ | 👤 |
 | DELETE | `/users/{userId}/rivals/{rivalId}` | ライバル関係を解除 | ❌ | 👤 |
 
 #### GET /users クエリパラメータ
-- `search` (string): ユーザー名での検索
+- `search` (string): キーワード検索（displayName, taglineを対象）
+- `skills` (string): スキルでフィルタ（カンマ区切りで複数指定可、OR検索）
+- `interests` (string): 興味・関心でフィルタ（カンマ区切りで複数指定可、OR検索）
+- `title_levels` (string): 称号レベルでフィルタ（カンマ区切りで複数指定可、1-8）
 - `limit` (number): 取得件数制限（デフォルト: 20, 最大: 100）
 - `offset` (number): オフセット（ページネーション用）
 
-**例:** `GET /users?search=john&limit=20&offset=40`
+**例:** `GET /users?search=エンジニア&skills=TypeScript,React&limit=20&offset=0`
 
 ### Goal Management
 目標設定・管理関連のエンドポイント
