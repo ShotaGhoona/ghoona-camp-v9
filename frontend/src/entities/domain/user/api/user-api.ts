@@ -11,6 +11,8 @@ import type {
   LoginResponse,
   LogoutResponse,
   MeResponse,
+  UpdateUserProfileRequest,
+  UpdateUserProfileResponse,
 } from '../model/types';
 
 export const userApi = {
@@ -56,6 +58,22 @@ export const userApi = {
   /** 現在のユーザー情報取得 */
   getMe: async (): Promise<MeResponse> => {
     const response = await httpClient.get<MeResponse>('/auth/me');
+    return response.data;
+  },
+
+  // ========================================
+  // プロフィール更新
+  // ========================================
+
+  /** プロフィール更新 */
+  updateUser: async (
+    userId: string,
+    data: UpdateUserProfileRequest,
+  ): Promise<UpdateUserProfileResponse> => {
+    const response = await httpClient.put<UpdateUserProfileResponse>(
+      `/api/v1/users/${userId}`,
+      data,
+    );
     return response.data;
   },
 };

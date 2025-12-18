@@ -117,3 +117,41 @@ export type User = {
   discord_id?: string;
   is_active: boolean;
 };
+
+// ========================================
+// プロフィール更新（PUT /api/v1/users/{userId}）
+// ========================================
+
+export type SocialLinkInput = {
+  platform:
+    | 'twitter'
+    | 'instagram'
+    | 'github'
+    | 'linkedin'
+    | 'website'
+    | 'blog'
+    | 'note';
+  url: string;
+  title?: string | null;
+};
+
+export type UpdateUserProfileRequest = {
+  username?: string;
+  avatarUrl?: string | null;
+  displayName?: string;
+  tagline?: string | null;
+  bio?: string | null;
+  skills?: string[];
+  interests?: string[];
+  vision?: string | null;
+  isVisionPublic?: boolean;
+  socialLinks?: SocialLinkInput[];
+};
+
+export type UpdateUserProfileResponse = {
+  data: {
+    user: UserDetail;
+  };
+  message: string;
+  timestamp: string;
+};
