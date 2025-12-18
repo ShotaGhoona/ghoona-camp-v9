@@ -1,10 +1,10 @@
 'use client';
 
-import { Target } from 'lucide-react';
+import { Target, Loader2 } from 'lucide-react';
 
 import { TimelineViewWidget } from '@/widgets/view/timeline-view/ui/TimelineViewWidget';
 
-import type { GoalItem } from '@/shared/dummy-data/goals/goals';
+import type { GoalItem } from '@/entities/domain/goal/model/types';
 import { GoalTimelineBar } from './components/GoalTimelineBar';
 import { GoalTimelineLabel } from './components/GoalTimelineLabel';
 
@@ -17,6 +17,10 @@ interface GoalsTimelineViewProps {
   goals: GoalItem[];
   /** 目標クリック時のコールバック */
   onGoalClick: (goal: GoalItem) => void;
+  /** ローディング中かどうか */
+  isLoading?: boolean;
+  /** 現在のユーザーID */
+  currentUserId?: string;
 }
 
 export function GoalsTimelineView({
@@ -24,7 +28,20 @@ export function GoalsTimelineView({
   month,
   goals,
   onGoalClick,
+  isLoading = false,
+  currentUserId,
 }: GoalsTimelineViewProps) {
+  if (isLoading) {
+    return (
+      <div className='flex flex-1 items-center justify-center'>
+        <div className='flex flex-col items-center gap-3'>
+          <Loader2 className='size-8 animate-spin text-primary' />
+          <p className='text-sm text-muted-foreground'>目標を読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <TimelineViewWidget
       year={year}
@@ -32,7 +49,9 @@ export function GoalsTimelineView({
       data={goals}
       startDateExtractor={(goal) => goal.startedAt}
       endDateExtractor={(goal) => goal.endedAt}
-      labelRenderer={(goal) => <GoalTimelineLabel goal={goal} />}
+      labelRenderer={(goal) => (
+        <GoalTimelineLabel goal={goal} currentUserId={currentUserId} />
+      )}
       barRenderer={(goal, barProps) => (
         <GoalTimelineBar goal={goal} barProps={barProps} />
       )}

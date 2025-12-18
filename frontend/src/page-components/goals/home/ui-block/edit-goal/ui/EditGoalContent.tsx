@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Globe, Lock, Save, User, X } from 'lucide-react';
+import { Globe, Lock, Save, Target, X } from 'lucide-react';
 
 import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
 import { Separator } from '@/shared/ui/shadcn/ui/separator';
@@ -11,11 +11,8 @@ import { TextField } from '@/shared/ui/form-fields/ui/TextField';
 import { TextareaField } from '@/shared/ui/form-fields/ui/TextareaField';
 import { DateField } from '@/shared/ui/form-fields/ui/DateField';
 
-import {
-  CURRENT_USER_ID,
-  type GoalItem,
-} from '@/shared/dummy-data/goals/goals';
-import { dummyMembers } from '@/shared/dummy-data/members/members';
+import type { GoalItem } from '@/entities/domain/goal/model/types';
+import { useUpdateGoal } from '@/features/domain/goal/update-goal/lib/use-update-goal';
 
 export interface EditGoalFormData {
   title: string;
@@ -27,8 +24,7 @@ export interface EditGoalFormData {
 
 interface EditGoalContentProps {
   goal: GoalItem;
-  onSave: (data: EditGoalFormData) => void;
-  onCancel: () => void;
+  onClose?: () => void;
 }
 
 function getFormDataFromGoal(goal: GoalItem): EditGoalFormData {
@@ -43,15 +39,17 @@ function getFormDataFromGoal(goal: GoalItem): EditGoalFormData {
 
 export function EditGoalContent({
   goal,
-  onSave,
-  onCancel,
+  onClose,
 }: EditGoalContentProps) {
   const [formData, setFormData] = useState<EditGoalFormData>(() =>
     getFormDataFromGoal(goal),
   );
 
-  // 現在のユーザー情報を取得
-  const currentUser = dummyMembers.find((m) => m.id === CURRENT_USER_ID);
+  const updateGoalMutation = useUpdateGoal({
+    onSuccess: () => {
+      onClose?.();
+    },
+  });
 
   const handleTitleChange = (value: string) => {
     setFormData((prev) => ({ ...prev, title: value }));
@@ -82,7 +80,20 @@ export function EditGoalContent({
       alert('タイトルを入力してください');
       return;
     }
-    onSave(formData);
+    updateGoalMutation.mutate({
+      goalId: goal.id,
+      data: {
+        title: formData.title,
+        description: formData.description || null,
+        startedAt: formData.startedAt || null,
+        endedAt: formData.endedAt || null,
+        isPublic: formData.isPublic,
+      },
+    });
+  };
+
+  const handleCancel = () => {
+    onClose?.();
   };
 
   return (
@@ -94,20 +105,12 @@ export function EditGoalContent({
             {/* 背景グラデーション */}
             <div className='h-24 bg-gradient-to-br from-primary via-primary/40 to-primary/5' />
 
-            {/* 自分のアバター */}
+            {/* アイコン */}
             <div className='absolute left-1/2 top-12 -translate-x-1/2'>
               <div className='size-24 overflow-hidden rounded-full bg-background shadow-raised'>
-                {currentUser?.avatarUrl ? (
-                  <img
-                    src={currentUser.avatarUrl}
-                    alt={currentUser.displayName}
-                    className='size-full object-cover'
-                  />
-                ) : (
-                  <div className='flex size-full items-center justify-center bg-muted'>
-                    <User className='size-10 text-muted-foreground' />
-                  </div>
-                )}
+                <div className='flex size-full items-center justify-center bg-muted'>
+                  <Target className='size-10 text-muted-foreground' />
+                </div>
               </div>
             </div>
           </div>
@@ -216,8 +219,9 @@ export function EditGoalContent({
         {/* キャンセルボタン */}
         <button
           type='button'
-          onClick={onCancel}
-          className='flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium shadow-raised-sm transition-all hover:bg-muted'
+          onClick={handleCancel}
+          disabled={updateGoalMutation.isPending}
+          className='flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium shadow-raised-sm transition-all hover:bg-muted disabled:opacity-50'
         >
           <X className='size-4' />
         </button>
@@ -226,10 +230,11 @@ export function EditGoalContent({
         <button
           type='button'
           onClick={handleSubmit}
-          className='flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-raised-sm transition-all hover:bg-primary/90'
+          disabled={updateGoalMutation.isPending}
+          className='flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-raised-sm transition-all hover:bg-primary/90 disabled:opacity-50'
         >
           <Save className='size-4' />
-          更新する
+          {updateGoalMutation.isPending ? '更新中...' : '更新する'}
         </button>
       </div>
     </div>

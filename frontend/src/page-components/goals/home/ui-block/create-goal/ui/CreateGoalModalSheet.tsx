@@ -14,10 +14,7 @@ import {
   useViewMode,
   type ViewMode,
 } from '../../goal-detail-modal/lib/use-view-mode';
-import {
-  CreateGoalContent,
-  type CreateGoalFormData,
-} from './CreateGoalContent';
+import { CreateGoalContent } from './CreateGoalContent';
 import { GoalComparePanel } from './GoalComparePanel';
 import { useCompareMode } from '../lib/use-compare-mode';
 
@@ -35,13 +32,7 @@ export function CreateGoalModalSheet({
   const { viewMode, toggleViewMode, isModal } = useViewMode(defaultViewMode);
   const { isCompareMode, toggleCompareMode } = useCompareMode();
 
-  const handleSave = (data: CreateGoalFormData) => {
-    // TODO: API呼び出し
-    alert(`目標「${data.title}」を作成しました（未実装）`);
-    onOpenChange(false);
-  };
-
-  const handleCancel = () => {
+  const handleClose = () => {
     onOpenChange(false);
   };
 
@@ -88,8 +79,7 @@ export function CreateGoalModalSheet({
             {/* フォーム（右側） */}
             <div className={isCompareMode ? 'w-1/2' : 'w-full'}>
               <CreateGoalContent
-                onSave={handleSave}
-                onCancel={handleCancel}
+                onClose={handleClose}
                 isCompareMode={isCompareMode}
                 onToggleCompareMode={toggleCompareMode}
               />
@@ -121,8 +111,7 @@ export function CreateGoalModalSheet({
           {/* フォーム（右側） */}
           <div className={isCompareMode ? 'w-1/2' : 'w-full'}>
             <CreateGoalContent
-              onSave={handleSave}
-              onCancel={handleCancel}
+              onClose={handleClose}
               isCompareMode={isCompareMode}
               onToggleCompareMode={toggleCompareMode}
             />

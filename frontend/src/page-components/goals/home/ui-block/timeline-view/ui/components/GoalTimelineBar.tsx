@@ -2,7 +2,7 @@
 
 import { cn } from '@/shared/ui/shadcn/lib/utils';
 
-import type { GoalItem } from '@/shared/dummy-data/goals/goals';
+import type { GoalItem } from '@/entities/domain/goal/model/types';
 import type { TimelineBarProps } from '@/widgets/view/timeline-view/ui/TimelineViewWidget';
 
 interface GoalTimelineBarProps {

@@ -1,14 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 
 import { Button } from '@/shared/ui/shadcn/ui/button';
-import {
-  dummyGoals,
-  CURRENT_USER_ID,
-  type GoalItem,
-} from '@/shared/dummy-data/goals/goals';
+import { useAppSelector } from '@/store/hooks';
+import type { GoalItem } from '@/entities/domain/goal/model/types';
+import { useMyGoals } from '@/features/domain/goal/get-my-goals/lib/use-my-goals';
+import { usePublicGoals } from '@/features/domain/goal/get-public-goals/lib/use-public-goals';
 import { GoalDetailModalSheet } from '../ui-block/goal-detail-modal/ui/GoalDetailModalSheet';
 import { CreateGoalModalSheet } from '../ui-block/create-goal/ui/CreateGoalModalSheet';
 import { EditGoalModalSheet } from '../ui-block/edit-goal/ui/EditGoalModalSheet';
@@ -18,9 +17,23 @@ import { GoalsTimelineView } from '../ui-block/timeline-view/ui/GoalsTimelineVie
 import { GoalsSidebar } from '../ui-block/goals-sidebar/ui/GoalsSidebar';
 
 export function GoalsHomeContainer() {
+  const { user } = useAppSelector((state) => state.auth);
+
   // 表示基準月
   const [baseYear, setBaseYear] = useState(() => new Date().getFullYear());
   const [baseMonth, setBaseMonth] = useState(() => new Date().getMonth() + 1);
+
+  // 自分の目標取得
+  const { data: myGoalsData, isLoading: isLoadingMyGoals } = useMyGoals({
+    year: baseYear,
+    month: baseMonth,
+  });
+
+  // 公開目標取得（モーダルで使用）
+  const { data: publicGoalsData } = usePublicGoals({
+    year: baseYear,
+    month: baseMonth,
+  });
 
   // 目標詳細モーダル
   const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
@@ -79,10 +92,9 @@ export function GoalsHomeContainer() {
     setIsMemberModalOpen(true);
   };
 
-  // 自分の目標のみ取得
-  const myGoals = useMemo(() => {
-    return dummyGoals.filter((goal) => goal.userId === CURRENT_USER_ID);
-  }, []);
+  // 自分の目標
+  const myGoals = myGoalsData?.data.goals ?? [];
+  const publicGoals = publicGoalsData?.data.goals ?? [];
 
   return (
     <div className='flex min-h-0 flex-1 gap-4 overflow-hidden p-4'>
@@ -127,13 +139,19 @@ export function GoalsHomeContainer() {
             month={baseMonth}
             goals={myGoals}
             onGoalClick={handleGoalClick}
+            isLoading={isLoadingMyGoals}
+            currentUserId={user?.id}
           />
         </div>
       </div>
 
       {/* 右側: みんなの目標（サイドバー） */}
       <div className='w-96 shrink-0'>
-        <GoalsSidebar onGoalClick={handleGoalClick} />
+        <GoalsSidebar
+          year={baseYear}
+          month={baseMonth}
+          onGoalClick={handleGoalClick}
+        />
       </div>
 
       {/* 目標詳細モーダル */}
@@ -144,6 +162,9 @@ export function GoalsHomeContainer() {
         defaultViewMode='modal'
         onMemberClick={handleMemberClick}
         onEdit={handleEditGoal}
+        currentUserId={user?.id}
+        myGoals={myGoals}
+        publicGoals={publicGoals}
       />
 
       {/* 新規作成モーダル */}
@@ -159,6 +180,7 @@ export function GoalsHomeContainer() {
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
         defaultViewMode='modal'
+        myGoals={myGoals}
       />
 
       {/* メンバー詳細モーダル */}

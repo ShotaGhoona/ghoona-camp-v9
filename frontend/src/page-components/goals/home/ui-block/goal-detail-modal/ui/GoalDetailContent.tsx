@@ -7,7 +7,6 @@ import {
   Lock,
   Target,
   Trash2,
-  User,
 } from 'lucide-react';
 
 import { Badge } from '@/shared/ui/shadcn/ui/badge';
@@ -15,17 +14,18 @@ import { Progress } from '@/shared/ui/shadcn/ui/progress';
 import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
 import { Separator } from '@/shared/ui/shadcn/ui/separator';
 
-import type { GoalItem } from '@/shared/dummy-data/goals/goals';
+import type { GoalItem } from '@/entities/domain/goal/model/types';
 import {
   getRemainingDays,
   getProgressPercent,
-  CURRENT_USER_ID,
-} from '@/shared/dummy-data/goals/goals';
+} from '@/entities/domain/goal/model/types';
+import { useDeleteGoal } from '@/features/domain/goal/delete-goal/lib/use-delete-goal';
 
 interface GoalDetailContentProps {
   goal: GoalItem;
+  isOwn: boolean;
   onEdit?: () => void;
-  onDelete?: () => void;
+  onClose?: () => void;
   onMemberClick?: (memberId: string) => void;
 }
 
@@ -45,11 +45,17 @@ function getRemainingText(days: number | null): string {
 
 export function GoalDetailContent({
   goal,
+  isOwn,
   onEdit,
-  onDelete,
+  onClose,
   onMemberClick,
 }: GoalDetailContentProps) {
-  const isOwn = goal.userId === CURRENT_USER_ID;
+  const deleteGoalMutation = useDeleteGoal({
+    onSuccess: () => {
+      onClose?.();
+    },
+  });
+
   const remainingDays = getRemainingDays(goal);
   const progressPercent = getProgressPercent(goal);
   const remainingText = getRemainingText(remainingDays);
@@ -57,7 +63,7 @@ export function GoalDetailContent({
 
   const handleMemberClick = () => {
     if (!isOwn && onMemberClick) {
-      onMemberClick(goal.creator.id);
+      onMemberClick(goal.userId);
     }
   };
 
@@ -66,9 +72,9 @@ export function GoalDetailContent({
   };
 
   const handleDelete = () => {
-    // TODO: API呼び出し
-    alert(`「${goal.title}」を削除しました（未実装）`);
-    onDelete?.();
+    if (confirm(`「${goal.title}」を削除してもよろしいですか？`)) {
+      deleteGoalMutation.mutate(goal.id);
+    }
   };
 
   return (
@@ -105,7 +111,7 @@ export function GoalDetailContent({
               )}
             </div>
 
-            {/* 作成者アバター */}
+            {/* アイコン */}
             <div className='absolute left-1/2 top-12 -translate-x-1/2'>
               <button
                 type='button'
@@ -113,28 +119,20 @@ export function GoalDetailContent({
                 disabled={isOwn}
                 className='size-24 overflow-hidden rounded-full bg-background shadow-raised transition-transform hover:scale-105 disabled:cursor-default disabled:hover:scale-100'
               >
-                {goal.creator.avatarUrl ? (
-                  <img
-                    src={goal.creator.avatarUrl}
-                    alt={goal.creator.displayName}
-                    className='size-full object-cover'
-                  />
-                ) : (
-                  <div className='flex size-full items-center justify-center bg-muted'>
-                    <Target className='size-10 text-muted-foreground' />
-                  </div>
-                )}
+                <div className='flex size-full items-center justify-center bg-muted'>
+                  <Target className='size-10 text-muted-foreground' />
+                </div>
               </button>
             </div>
           </div>
 
           {/* 目標情報 */}
           <div className='mt-14 space-y-5 px-6 pb-6'>
-            {/* タイトル & 作成者名 */}
+            {/* タイトル */}
             <div className='text-center'>
               <h2 className='text-xl font-bold'>{goal.title}</h2>
               <p className='mt-1 text-sm text-muted-foreground'>
-                {isOwn ? 'あなたの目標' : `作成: ${goal.creator.displayName}`}
+                {isOwn ? 'あなたの目標' : '他のメンバーの目標'}
               </p>
             </div>
 
@@ -197,15 +195,17 @@ export function GoalDetailContent({
           <button
             type='button'
             onClick={handleDelete}
-            className='flex items-center justify-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm font-medium text-destructive shadow-raised-sm transition-all hover:bg-destructive/20'
+            disabled={deleteGoalMutation.isPending}
+            className='flex items-center justify-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm font-medium text-destructive shadow-raised-sm transition-all hover:bg-destructive/20 disabled:opacity-50'
           >
             <Trash2 className='size-4' />
-            削除
+            {deleteGoalMutation.isPending ? '削除中...' : '削除'}
           </button>
           <button
             type='button'
             onClick={handleEdit}
-            className='flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-raised-sm transition-all hover:bg-primary/90'
+            disabled={deleteGoalMutation.isPending}
+            className='flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-raised-sm transition-all hover:bg-primary/90 disabled:opacity-50'
           >
             <Edit className='size-4' />
             編集する

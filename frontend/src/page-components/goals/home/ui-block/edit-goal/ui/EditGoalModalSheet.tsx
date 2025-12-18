@@ -10,18 +10,20 @@ import {
   TooltipTrigger,
 } from '@/shared/ui/shadcn/ui/tooltip';
 
-import { dummyGoals } from '@/shared/dummy-data/goals/goals';
+import type { GoalItem } from '@/entities/domain/goal/model/types';
 import {
   useViewMode,
   type ViewMode,
 } from '../../goal-detail-modal/lib/use-view-mode';
-import { EditGoalContent, type EditGoalFormData } from './EditGoalContent';
+import { EditGoalContent } from './EditGoalContent';
 
 interface EditGoalModalSheetProps {
   goalId: string | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultViewMode?: ViewMode;
+  /** 目標リスト（goalIdから目標を検索する用） */
+  myGoals?: GoalItem[];
 }
 
 export function EditGoalModalSheet({
@@ -29,19 +31,14 @@ export function EditGoalModalSheet({
   open,
   onOpenChange,
   defaultViewMode = 'modal',
+  myGoals = [],
 }: EditGoalModalSheetProps) {
   const { viewMode, toggleViewMode, isModal } = useViewMode(defaultViewMode);
 
-  // ダミーデータから目標を取得
-  const goal = goalId ? dummyGoals.find((g) => g.id === goalId) : null;
+  // 目標リストから検索
+  const goal = goalId ? myGoals.find((g) => g.id === goalId) : null;
 
-  const handleSave = (data: EditGoalFormData) => {
-    // TODO: API呼び出し
-    alert(`目標「${data.title}」を更新しました（未実装）`);
-    onOpenChange(false);
-  };
-
-  const handleCancel = () => {
+  const handleClose = () => {
     onOpenChange(false);
   };
 
@@ -81,11 +78,7 @@ export function EditGoalModalSheet({
         >
           {ViewModeToggle}
           <div className='max-h-[85vh]'>
-            <EditGoalContent
-              goal={goal}
-              onSave={handleSave}
-              onCancel={handleCancel}
-            />
+            <EditGoalContent goal={goal} onClose={handleClose} />
           </div>
         </DialogContent>
       </Dialog>
@@ -101,11 +94,7 @@ export function EditGoalModalSheet({
         showCloseButton={false}
       >
         {ViewModeToggle}
-        <EditGoalContent
-          goal={goal}
-          onSave={handleSave}
-          onCancel={handleCancel}
-        />
+        <EditGoalContent goal={goal} onClose={handleClose} />
       </SheetContent>
     </Sheet>
   );

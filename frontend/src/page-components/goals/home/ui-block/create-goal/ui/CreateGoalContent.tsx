@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Eye, EyeOff, Globe, Lock, Save, User, X } from 'lucide-react';
+import { Eye, EyeOff, Globe, Lock, Save, Target, X } from 'lucide-react';
 
 import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
 import { Separator } from '@/shared/ui/shadcn/ui/separator';
@@ -15,9 +15,7 @@ import {
 import { TextField } from '@/shared/ui/form-fields/ui/TextField';
 import { TextareaField } from '@/shared/ui/form-fields/ui/TextareaField';
 import { DateField } from '@/shared/ui/form-fields/ui/DateField';
-
-import { CURRENT_USER_ID } from '@/shared/dummy-data/goals/goals';
-import { dummyMembers } from '@/shared/dummy-data/members/members';
+import { useCreateGoal } from '@/features/domain/goal/create-goal/lib/use-create-goal';
 
 export interface CreateGoalFormData {
   title: string;
@@ -28,8 +26,7 @@ export interface CreateGoalFormData {
 }
 
 interface CreateGoalContentProps {
-  onSave: (data: CreateGoalFormData) => void;
-  onCancel: () => void;
+  onClose?: () => void;
   isCompareMode?: boolean;
   onToggleCompareMode?: () => void;
 }
@@ -47,16 +44,18 @@ function getDefaultFormData(): CreateGoalFormData {
 }
 
 export function CreateGoalContent({
-  onSave,
-  onCancel,
+  onClose,
   isCompareMode = false,
   onToggleCompareMode,
 }: CreateGoalContentProps) {
   const [formData, setFormData] =
     useState<CreateGoalFormData>(getDefaultFormData);
 
-  // 現在のユーザー情報を取得
-  const currentUser = dummyMembers.find((m) => m.id === CURRENT_USER_ID);
+  const createGoalMutation = useCreateGoal({
+    onSuccess: () => {
+      onClose?.();
+    },
+  });
 
   const handleTitleChange = (value: string) => {
     setFormData((prev) => ({ ...prev, title: value }));
@@ -87,7 +86,17 @@ export function CreateGoalContent({
       alert('タイトルを入力してください');
       return;
     }
-    onSave(formData);
+    createGoalMutation.mutate({
+      title: formData.title,
+      description: formData.description || null,
+      startedAt: formData.startedAt || null,
+      endedAt: formData.endedAt || null,
+      isPublic: formData.isPublic,
+    });
+  };
+
+  const handleCancel = () => {
+    onClose?.();
   };
 
   return (
@@ -99,20 +108,12 @@ export function CreateGoalContent({
             {/* 背景グラデーション */}
             <div className='h-24 bg-gradient-to-br from-primary via-primary/40 to-primary/5' />
 
-            {/* 自分のアバター */}
+            {/* アイコン */}
             <div className='absolute left-1/2 top-12 -translate-x-1/2'>
               <div className='size-24 overflow-hidden rounded-full bg-background shadow-raised'>
-                {currentUser?.avatarUrl ? (
-                  <img
-                    src={currentUser.avatarUrl}
-                    alt={currentUser.displayName}
-                    className='size-full object-cover'
-                  />
-                ) : (
-                  <div className='flex size-full items-center justify-center bg-muted'>
-                    <User className='size-10 text-muted-foreground' />
-                  </div>
-                )}
+                <div className='flex size-full items-center justify-center bg-muted'>
+                  <Target className='size-10 text-muted-foreground' />
+                </div>
               </div>
             </div>
           </div>
@@ -249,8 +250,9 @@ export function CreateGoalContent({
         {/* キャンセルボタン */}
         <button
           type='button'
-          onClick={onCancel}
-          className='flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium shadow-raised-sm transition-all hover:bg-muted'
+          onClick={handleCancel}
+          disabled={createGoalMutation.isPending}
+          className='flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium shadow-raised-sm transition-all hover:bg-muted disabled:opacity-50'
         >
           <X className='size-4' />
         </button>
@@ -259,10 +261,11 @@ export function CreateGoalContent({
         <button
           type='button'
           onClick={handleSubmit}
-          className='flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-raised-sm transition-all hover:bg-primary/90'
+          disabled={createGoalMutation.isPending}
+          className='flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-raised-sm transition-all hover:bg-primary/90 disabled:opacity-50'
         >
           <Save className='size-4' />
-          作成する
+          {createGoalMutation.isPending ? '作成中...' : '作成する'}
         </button>
       </div>
     </div>

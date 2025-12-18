@@ -10,31 +10,46 @@ import {
   TooltipTrigger,
 } from '@/shared/ui/shadcn/ui/tooltip';
 
-import { dummyGoals } from '@/shared/dummy-data/goals/goals';
+import type { GoalItem } from '@/entities/domain/goal/model/types';
 import { useViewMode, type ViewMode } from '../lib/use-view-mode';
 import { GoalDetailContent } from './GoalDetailContent';
 
 interface GoalDetailModalSheetProps {
   goalId: string | null;
+  goal?: GoalItem | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultViewMode?: ViewMode;
   onMemberClick?: (memberId: string) => void;
   onEdit?: (goalId: string) => void;
+  currentUserId?: string;
+  /** 自分の目標リスト（goalIdから目標を検索する用） */
+  myGoals?: GoalItem[];
+  /** 公開目標リスト（goalIdから目標を検索する用） */
+  publicGoals?: GoalItem[];
 }
 
 export function GoalDetailModalSheet({
   goalId,
+  goal: goalProp,
   open,
   onOpenChange,
   defaultViewMode = 'modal',
   onMemberClick,
   onEdit,
+  currentUserId,
+  myGoals = [],
+  publicGoals = [],
 }: GoalDetailModalSheetProps) {
   const { viewMode, toggleViewMode, isModal } = useViewMode(defaultViewMode);
 
-  // ダミーデータから目標を取得
-  const goal = goalId ? dummyGoals.find((g) => g.id === goalId) : null;
+  // 目標を検索（propsから渡された場合はそれを使用、なければリストから検索）
+  const goal =
+    goalProp ??
+    (goalId
+      ? myGoals.find((g) => g.id === goalId) ??
+        publicGoals.find((g) => g.id === goalId)
+      : null);
 
   const handleEdit = () => {
     if (goal) {
@@ -43,13 +58,15 @@ export function GoalDetailModalSheet({
     }
   };
 
-  const handleDelete = () => {
+  const handleClose = () => {
     onOpenChange(false);
   };
 
   if (!goal) {
     return null;
   }
+
+  const isOwn = currentUserId === goal.userId;
 
   // 切り替えボタン
   const ViewModeToggle = (
@@ -85,8 +102,9 @@ export function GoalDetailModalSheet({
           <div className='max-h-[85vh]'>
             <GoalDetailContent
               goal={goal}
+              isOwn={isOwn}
               onEdit={handleEdit}
-              onDelete={handleDelete}
+              onClose={handleClose}
               onMemberClick={onMemberClick}
             />
           </div>
@@ -106,8 +124,9 @@ export function GoalDetailModalSheet({
         {ViewModeToggle}
         <GoalDetailContent
           goal={goal}
+          isOwn={isOwn}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onClose={handleClose}
           onMemberClick={onMemberClick}
         />
       </SheetContent>

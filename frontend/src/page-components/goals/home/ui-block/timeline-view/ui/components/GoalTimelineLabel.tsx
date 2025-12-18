@@ -2,10 +2,11 @@
 
 import { Target, Calendar } from 'lucide-react';
 
-import type { GoalItem } from '@/shared/dummy-data/goals/goals';
+import type { GoalItem } from '@/entities/domain/goal/model/types';
 
 interface GoalTimelineLabelProps {
   goal: GoalItem;
+  currentUserId?: string;
 }
 
 /** 日付をフォーマット（MM/DD形式） */
@@ -14,7 +15,7 @@ function formatDate(dateStr: string): string {
   return `${date.getMonth() + 1}/${date.getDate()}`;
 }
 
-export function GoalTimelineLabel({ goal }: GoalTimelineLabelProps) {
+export function GoalTimelineLabel({ goal, currentUserId }: GoalTimelineLabelProps) {
   const isCompleted = !goal.isActive;
 
   return (

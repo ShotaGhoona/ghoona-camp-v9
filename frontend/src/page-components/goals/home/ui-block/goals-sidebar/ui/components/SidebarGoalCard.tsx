@@ -1,12 +1,12 @@
 'use client';
 
-import { User } from 'lucide-react';
+import { User, Target } from 'lucide-react';
 
 import { Badge } from '@/shared/ui/shadcn/ui/badge';
 import { Card } from '@/shared/ui/shadcn/ui/card';
 
-import type { GoalItem } from '@/shared/dummy-data/goals/goals';
-import { getRemainingDays } from '@/shared/dummy-data/goals/goals';
+import type { GoalItem } from '@/entities/domain/goal/model/types';
+import { getRemainingDays } from '@/entities/domain/goal/model/types';
 
 interface SidebarGoalCardProps {
   goal: GoalItem;
@@ -19,6 +19,19 @@ function getRemainingText(days: number | null): string {
   if (days < 0) return '期限切れ';
   if (days === 0) return '今日まで';
   return `残り${days}日`;
+}
+
+/** 日付をフォーマット */
+function formatDateRange(startedAt: string, endedAt: string | null): string {
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return `${date.getMonth() + 1}/${date.getDate()}`;
+  };
+
+  if (endedAt) {
+    return `${formatDate(startedAt)} 〜 ${formatDate(endedAt)}`;
+  }
+  return `${formatDate(startedAt)} 〜`;
 }
 
 export function SidebarGoalCard({ goal, onClick }: SidebarGoalCardProps) {
@@ -37,25 +50,15 @@ export function SidebarGoalCard({ goal, onClick }: SidebarGoalCardProps) {
       onClick={handleClick}
     >
       <div className='flex items-start gap-3'>
-        {/* アバター */}
-        <div className='size-10 shrink-0 overflow-hidden rounded-full bg-muted shadow-inset-sm'>
-          {goal.creator.avatarUrl ? (
-            <img
-              src={goal.creator.avatarUrl}
-              alt={goal.creator.displayName}
-              className='size-full object-cover'
-            />
-          ) : (
-            <div className='flex size-full items-center justify-center'>
-              <User className='size-4 text-muted-foreground' />
-            </div>
-          )}
+        {/* アイコン */}
+        <div className='flex size-10 shrink-0 items-center justify-center rounded-full bg-muted shadow-inset-sm'>
+          <Target className='size-4 text-muted-foreground' />
         </div>
 
         {/* コンテンツ */}
         <div className='min-w-0 flex-1'>
           <p className='text-xs text-muted-foreground'>
-            {goal.creator.displayName}
+            {formatDateRange(goal.startedAt, goal.endedAt)}
           </p>
           <p className='mt-0.5 line-clamp-2 text-sm font-medium leading-tight'>
             {goal.title}
