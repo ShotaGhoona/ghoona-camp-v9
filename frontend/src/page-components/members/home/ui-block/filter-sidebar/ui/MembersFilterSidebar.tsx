@@ -7,7 +7,7 @@ import { Button } from '@/shared/ui/shadcn/ui/button';
 import { Badge } from '@/shared/ui/shadcn/ui/badge';
 import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
 import { Card, CardContent } from '@/shared/ui/shadcn/ui/card';
-import { TITLE_MASTER } from '@/shared/types/title/title';
+import { TITLE_MASTER } from '@/shared/domain/title/data/title-master';
 import { useSkills } from '@/features/domain/user/get-skills/lib/use-skills';
 import { useInterests } from '@/features/domain/user/get-interests/lib/use-interests';
 

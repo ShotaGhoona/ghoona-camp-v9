@@ -1,27 +1,13 @@
-"""シードデータ投入スクリプト
+"""ユーザードメインのシードデータ
 
-朝活コミュニティアプリ用のリアルなテストデータを投入します。
-ランダム生成で多様なユーザーを作成します。
-
-Usage:
-    make db-seed
-    または
-    docker compose exec backend python scripts/seed.py
+ユーザー、メタデータ、ビジョン、SNSリンク、参加統計、称号実績を生成します。
 """
 
-import os
 import random
-import sys
 from datetime import date, datetime, timedelta
 from uuid import uuid4
 
-from passlib.context import CryptContext
-
-# プロジェクトルートをパスに追加
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session
 
 from app.infrastructure.db.models import (
     AttendanceStatisticsModel,
@@ -32,27 +18,7 @@ from app.infrastructure.db.models import (
     UserVisionModel,
 )
 
-# ========================================
-# 設定
-# ========================================
-NUM_USERS = 50  # 生成するユーザー数
-
-# データベース接続
-DATABASE_URL = os.getenv(
-    'DATABASE_URL',
-    'postgresql+psycopg2://app_user:app_password@db:5432/ghoona_camp_db',
-)
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(bind=engine)
-
-
-pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-
-
-def hash_password(password: str) -> str:
-    """パスワードをbcryptでハッシュ化"""
-    return pwd_context.hash(password)
-
+from .config import TEST_EMAIL_TEMPLATE, TEST_PASSWORD, hash_password
 
 # ========================================
 # データソース
@@ -385,11 +351,11 @@ def generate_user(index: int) -> dict:
             })
 
     # メールアドレス生成
-    email = f'user{index:03d}@example.com'
+    email = TEST_EMAIL_TEMPLATE.format(index)
 
     return {
         'email': email,
-        'password': 'password123',
+        'password': TEST_PASSWORD,
         'username': username,
         'avatar_url': f'https://api.dicebear.com/7.x/avataaars/svg?seed=user{index}',
         'metadata': {
@@ -418,9 +384,9 @@ def generate_user(index: int) -> dict:
 # データベース操作
 # ========================================
 
-def clear_data(session):
-    """既存データをクリア"""
-    print('既存データを削除中...')
+def clear_user_data(session: Session) -> None:
+    """ユーザー関連データをクリア"""
+    print('ユーザー関連データを削除中...')
     session.query(UserSocialLinkModel).delete()
     session.query(UserVisionModel).delete()
     session.query(UserMetadataModel).delete()
@@ -428,10 +394,10 @@ def clear_data(session):
     session.query(AttendanceStatisticsModel).delete()
     session.query(UserModel).delete()
     session.commit()
-    print('既存データを削除しました')
+    print('ユーザー関連データを削除しました')
 
 
-def seed_users(session, num_users: int):
+def seed_users(session: Session, num_users: int) -> None:
     """ユーザーデータを投入"""
     print(f'{num_users}人のユーザーを生成中...')
 
@@ -534,46 +500,12 @@ def seed_users(session, num_users: int):
     print(f'\n✅ {num_users}人のユーザーを追加しました')
 
 
-def print_stats(session):
-    """統計情報を表示"""
-    print('\n📊 データ統計:')
+def print_user_stats(session: Session) -> None:
+    """ユーザー関連の統計情報を表示"""
+    print('\n📊 ユーザーデータ統計:')
     print(f'  ユーザー数: {session.query(UserModel).count()}')
     print(f'  メタデータ: {session.query(UserMetadataModel).count()}')
     print(f'  ビジョン: {session.query(UserVisionModel).count()}')
     print(f'  SNSリンク: {session.query(UserSocialLinkModel).count()}')
     print(f'  参加統計: {session.query(AttendanceStatisticsModel).count()}')
     print(f'  称号実績: {session.query(TitleAchievementModel).count()}')
-
-
-def main():
-    """メイン処理"""
-    print('=' * 50)
-    print('Ghoona Camp シードデータ投入スクリプト')
-    print('=' * 50)
-    print()
-
-    session = SessionLocal()
-
-    try:
-        clear_data(session)
-        seed_users(session, NUM_USERS)
-        print_stats(session)
-        print()
-        print('✅ シードデータの投入が完了しました！')
-        print()
-        print('テスト用アカウント:')
-        print('  Email: user001@example.com')
-        print('  Password: password123')
-        print()
-    except Exception as e:
-        session.rollback()
-        print(f'❌ エラーが発生しました: {e}')
-        import traceback
-        traceback.print_exc()
-        raise
-    finally:
-        session.close()
-
-
-if __name__ == '__main__':
-    main()

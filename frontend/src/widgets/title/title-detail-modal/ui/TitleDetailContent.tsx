@@ -1,9 +1,16 @@
 'use client';
 
-import { Calendar, Crown, Users, User, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { Calendar, Crown, Users, User } from 'lucide-react';
 
 import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
 import { Separator } from '@/shared/ui/shadcn/ui/separator';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/shared/ui/shadcn/ui/tooltip';
+import { Skeleton } from '@/shared/ui/shadcn/ui/skeleton';
 import { cn } from '@/shared/ui/shadcn/lib/utils';
 
 import { useAppSelector } from '@/store/hooks';
@@ -47,30 +54,42 @@ export function TitleDetailContent({
   // 保持者データ
   const holders = holdersData?.data.holders ?? [];
   const holderCount = holdersData?.data.total ?? 0;
+
+  // ストーリー展開状態
+  const [isStoryExpanded, setIsStoryExpanded] = useState(false);
+
+  // 保持者展開状態
+  const [isHoldersExpanded, setIsHoldersExpanded] = useState(false);
+
   return (
-    <div className='flex h-full flex-col'>
-      <ScrollArea className='flex-1'>
-        <div className='flex flex-col'>
-          {/* ヘッダー部分 - 画像 */}
-          <div className='relative h-72 overflow-hidden'>
-            <img
-              src={title.imageUrl}
-              alt={title.nameJp}
-              className={cn(
-                'size-full object-cover object-top',
-                !isAchieved && 'opacity-60 grayscale',
-              )}
-            />
-            <div className='absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent' />
+    <div className='relative h-full overflow-hidden'>
+      {/* 背景画像（固定） */}
+      <div className='absolute inset-x-0 top-0 h-72'>
+        <img
+          src={title.imageUrl}
+          alt={title.nameJp}
+          className={cn(
+            'size-full object-cover object-top',
+            !isAchieved && 'opacity-60 grayscale',
+          )}
+        />
+        {/* レベル */}
+        <p className='absolute left-4 top-4 text-sm font-medium text-white/80 drop-shadow-md'>
+          Lv.{title.level}
+        </p>
+      </div>
 
-            {/* レベル */}
-            <p className='absolute left-4 top-4 text-sm font-medium text-white/80 drop-shadow-md'>
-              Lv.{title.level}
-            </p>
-          </div>
+      {/* スクロールコンテンツ */}
+      <ScrollArea className='h-full'>
+        {/* スペーサー（写真が見える領域） */}
+        <div className='h-56' />
 
-          {/* プロフィール情報 */}
-          <div className='space-y-5 px-6 pb-6'>
+        {/* コンテンツカード（写真を侵食） */}
+        <div className='relative z-10'>
+          {/* グラデーションオーバーレイ */}
+          <div className='h-16 bg-gradient-to-t from-background to-transparent' />
+          <div className='bg-background px-6 pb-6'>
+            <div className='space-y-5'>
             {/* 名前 & ステータス */}
             <div className='text-center'>
               <h2 className='text-xl font-bold'>{title.nameJp}</h2>
@@ -112,7 +131,27 @@ export function TitleDetailContent({
               <h3 className='mb-2 text-sm font-semibold text-muted-foreground'>
                 Story
               </h3>
-              <p className='text-sm leading-relaxed'>{title.story}</p>
+              <button
+                type='button'
+                onClick={() => setIsStoryExpanded(!isStoryExpanded)}
+                className='relative w-full text-left'
+              >
+                <p
+                  className={cn(
+                    'text-sm leading-relaxed transition-all duration-300',
+                    !isStoryExpanded && 'line-clamp-3',
+                  )}
+                >
+                  {title.story}
+                </p>
+                {!isStoryExpanded && (
+                  <div className='absolute inset-x-0 bottom-0 flex h-12 items-end justify-center bg-gradient-to-t from-background via-background/80 to-transparent'>
+                    <span className='pb-1 text-xs text-muted-foreground'>
+                      続きを読む
+                    </span>
+                  </div>
+                )}
+              </button>
             </div>
 
             <Separator />
@@ -130,35 +169,49 @@ export function TitleDetailContent({
               </div>
 
               {isLoadingHolders ? (
-                <div className='flex items-center justify-center py-4'>
-                  <Loader2 className='size-5 animate-spin text-muted-foreground' />
+                <div className='flex flex-wrap gap-1'>
+                  {[...Array(6)].map((_, i) => (
+                    <Skeleton key={i} className='size-10 rounded-full' />
+                  ))}
                 </div>
               ) : holders.length > 0 ? (
                 <div className='flex flex-wrap gap-1'>
-                  {holders.slice(0, 12).map((holder) => (
+                  {(isHoldersExpanded ? holders : holders.slice(0, 9)).map(
+                    (holder) => (
+                      <Tooltip key={holder.id}>
+                        <TooltipTrigger asChild>
+                          <button
+                            type='button'
+                            onClick={() => onHolderClick?.(holder.id)}
+                            className='size-10 overflow-hidden rounded-full bg-muted shadow-raised-sm transition-transform hover:scale-105'
+                          >
+                            {holder.avatarUrl ? (
+                              <img
+                                src={holder.avatarUrl}
+                                alt={holder.displayName ?? ''}
+                                className='size-full object-cover'
+                              />
+                            ) : (
+                              <div className='flex size-full items-center justify-center'>
+                                <User className='size-4 text-muted-foreground' />
+                              </div>
+                            )}
+                          </button>
+                        </TooltipTrigger>
+                        {holder.displayName && (
+                          <TooltipContent>{holder.displayName}</TooltipContent>
+                        )}
+                      </Tooltip>
+                    ),
+                  )}
+                  {holderCount > 9 && (
                     <button
-                      key={holder.id}
                       type='button'
-                      onClick={() => onHolderClick?.(holder.id)}
-                      className='size-10 overflow-hidden rounded-full bg-muted shadow-raised-sm transition-transform hover:scale-105'
+                      onClick={() => setIsHoldersExpanded(!isHoldersExpanded)}
+                      className='flex size-10 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground shadow-raised-sm transition-colors hover:bg-muted/80'
                     >
-                      {holder.avatarUrl ? (
-                        <img
-                          src={holder.avatarUrl}
-                          alt={holder.displayName ?? ''}
-                          className='size-full object-cover'
-                        />
-                      ) : (
-                        <div className='flex size-full items-center justify-center'>
-                          <User className='size-4 text-muted-foreground' />
-                        </div>
-                      )}
+                      {isHoldersExpanded ? '閉' : `+${holderCount - 9}`}
                     </button>
-                  ))}
-                  {holderCount > 12 && (
-                    <div className='flex size-10 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground shadow-raised-sm'>
-                      +{holderCount - 12}
-                    </div>
                   )}
                 </div>
               ) : (
@@ -167,6 +220,7 @@ export function TitleDetailContent({
                 </p>
               )}
             </div>
+          </div>
           </div>
         </div>
       </ScrollArea>

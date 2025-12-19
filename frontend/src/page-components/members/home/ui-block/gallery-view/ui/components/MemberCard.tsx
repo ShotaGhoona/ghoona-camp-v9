@@ -4,7 +4,8 @@ import { Eye, Trophy, User } from 'lucide-react';
 
 import { Badge } from '@/shared/ui/shadcn/ui/badge';
 import { Card } from '@/shared/ui/shadcn/ui/card';
-import { getTitleByLevel, type TitleLevel } from '@/shared/types/title/title';
+import type { TitleLevel } from '@/shared/domain/title/model/types';
+import { getTitleByLevel } from '@/shared/domain/title/lib/title-utils';
 import type { UserListItem } from '@/entities/domain/user/model/types';
 
 interface MemberCardProps {

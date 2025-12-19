@@ -123,28 +123,26 @@ Cookie: access_token=<jwt_token>
 | DELETE | `/goals/{goalId}` | 目標を削除。達成済みまたは不要になった目標の削除で使用 | ❌ | 👤 |
 
 #### GET /goals/me クエリパラメータ
-- `search` (string): 目標タイトルでの検索
+- `year` (number, 必須): 表示対象の年（例: 2025）
+- `month` (number, 必須): 表示対象の月（1-12）
 - `is_public` (boolean): 公開設定でフィルタリング（true=公開のみ, false=プライベートのみ, 省略=全て）
-- `started_from` (string): 目標開始日でフィルタリング（YYYY-MM-DD形式）
-- `started_to` (string): 目標開始日でフィルタリング（YYYY-MM-DD形式）
-- `ended_from` (string): 目標終了日でフィルタリング（YYYY-MM-DD形式）
-- `ended_to` (string): 目標終了日でフィルタリング（YYYY-MM-DD形式）
-- `limit` (number): 取得件数制限（デフォルト: 20, 最大: 100）
-- `offset` (number): オフセット（ページネーション用）
 
-**例:** `GET /goals/me?started_from=2025-02-01&ended_to=2025-06-30` - 2月開始で6月末までに終了する目標
+**フィルタリングロジック:**
+指定月に「かかる」目標を返す:
+- 開始日が月末以前 AND (終了日が月初以降 OR 終了日がnull)
+
+**例:** `GET /goals/me?year=2025&month=1` - 2025年1月に表示される自分の目標
 
 #### GET /goals/public クエリパラメータ
-- `search` (string): 目標タイトルでの検索
-- `user` (string): 特定ユーザーIDでフィルタリング
-- `started_from` (string): 目標開始日でフィルタリング（YYYY-MM-DD形式）
-- `started_to` (string): 目標開始日でフィルタリング（YYYY-MM-DD形式）
-- `ended_from` (string): 目標終了日でフィルタリング（YYYY-MM-DD形式）
-- `ended_to` (string): 目標終了日でフィルタリング（YYYY-MM-DD形式）
-- `limit` (number): 取得件数制限（デフォルト: 20, 最大: 100）
-- `offset` (number): オフセット（ページネーション用）
+- `year` (number, 必須): 表示対象の年（例: 2025）
+- `month` (number, 必須): 表示対象の月（1-12）
+- `user_id` (string): 特定ユーザーIDでフィルタリング
 
-**例:** `GET /goals/public?search=プログラミング&started_from=2025-01-01&ended_to=2025-12-31` - 今年中に開始・終了するプログラミング関連目標
+**フィルタリングロジック:**
+指定月に「かかる」公開目標を返す:
+- 開始日が月末以前 AND (終了日が月初以降 OR 終了日がnull)
+
+**例:** `GET /goals/public?year=2025&month=1` - 2025年1月に表示される公開目標
 
 ### Event Management
 朝活イベント・参加者管理関連のエンドポイント

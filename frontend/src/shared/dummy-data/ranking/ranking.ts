@@ -1,8 +1,8 @@
 // ランキングページ用ダミーデータ
 // TODO: バックエンド接続時に削除
 
-import type { Title } from '@/shared/types/title/title';
-import { TITLE_MASTER } from '@/shared/types/title/title';
+import type { Title } from '@/shared/domain/title/model/types';
+import { TITLE_MASTER } from '@/shared/domain/title/data/title-master';
 
 // ========================================
 // 型定義（ダミーデータ用）

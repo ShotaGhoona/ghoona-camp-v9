@@ -25,7 +25,8 @@ import {
   getSnsLabel,
   type SnsPlatform,
 } from '@/shared/types/user/sns';
-import { getTitleByLevel, type TitleLevel } from '@/shared/types/title/title';
+import type { TitleLevel } from '@/shared/domain/title/model/types';
+import { getTitleByLevel } from '@/shared/domain/title/lib/title-utils';
 import { useRivalAction } from '../lib/use-rival-action';
 
 interface MemberDetailContentProps {

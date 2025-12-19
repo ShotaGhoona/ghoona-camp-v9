@@ -75,7 +75,7 @@ db-current:
 	docker compose run --rm migrator alembic current
 
 db-seed:
-	docker compose exec backend python scripts/seed.py
+	docker compose exec backend python -m scripts.seed.run
 
 # ==========================================
 # テスト
