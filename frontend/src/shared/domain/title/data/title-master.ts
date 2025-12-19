@@ -1,27 +1,4 @@
-/** 称号レベル (1-8) */
-export type TitleLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-
-/** 称号のテーマカラー */
-export interface TitleColorTheme {
-  primary: string;
-  secondary: string;
-  gradient: string;
-  text: string;
-  bg: string;
-  glow: string;
-}
-
-/** 称号情報 (titles テーブル) */
-export interface Title {
-  level: TitleLevel;
-  nameJp: string;
-  nameEn: string;
-  concept: string;
-  story: string;
-  requiredDays: number;
-  imageUrl: string;
-  colorTheme: TitleColorTheme;
-}
+import type { Title } from '../model/types';
 
 /** 称号マスターデータ - コンセプトに基づく完全版 */
 export const TITLE_MASTER: Title[] = [
@@ -178,34 +155,3 @@ export const TITLE_MASTER: Title[] = [
     },
   },
 ];
-
-/** レベルから称号を取得 */
-export function getTitleByLevel(level: TitleLevel): Title {
-  return TITLE_MASTER[level - 1];
-}
-
-/** 参加日数から称号を取得 */
-export function getTitleByDays(days: number): Title {
-  for (let i = TITLE_MASTER.length - 1; i >= 0; i--) {
-    if (days >= TITLE_MASTER[i].requiredDays) {
-      return TITLE_MASTER[i];
-    }
-  }
-  return TITLE_MASTER[0];
-}
-
-/** 次の称号を取得（最高レベルの場合はnull） */
-export function getNextTitle(currentLevel: TitleLevel): Title | null {
-  if (currentLevel >= 8) return null;
-  return TITLE_MASTER[currentLevel];
-}
-
-/** 次の称号までの残り日数を取得 */
-export function getDaysToNextTitle(
-  currentDays: number,
-  currentLevel: TitleLevel,
-): number | null {
-  const nextTitle = getNextTitle(currentLevel);
-  if (!nextTitle) return null;
-  return Math.max(0, nextTitle.requiredDays - currentDays);
-}

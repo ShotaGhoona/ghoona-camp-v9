@@ -5,7 +5,7 @@ import { Sparkles } from 'lucide-react';
 import { Card } from '@/shared/ui/shadcn/ui/card';
 import { cn } from '@/shared/ui/shadcn/lib/utils';
 
-import type { Title } from '@/shared/types/title/title';
+import type { Title } from '@/shared/domain/title/model/types';
 
 interface CurrentTitleCardProps {
   title: Title;

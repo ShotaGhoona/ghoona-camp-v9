@@ -1,28 +1,52 @@
 'use client';
 
-import { Calendar, Crown, Users, User } from 'lucide-react';
+import { Calendar, Crown, Users, User, Loader2 } from 'lucide-react';
 
 import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
 import { Separator } from '@/shared/ui/shadcn/ui/separator';
 import { cn } from '@/shared/ui/shadcn/lib/utils';
 
-import type { TitleWithHolders } from '@/shared/dummy-data/titles/titles';
+import { useAppSelector } from '@/store/hooks';
+import type { TitleLevel } from '@/shared/domain/title/model/types';
+import { getTitleByLevel } from '@/shared/domain/title/lib/title-utils';
+import { useTitleHolders } from '@/features/domain/title/get-title-holders/lib/use-title-holders';
+import { useUserTitleAchievements } from '@/features/domain/title/get-user-title-achievements/lib/use-user-title-achievements';
 
 interface TitleDetailContentProps {
-  title: TitleWithHolders;
-  isAchieved: boolean;
-  isCurrent: boolean;
-  achievedAt?: string;
+  titleLevel: TitleLevel;
   onHolderClick?: (holderId: string) => void;
 }
 
 export function TitleDetailContent({
-  title,
-  isAchieved,
-  isCurrent,
-  achievedAt,
+  titleLevel,
   onHolderClick,
 }: TitleDetailContentProps) {
+  const { user } = useAppSelector((state) => state.auth);
+
+  // 称号マスターから取得
+  const title = getTitleByLevel(titleLevel);
+
+  // APIから保持者一覧を取得
+  const { data: holdersData, isLoading: isLoadingHolders } =
+    useTitleHolders(titleLevel);
+
+  // ユーザーの称号実績を取得
+  const { data: achievementsData } = useUserTitleAchievements(user?.id ?? null);
+
+  // ユーザーの獲得状態を計算
+  const achievements = achievementsData?.data.achievements ?? [];
+  const currentTitleLevel = achievementsData?.data.currentTitleLevel ?? 1;
+  const achievedLevels = new Set<TitleLevel>(
+    achievements.map((a) => a.titleLevel),
+  );
+  const isAchieved = achievedLevels.has(titleLevel);
+  const isCurrent = titleLevel === currentTitleLevel;
+  const achievement = achievements.find((a) => a.titleLevel === titleLevel);
+  const achievedAt = achievement?.achievedAt;
+
+  // 保持者データ
+  const holders = holdersData?.data.holders ?? [];
+  const holderCount = holdersData?.data.total ?? 0;
   return (
     <div className='flex h-full flex-col'>
       <ScrollArea className='flex-1'>
@@ -101,13 +125,17 @@ export function TitleDetailContent({
                   保持者
                 </h3>
                 <span className='text-xs text-muted-foreground'>
-                  {title.holderCount}人
+                  {isLoadingHolders ? '...' : `${holderCount}人`}
                 </span>
               </div>
 
-              {title.holders.length > 0 ? (
+              {isLoadingHolders ? (
+                <div className='flex items-center justify-center py-4'>
+                  <Loader2 className='size-5 animate-spin text-muted-foreground' />
+                </div>
+              ) : holders.length > 0 ? (
                 <div className='flex flex-wrap gap-1'>
-                  {title.holders.slice(0, 12).map((holder) => (
+                  {holders.slice(0, 12).map((holder) => (
                     <button
                       key={holder.id}
                       type='button'
@@ -117,7 +145,7 @@ export function TitleDetailContent({
                       {holder.avatarUrl ? (
                         <img
                           src={holder.avatarUrl}
-                          alt={holder.displayName}
+                          alt={holder.displayName ?? ''}
                           className='size-full object-cover'
                         />
                       ) : (
@@ -127,9 +155,9 @@ export function TitleDetailContent({
                       )}
                     </button>
                   ))}
-                  {title.holderCount > 12 && (
+                  {holderCount > 12 && (
                     <div className='flex size-10 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground shadow-raised-sm'>
-                      +{title.holderCount - 12}
+                      +{holderCount - 12}
                     </div>
                   )}
                 </div>

@@ -10,10 +10,7 @@ import {
   TooltipTrigger,
 } from '@/shared/ui/shadcn/ui/tooltip';
 
-import {
-  dummyTitlesWithHolders,
-  dummyUserTitleProgress,
-} from '@/shared/dummy-data/titles/titles';
+import type { TitleLevel } from '@/shared/domain/title/model/types';
 import { useViewMode, type ViewMode } from '../lib/use-view-mode';
 import { TitleDetailContent } from './TitleDetailContent';
 
@@ -34,26 +31,9 @@ export function TitleDetailModalSheet({
 }: TitleDetailModalSheetProps) {
   const { viewMode, toggleViewMode, isModal } = useViewMode(defaultViewMode);
 
-  // ダミーデータから称号を取得
-  const title = titleLevel
-    ? dummyTitlesWithHolders.find((t) => t.level === titleLevel)
-    : null;
-
-  // ダミーデータからユーザー進捗を取得
-  const userProgress = dummyUserTitleProgress;
-
-  if (!title) {
+  if (!titleLevel) {
     return null;
   }
-
-  const achievedLevels = new Set(
-    userProgress.achievements.map((a) => a.titleLevel),
-  );
-  const isAchieved = achievedLevels.has(title.level);
-  const isCurrent = title.level === userProgress.currentTitle.level;
-  const achievement = userProgress.achievements.find(
-    (a) => a.titleLevel === title.level,
-  );
 
   // 切り替えボタン
   const ViewModeToggle = (
@@ -88,10 +68,7 @@ export function TitleDetailModalSheet({
           {ViewModeToggle}
           <div className='max-h-[85vh]'>
             <TitleDetailContent
-              title={title}
-              isAchieved={isAchieved}
-              isCurrent={isCurrent}
-              achievedAt={achievement?.achievedAt}
+              titleLevel={titleLevel as TitleLevel}
               onHolderClick={onHolderClick}
             />
           </div>
@@ -110,10 +87,7 @@ export function TitleDetailModalSheet({
       >
         {ViewModeToggle}
         <TitleDetailContent
-          title={title}
-          isAchieved={isAchieved}
-          isCurrent={isCurrent}
-          achievedAt={achievement?.achievedAt}
+          titleLevel={titleLevel as TitleLevel}
           onHolderClick={onHolderClick}
         />
       </SheetContent>

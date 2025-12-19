@@ -1,14 +1,13 @@
 'use client';
 
 import { cn } from '@/shared/ui/shadcn/lib/utils';
-
-import type { TitleWithHolders } from '@/shared/dummy-data/titles/titles';
+import type { Title } from '@/shared/domain/title/model/types';
 
 interface TitleCardProps {
-  title: TitleWithHolders;
+  title: Title;
   isAchieved: boolean;
   isCurrent: boolean;
-  onClick?: (title: TitleWithHolders) => void;
+  onClick?: (title: Title) => void;
 }
 
 export function TitleCard({

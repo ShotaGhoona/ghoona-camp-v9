@@ -2,7 +2,7 @@
 
 import { Card } from '@/shared/ui/shadcn/ui/card';
 import { cn } from '@/shared/ui/shadcn/lib/utils';
-import { TITLE_MASTER } from '@/shared/types/title/title';
+import { TITLE_MASTER } from '@/shared/domain/title/data/title-master';
 
 interface TitleJourneyProgressProps {
   totalAttendanceDays: number;

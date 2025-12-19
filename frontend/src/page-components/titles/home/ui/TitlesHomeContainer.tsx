@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 
-import {
-  dummyTitlesWithHolders,
-  dummyUserTitleProgress,
-} from '@/shared/dummy-data/titles/titles';
-import type { TitleWithHolders } from '@/shared/dummy-data/titles/titles';
+import { useAppSelector } from '@/store/hooks';
+import type { Title, TitleLevel } from '@/shared/domain/title/model/types';
+import { TITLE_MASTER } from '@/shared/domain/title/data/title-master';
+import { getTitleByLevel } from '@/shared/domain/title/lib/title-utils';
+import { useUserTitleAchievements } from '@/features/domain/title/get-user-title-achievements/lib/use-user-title-achievements';
 
 import { CurrentTitleCard } from '../ui-block/user-stats/ui/CurrentTitleCard';
 import { TitleJourneyProgress } from '../ui-block/user-stats/ui/NextTitleProgress';
@@ -16,6 +16,7 @@ import { TitleDetailModalSheet } from '@/widgets/title/title-detail-modal/ui/Tit
 import { MemberDetailModalSheet } from '@/widgets/member/member-detail-modal/ui/MemberDetailModalSheet';
 
 export function TitlesHomeContainer() {
+  const { user } = useAppSelector((state) => state.auth);
   const [selectedTitleLevel, setSelectedTitleLevel] = useState<number | null>(
     null,
   );
@@ -23,7 +24,12 @@ export function TitlesHomeContainer() {
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
 
-  const handleTitleClick = (title: TitleWithHolders) => {
+  // ユーザーの称号実績を取得
+  const { data: achievementsData } = useUserTitleAchievements(
+    user?.id ?? null,
+  );
+
+  const handleTitleClick = (title: Title) => {
     setSelectedTitleLevel(title.level);
     setIsDetailModalOpen(true);
   };
@@ -33,14 +39,15 @@ export function TitlesHomeContainer() {
     setIsMemberModalOpen(true);
   };
 
-  const {
-    currentTitle,
-    nextTitle,
-    totalAttendanceDays,
-    daysToNextTitle,
-    progressPercentage,
-    achievements,
-  } = dummyUserTitleProgress;
+  // APIデータから値を取得（未取得時はデフォルト値）
+  const currentTitleLevel = (achievementsData?.data.currentTitleLevel ?? 1) as TitleLevel;
+  const totalAttendanceDays = achievementsData?.data.totalAttendanceDays ?? 0;
+  const achievements = achievementsData?.data.achievements ?? [];
+
+  const currentTitle = getTitleByLevel(currentTitleLevel);
+  const achievedLevels = new Set<TitleLevel>(
+    achievements.map((a) => a.titleLevel),
+  );
 
   return (
     <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
@@ -69,8 +76,9 @@ export function TitlesHomeContainer() {
         {/* 下部: 称号ギャラリー（横スクロール） */}
         <div className='min-h-0 flex-1'>
           <TitleGallery
-            titles={dummyTitlesWithHolders}
-            userProgress={dummyUserTitleProgress}
+            titles={TITLE_MASTER}
+            currentTitleLevel={currentTitleLevel}
+            achievedLevels={achievedLevels}
             onTitleClick={handleTitleClick}
           />
         </div>
