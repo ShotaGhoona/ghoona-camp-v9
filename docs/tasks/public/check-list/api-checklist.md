@@ -4,8 +4,8 @@
 
 Ghoona Camp アプリケーションのAPI実装進捗を追跡するためのチェックリストです。
 
-- **Total APIs**: 39
-- **Total Tasks**: 78 (Backend + Frontend)
+- **Total APIs**: 37
+- **Total Tasks**: 74 (Backend + Frontend)
 - **Reference**: `docs/requirements/12-api.md`
 
 ## Legend
@@ -67,26 +67,23 @@ Ghoona Camp アプリケーションのAPI実装進捗を追跡するための�
 
 ---
 
-## Title Management (4 APIs)
+## Title Management (2 APIs)
 
 | # | Method | Endpoint | Backend | Frontend |
 |---|--------|----------|---------|----------|
-| 25 | GET | `/titles` | [ ] | [ ] |
-| 26 | GET | `/titles/{titleId}` | [ ] | [ ] |
-| 27 | GET | `/users/{userId}/achievements` | [ ] | [ ] |
-| 28 | PUT | `/users/{userId}/achievements/{titleId}` | [ ] | [ ] |
+| 25 | GET | `/titles/{level}/holders` | [x] | [x] |
+| 26 | GET | `/users/{userId}/title-achievements` | [x] | [x] |
 
 ---
 
-## Attendance Management (5 APIs)
+## Attendance Management (4 APIs)
 
 | # | Method | Endpoint | Backend | Frontend |
 |---|--------|----------|---------|----------|
+| 27 | GET | `/rankings` | [x] | [x] |
+| 28 | GET | `/rankings/me` | [x] | [x] |
 | 29 | GET | `/users/{userId}/attendance/summaries` | [ ] | [ ] |
 | 30 | GET | `/users/{userId}/attendance/statistics` | [ ] | [ ] |
-| 31 | GET | `/ranking/monthly` | [ ] | [ ] |
-| 32 | GET | `/ranking/total` | [ ] | [ ] |
-| 33 | GET | `/ranking/streak` | [ ] | [ ] |
 
 ---
 
@@ -94,19 +91,20 @@ Ghoona Camp アプリケーションのAPI実装進捗を追跡するための�
 
 | # | Method | Endpoint | Backend | Frontend |
 |---|--------|----------|---------|----------|
-| 34 | GET | `/users/{userId}/notifications` | [ ] | [ ] |
-| 35 | PUT | `/notifications/{notificationId}` | [ ] | [ ] |
-| 36 | DELETE | `/notifications/{notificationId}` | [ ] | [ ] |
-| 37 | GET | `/users/{userId}/notification-settings` | [ ] | [ ] |
-| 38 | PUT | `/users/{userId}/notification-settings` | [ ] | [ ] |
+| 31 | GET | `/users/{userId}/notifications` | [ ] | [ ] |
+| 32 | PUT | `/notifications/{notificationId}` | [ ] | [ ] |
+| 33 | DELETE | `/notifications/{notificationId}` | [ ] | [ ] |
+| 34 | GET | `/users/{userId}/notification-settings` | [ ] | [ ] |
+| 35 | PUT | `/users/{userId}/notification-settings` | [ ] | [ ] |
 
 ---
 
-## System API (1 API)
+## System API (2 APIs)
 
 | # | Method | Endpoint | Backend | Frontend |
 |---|--------|----------|---------|----------|
-| 39 | GET | `/health` | [ ] | [ ] |
+| 36 | GET | `/health` | [ ] | [ ] |
+| 37 | GET | `/version` | [ ] | [ ] |
 
 ---
 
@@ -118,17 +116,21 @@ Ghoona Camp アプリケーションのAPI実装進捗を追跡するための�
 | User Management | 8 | 8/8 | 8/8 |
 | Goal Management | 5 | 5/5 | 5/5 |
 | Event Management | 7 | 0/7 | 0/7 |
-| Title Management | 4 | 0/4 | 0/4 |
-| Attendance Management | 5 | 0/5 | 0/5 |
+| Title Management | 2 | 2/2 | 2/2 |
+| Attendance Management | 4 | 2/4 | 2/4 |
 | Notification Management | 5 | 0/5 | 0/5 |
-| System API | 1 | 0/1 | 0/1 |
-| **Total** | **39** | **16/39** | **16/39** |
+| System API | 2 | 0/2 | 0/2 |
+| **Total** | **37** | **20/37** | **20/37** |
 
 ---
 
 ## Related Reports
 
-- `docs/tasks/report/21-user-domain-backend.md` - User Domain バックエンド実装レポート
-- `docs/tasks/report/22-user-domain-frontend.md` - User Domain フロントエンド実装レポート
-- `docs/tasks/report/23-goal-domain-backend.md` - Goal Domain バックエンド実装レポート
-- `docs/tasks/report/24-goal-domain-frontend.md` - Goal Domain フロントエンド実装レポート
+- `docs/tasks/public/report/21-user-domain-backend.md` - User Domain バックエンド実装レポート
+- `docs/tasks/public/report/22-user-domain-frontend.md` - User Domain フロントエンド実装レポート
+- `docs/tasks/public/report/23-goal-domain-backend.md` - Goal Domain バックエンド実装レポート
+- `docs/tasks/public/report/24-goal-domain-frontend.md` - Goal Domain フロントエンド実装レポート
+- `docs/tasks/public/report/25-title-domain-backend.md` - Title Domain バックエンド実装レポート
+- `docs/tasks/public/report/26-title-domain-frontend.md` - Title Domain フロントエンド実装レポート
+- `docs/tasks/public/report/27-attendance-domain-backend.md` - Attendance Domain バックエンド実装レポート
+- `docs/tasks/public/report/28-attendance-domain-frontend.md` - Attendance Domain フロントエンド実装レポート

@@ -8,28 +8,26 @@ import {
   AvatarImage,
 } from '@/shared/ui/shadcn/ui/avatar';
 import { cn } from '@/shared/ui/shadcn/lib/utils';
-import type {
-  RankingEntry,
-  RankingType,
-} from '@/shared/dummy-data/ranking/ranking';
-import { getScoreValue } from '@/shared/dummy-data/ranking/ranking';
+import type { RankingEntry } from '@/entities/domain/attendance/model/types';
 
 interface RankingItemProps {
   entry: RankingEntry;
-  rankingType: RankingType;
+  isCurrentUser?: boolean;
   onClick?: (entry: RankingEntry) => void;
 }
 
-export function RankingItem({ entry, rankingType, onClick }: RankingItemProps) {
-  const score = getScoreValue(entry, rankingType);
-
+export function RankingItem({
+  entry,
+  isCurrentUser,
+  onClick,
+}: RankingItemProps) {
   return (
     <div
       className={cn(
         'group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200',
         'cursor-pointer shadow-raised',
         'hover:scale-[0.98] hover:shadow-raised-sm active:scale-[0.97] active:shadow-inset',
-        entry.isCurrentUser ? 'bg-primary/20' : 'bg-card',
+        isCurrentUser ? 'bg-primary/10' : 'bg-card',
       )}
       onClick={() => onClick?.(entry)}
     >
@@ -43,31 +41,22 @@ export function RankingItem({ entry, rankingType, onClick }: RankingItemProps) {
         <Avatar className='size-8'>
           <AvatarImage
             src={entry.user.avatarUrl ?? undefined}
-            alt={entry.user.displayName}
+            alt={entry.user.displayName ?? 'User'}
           />
           <AvatarFallback className='bg-muted text-xs'>
             <User className='size-4 text-muted-foreground' />
           </AvatarFallback>
         </Avatar>
-        {/* 自分インジケーター（小さなドット） */}
-        {entry.isCurrentUser && (
-          <div className='absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full bg-primary ring-[1.5px] ring-background' />
-        )}
       </div>
 
       {/* ユーザー情報 */}
       <div className='min-w-0 flex-1'>
-        <p
-          className={cn(
-            'truncate text-sm',
-            entry.isCurrentUser ? 'font-semibold' : 'font-medium',
-          )}
-        >
-          {entry.user.displayName}
+        <p className='truncate text-sm font-medium'>
+          {entry.user.displayName ?? 'Unknown'}
         </p>
-        {entry.user.bio && (
+        {entry.user.tagline && (
           <p className='truncate text-[10px] text-muted-foreground'>
-            {entry.user.bio}
+            {entry.user.tagline}
           </p>
         )}
       </div>
@@ -75,7 +64,7 @@ export function RankingItem({ entry, rankingType, onClick }: RankingItemProps) {
       {/* スコア */}
       <div className='shrink-0 text-right'>
         <span className='text-sm font-semibold tabular-nums text-foreground'>
-          {score}
+          {entry.score}
         </span>
         <span className='ml-0.5 text-[10px] text-muted-foreground'>日</span>
       </div>

@@ -3,23 +3,14 @@
 import { Calendar, Flame, Trophy } from 'lucide-react';
 
 import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
-import type { RankingEntry } from '@/entities/domain/attendance/model/types';
+import { Skeleton } from '@/shared/ui/shadcn/ui/skeleton';
+import type { RankingType } from '../RankingColumn';
 
-import { TopThreeItem } from './components/TopThreeItem';
-import { RankingItem } from './components/RankingItem';
-import { RankingColumnSkeleton } from './skeleton/RankingColumnSkeleton';
+import { TopThreeItemSkeleton } from './TopThreeItemSkeleton';
+import { RankingItemSkeleton } from './RankingItemSkeleton';
 
-/** ランキングの種類 */
-export type RankingType = 'monthly' | 'total' | 'streak';
-
-interface RankingColumnProps {
+interface RankingColumnSkeletonProps {
   type: RankingType;
-  entries: RankingEntry[];
-  myRank: number;
-  myScore: number;
-  currentUserId: string | null;
-  isLoading?: boolean;
-  onEntryClick?: (entry: RankingEntry) => void;
 }
 
 const COLUMN_CONFIG = {
@@ -40,24 +31,9 @@ const COLUMN_CONFIG = {
   },
 };
 
-export function RankingColumn({
-  type,
-  entries,
-  myRank,
-  myScore,
-  currentUserId,
-  isLoading,
-  onEntryClick,
-}: RankingColumnProps) {
+export function RankingColumnSkeleton({ type }: RankingColumnSkeletonProps) {
   const config = COLUMN_CONFIG[type];
   const Icon = config.icon;
-
-  if (isLoading) {
-    return <RankingColumnSkeleton type={type} />;
-  }
-
-  const topThree = entries.filter((e) => e.rank <= 3);
-  const rest = entries.filter((e) => e.rank > 3);
 
   return (
     <div className='flex min-h-0 flex-1 flex-col gap-0'>
@@ -79,14 +55,12 @@ export function RankingColumn({
             </div>
           </div>
 
-          {/* 右: 自分のスコア・順位 */}
+          {/* 右: スコア・順位（スケルトン） */}
           <div className='flex items-baseline gap-1.5'>
-            <span className='text-lg font-bold tabular-nums'>{myScore}</span>
+            <Skeleton className='h-5 w-6' />
             <span className='text-[10px] text-muted-foreground'>日</span>
             <span className='mx-1 text-muted-foreground/50'>/</span>
-            <span className='flex size-5 items-center justify-center rounded bg-primary text-[10px] font-bold text-white'>
-              {myRank > 0 ? myRank : '-'}
-            </span>
+            <Skeleton className='size-5 rounded' />
             <span className='text-[10px] text-muted-foreground'>位</span>
           </div>
         </div>
@@ -98,25 +72,15 @@ export function RankingColumn({
           <div className='flex flex-col gap-4 p-6'>
             {/* トップ3（横並び） */}
             <div className='flex gap-3'>
-              {topThree.map((entry) => (
-                <TopThreeItem
-                  key={entry.user.id}
-                  entry={entry}
-                  isCurrentUser={entry.user.id === currentUserId}
-                  onClick={onEntryClick}
-                />
-              ))}
+              <TopThreeItemSkeleton />
+              <TopThreeItemSkeleton />
+              <TopThreeItemSkeleton />
             </div>
 
             {/* 4位以下 */}
             <div className='flex flex-col gap-2'>
-              {rest.map((entry) => (
-                <RankingItem
-                  key={entry.user.id}
-                  entry={entry}
-                  isCurrentUser={entry.user.id === currentUserId}
-                  onClick={onEntryClick}
-                />
+              {Array.from({ length: 7 }).map((_, i) => (
+                <RankingItemSkeleton key={i} />
               ))}
             </div>
           </div>
