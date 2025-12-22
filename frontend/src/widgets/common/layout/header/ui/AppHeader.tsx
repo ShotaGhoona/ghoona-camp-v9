@@ -21,6 +21,7 @@ import {
 import { useAppSelector } from '@/store/hooks';
 import { useLogout } from '@/features/domain/user/logout/lib/use-logout';
 import { ThemeSheet } from '@/features/core/theme/ui/ThemeSheet';
+import { ProfileSheet } from '@/features/domain/user/update-profile/ui/ProfileSheet';
 import { cn } from '@/shared/ui/shadcn/lib/utils';
 import { Button } from '@/shared/ui/shadcn/ui/button';
 import {
@@ -47,7 +48,6 @@ const mainNavItems = [
 ];
 
 const settingsMenuItems = [
-  { href: '/settings/profile', label: 'プロフィール設定', icon: User },
   { href: '/settings/vision', label: 'ビジョン設定', icon: Eye },
   { href: '/settings/notifications', label: '通知設定', icon: Bell },
 ];
@@ -57,6 +57,7 @@ export function AppHeader() {
   const { user } = useAppSelector((state) => state.auth);
   const logoutMutation = useLogout();
   const [isThemeSheetOpen, setIsThemeSheetOpen] = useState(false);
+  const [isProfileSheetOpen, setIsProfileSheetOpen] = useState(false);
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -175,6 +176,15 @@ export function AppHeader() {
                 {/* 設定グループ */}
                 <div className='mb-2'>
                   <DropdownMenuGroup className='space-y-0.5'>
+                    <DropdownMenuItem
+                      onClick={() => setIsProfileSheetOpen(true)}
+                      className='cursor-pointer rounded-lg px-3 py-2 transition-all hover:bg-muted/50 hover:shadow-inset-sm focus:bg-muted/50 focus:shadow-inset-sm'
+                    >
+                      <div className='mr-3 flex size-7 items-center justify-center rounded-md bg-muted shadow-raised-sm'>
+                        <User className='size-3.5 text-muted-foreground' />
+                      </div>
+                      <span className='text-sm'>プロフィール設定</span>
+                    </DropdownMenuItem>
                     {settingsMenuItems.map((item) => {
                       const Icon = item.icon;
                       return (
@@ -230,6 +240,12 @@ export function AppHeader() {
 
       {/* Theme Settings Sheet */}
       <ThemeSheet open={isThemeSheetOpen} onOpenChange={setIsThemeSheetOpen} />
+
+      {/* Profile Settings Sheet */}
+      <ProfileSheet
+        open={isProfileSheetOpen}
+        onOpenChange={setIsProfileSheetOpen}
+      />
     </>
   );
 }
