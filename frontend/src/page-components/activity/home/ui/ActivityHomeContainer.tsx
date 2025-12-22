@@ -5,7 +5,7 @@ import { useState, useMemo } from 'react';
 import { dummyUserStatistics } from '@/shared/dummy-data/activity/activity';
 import { dummyEvents } from '@/shared/dummy-data/events/events';
 import type { EventItem } from '@/shared/dummy-data/events/events';
-import { EventDetailModalSheet } from '@/widgets/event/event-detail-modal/ui/EventDetailModalSheet';
+import { EventDetailModalSheet } from '@/page-components/events/home/ui-block/event-detail-modal/ui/EventDetailModalSheet';
 
 import { StatsCardsSection } from '../ui-block/stats-cards/ui/StatsCardsSection';
 import { ActivityCalendarView } from '../ui-block/calendar-view/ui/ActivityCalendarView';
@@ -95,6 +95,7 @@ export function ActivityHomeContainer() {
         open={isDetailModalOpen}
         onOpenChange={setIsDetailModalOpen}
         defaultViewMode='modal'
+        events={dummyEvents}
       />
     </div>
   );

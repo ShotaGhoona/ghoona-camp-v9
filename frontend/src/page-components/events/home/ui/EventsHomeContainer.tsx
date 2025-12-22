@@ -1,18 +1,20 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 
 import { Button } from '@/shared/ui/shadcn/ui/button';
 import { dummyEvents } from '@/shared/dummy-data/events/events';
 import type { EventItem } from '@/shared/dummy-data/events/events';
-import { EventDetailModalSheet } from '@/widgets/event/event-detail-modal/ui/EventDetailModalSheet';
 import { MemberDetailModalSheet } from '@/widgets/member/member-detail-modal/ui/MemberDetailModalSheet';
 
 import { EventsGalleryView } from '../ui-block/gallery-view/ui/EventsGalleryView';
 import { EventsCalendarView } from '../ui-block/calendar-view/ui/EventsCalendarView';
 import { EventsFilterSidebar } from '../ui-block/filter-sidebar/ui/EventsFilterSidebar';
 import { FilterToggleButton } from '../ui-block/filter-sidebar/ui/FilterToggleButton';
+import { EventDetailModalSheet } from '../ui-block/event-detail-modal/ui/EventDetailModalSheet';
+import { CreateEventModalSheet } from '../ui-block/create-event/ui/CreateEventModalSheet';
+import { EditEventModalSheet } from '../ui-block/edit-event/ui/EditEventModalSheet';
 import type { EventsFilterState } from '../ui-block/filter-sidebar/model/types';
 import {
   initialFilterState,
@@ -45,6 +47,13 @@ export function EventsHomeContainer() {
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
+  // イベント作成モーダル
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  // イベント編集モーダル
+  const [editEventId, setEditEventId] = useState<string | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   // メンバー詳細モーダル
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
@@ -74,10 +83,21 @@ export function EventsHomeContainer() {
     setIsDetailModalOpen(true);
   };
 
+  // 編集ボタンクリック（詳細モーダルから）
+  const handleEdit = (eventId: string) => {
+    setEditEventId(eventId);
+    setIsEditModalOpen(true);
+  };
+
   // メンバークリック（イベント詳細から）
   const handleMemberClick = (memberId: string) => {
     setSelectedMemberId(memberId);
     setIsMemberModalOpen(true);
+  };
+
+  // 新規作成ボタンクリック
+  const handleCreateClick = () => {
+    setIsCreateModalOpen(true);
   };
 
   // 今後消す==========================================
@@ -104,7 +124,7 @@ export function EventsHomeContainer() {
       if (filter.participationStatus !== null) {
         // TODO: 実際にはログインユーザーIDで判定
         const isParticipating = event.participants.some(
-          (p) => p.userId === 'user-001' && p.status === 'registered',
+          (p) => p.userId === '1' && p.status === 'registered',
         );
         if (filter.participationStatus !== isParticipating) {
           return false;
@@ -123,21 +143,10 @@ export function EventsHomeContainer() {
       {/* メインコンテンツ */}
       <div className='flex min-h-0 min-w-0 flex-1 flex-col'>
         {/* ヘッダー */}
-        <div className='flex items-center justify-between px-6 py-4 shadow-raised'>
-          <div className='flex items-center gap-3'>
-            <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10'>
-              <CalendarDays className='size-5 text-primary' />
-            </div>
-            <div>
-              <h1 className='text-xl font-bold'>イベント</h1>
-              <p className='text-sm text-muted-foreground'>
-                {filteredEvents.length}件のイベント
-                {activeFilterCount > 0 && ' (フィルター適用中)'}
-              </p>
-            </div>
-          </div>
+        <div className='flex items-center justify-between px-6 py-4'>
+          <div className='flex items-center gap-3'></div>
 
-          {/* 月ナビゲーション & ビュー切り替え & フィルター */}
+          {/* 月ナビゲーション & ビュー切り替え & フィルター & 作成ボタン */}
           <div className='flex items-center gap-4'>
             {/* 月ナビゲーション */}
             <div className='flex items-center gap-2'>
@@ -171,6 +180,12 @@ export function EventsHomeContainer() {
               activeCount={activeFilterCount}
               onClick={() => setIsFilterOpen(!isFilterOpen)}
             />
+
+            {/* 新規作成ボタン */}
+            <Button onClick={handleCreateClick} variant='raised' size='lg' className='gap-2'>
+              <Plus className='size-4' />
+              新規作成
+            </Button>
           </div>
         </div>
 
@@ -204,6 +219,22 @@ export function EventsHomeContainer() {
         onOpenChange={setIsDetailModalOpen}
         defaultViewMode='modal'
         onMemberClick={handleMemberClick}
+        onEdit={handleEdit}
+        events={dummyEvents}
+      />
+
+      {/* イベント作成モーダル */}
+      <CreateEventModalSheet
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+      />
+
+      {/* イベント編集モーダル */}
+      <EditEventModalSheet
+        eventId={editEventId}
+        open={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+        events={dummyEvents}
       />
 
       {/* メンバー詳細モーダル */}

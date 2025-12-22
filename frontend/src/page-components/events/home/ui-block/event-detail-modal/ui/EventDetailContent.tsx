@@ -1,6 +1,14 @@
 'use client';
 
-import { Calendar, Clock, Repeat, User, Users } from 'lucide-react';
+import {
+  Calendar,
+  Clock,
+  Edit,
+  Repeat,
+  Trash2,
+  User,
+  Users,
+} from 'lucide-react';
 
 import { Badge } from '@/shared/ui/shadcn/ui/badge';
 import { Separator } from '@/shared/ui/shadcn/ui/separator';
@@ -11,16 +19,22 @@ import { EVENT_TYPE_LABELS } from '@/shared/dummy-data/events/events';
 
 interface EventDetailContentProps {
   event: EventItem;
+  isOwner?: boolean;
   isParticipating?: boolean;
   onToggleParticipation?: () => void;
   onMemberClick?: (memberId: string) => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 export function EventDetailContent({
   event,
+  isOwner = false,
   isParticipating = false,
   onToggleParticipation,
   onMemberClick,
+  onEdit,
+  onDelete,
 }: EventDetailContentProps) {
   const participantCount = event.participants.filter(
     (p) => p.status === 'registered',
@@ -29,8 +43,8 @@ export function EventDetailContent({
     event.maxParticipants !== null && participantCount >= event.maxParticipants;
 
   return (
-    <div className='flex h-full flex-col'>
-      <ScrollArea className='flex-1'>
+    <div className='flex min-h-0 flex-1 flex-col'>
+      <ScrollArea className='min-h-0 flex-1'>
         <div className='flex flex-col'>
           {/* ヘッダー部分 */}
           <div className='relative'>
@@ -49,7 +63,8 @@ export function EventDetailContent({
               <button
                 type='button'
                 onClick={() => onMemberClick?.(event.creator.id)}
-                className='size-24 overflow-hidden rounded-full bg-background shadow-raised transition-transform hover:scale-105'
+                disabled={isOwner}
+                className='size-24 overflow-hidden rounded-full bg-background shadow-raised transition-transform hover:scale-105 disabled:cursor-default disabled:hover:scale-100'
               >
                 {event.creator.avatarUrl ? (
                   <img
@@ -72,7 +87,7 @@ export function EventDetailContent({
             <div className='text-center'>
               <h2 className='text-xl font-bold'>{event.title}</h2>
               <p className='mt-1 text-sm text-muted-foreground'>
-                主催: {event.creator.displayName}
+                {isOwner ? 'あなたが主催' : `主催: ${event.creator.displayName}`}
               </p>
             </div>
 
@@ -178,22 +193,45 @@ export function EventDetailContent({
         </div>
       </ScrollArea>
 
-      {/* 参加ボタン */}
-      <div className='border-t bg-background px-6 py-4'>
-        <button
-          type='button'
-          onClick={onToggleParticipation}
-          disabled={!isParticipating && isFull}
-          className='flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-raised-sm transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50'
-        >
-          <Users className='size-4' />
-          {isParticipating
-            ? '参加をキャンセル'
-            : isFull
-              ? '定員に達しました'
-              : 'このイベントに参加する'}
-        </button>
-      </div>
+      {/* アクションボタン */}
+      {isOwner ? (
+        // 主催者の場合：編集・削除ボタン
+        <div className='flex gap-3 border-t bg-background px-6 py-4'>
+          <button
+            type='button'
+            onClick={onDelete}
+            className='flex items-center justify-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm font-medium text-destructive shadow-raised-sm transition-all hover:bg-destructive/20'
+          >
+            <Trash2 className='size-4' />
+            削除
+          </button>
+          <button
+            type='button'
+            onClick={onEdit}
+            className='flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-raised-sm transition-all hover:bg-primary/90'
+          >
+            <Edit className='size-4' />
+            編集する
+          </button>
+        </div>
+      ) : (
+        // 参加者の場合：参加ボタン
+        <div className='border-t bg-background px-6 py-4'>
+          <button
+            type='button'
+            onClick={onToggleParticipation}
+            disabled={!isParticipating && isFull}
+            className='flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-raised-sm transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50'
+          >
+            <Users className='size-4' />
+            {isParticipating
+              ? '参加をキャンセル'
+              : isFull
+                ? '定員に達しました'
+                : 'このイベントに参加する'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
