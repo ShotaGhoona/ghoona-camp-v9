@@ -4,13 +4,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/shared/ui/shadcn/ui/button';
 import { CalendarViewWidget } from '@/widgets/view/calendar-view/ui/CalendarViewWidget';
 import { ActivityEventCard } from './components/ActivityEventCard';
-import type { EventItem } from '@/shared/dummy-data/events/events';
+import type { MyEventItem } from '@/entities/domain/event/model/types';
 
 interface ActivityCalendarViewProps {
   year: number;
   month: number;
-  events: EventItem[];
-  onEventClick?: (event: EventItem) => void;
+  events: MyEventItem[];
+  onEventClick?: (event: MyEventItem) => void;
   onPrevMonth: () => void;
   onNextMonth: () => void;
 }

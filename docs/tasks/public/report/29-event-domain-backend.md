@@ -310,11 +310,13 @@ query = (
 - `EventCreatorDTO` / `EventParticipantDTO` - 主催者・参加者DTO
 - `EventListItemDTO` / `EventDetailDTO` - 一覧・詳細DTO
 - `EventListDTO` - 一覧結果DTO
+- `MyEventItemDTO` / `MyEventsListDTO` - 自分のイベントDTO
 - `CreateEventInputDTO` / `UpdateEventInputDTO` - 作成・更新入力DTO
 - `ParticipantResultDTO` - 参加結果DTO
 
 **Usecaseメソッド:**
 - `get_events_by_month()` - 月ベースでイベント一覧取得
+- `get_my_events()` - 自分が参加/主催のイベント取得
 - `get_event_detail()` - イベント詳細取得
 - `create_event()` - イベント作成
 - `update_event()` - イベント更新（権限チェック付き）
@@ -329,6 +331,7 @@ query = (
 - `EventListItemResponse` / `EventDetailResponse` - 一覧・詳細
 - `EventListDataResponse` / `EventDetailDataResponse` - データラッパー
 - `EventListAPIResponse` / `EventDetailAPIResponse` - APIレスポンス
+- `MyEventItemResponse` / `MyEventsDataResponse` / `MyEventsAPIResponse` - 自分のイベント
 - `CreateEventRequest` / `CreateEventDataResponse` / `CreateEventAPIResponse` - 作成
 - `UpdateEventRequest` / `UpdateEventDataResponse` / `UpdateEventAPIResponse` - 更新
 - `DeleteEventDataResponse` / `DeleteEventAPIResponse` - 削除
@@ -336,6 +339,7 @@ query = (
 
 **レスポンス構造（他ドメインと統一）:**
 - 一覧: `{ "data": { "events": [...] } }`
+- 自分のイベント: `{ "data": { "events": [...] } }`
 - 詳細/作成/更新: `{ "data": { "event": {...} } }`
 - 削除/キャンセル: `{ "data": {} }`（空オブジェクト）
 
@@ -400,5 +404,6 @@ query = (
 
 ## 関連ドキュメント
 
-- `docs/tasks/public/plan/event-api-design.md` - API設計書
+- `docs/tasks/public/plan/event-api-design.md` - イベントAPI設計書
+- `docs/tasks/public/plan/attendance-activity-api-design.md` - 参加履歴API設計書（`/events/me` 含む）
 - `docs/tasks/public/report/05-event-page.md` - フロントエンド実装

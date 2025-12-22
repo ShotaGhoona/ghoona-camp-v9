@@ -165,3 +165,41 @@ export type UpdateEventRequest = {
   isRecurring?: boolean;
   recurrencePattern?: RecurrencePattern | null;
 };
+
+// ========================================
+// 自分のイベント（/events/me）
+// ========================================
+
+/** イベントでの役割 */
+export type EventRole = 'participant' | 'organizer';
+
+/** 自分のイベントアイテム */
+export type MyEventItem = {
+  id: string;
+  title: string;
+  eventType: EventType;
+  scheduledDate: string; // YYYY-MM-DD
+  startTime: string; // HH:MM
+  endTime: string; // HH:MM
+  role: EventRole;
+  maxParticipants: number | null;
+  participantCount: number;
+};
+
+/** 自分のイベントデータ */
+export type MyEventsData = {
+  events: MyEventItem[];
+};
+
+/** 自分のイベントレスポンス */
+export type MyEventsResponse = {
+  data: MyEventsData;
+  message: string;
+  timestamp: string;
+};
+
+/** 自分のイベントクエリパラメータ */
+export type MyEventsParams = {
+  year: number;
+  month: number;
+};

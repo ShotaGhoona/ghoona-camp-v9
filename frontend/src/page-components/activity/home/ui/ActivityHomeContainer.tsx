@@ -1,19 +1,21 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 
-import { dummyUserStatistics } from '@/shared/dummy-data/activity/activity';
-import { dummyEvents } from '@/shared/dummy-data/events/events';
-import type { EventItem } from '@/shared/dummy-data/events/events';
+import { useAppSelector } from '@/store/hooks';
+import { useAttendanceStatistics } from '@/features/domain/attendance/get-statistics/lib/use-attendance-statistics';
+import { useMyEvents } from '@/features/domain/event/get-my-events/lib/use-my-events';
 import { EventDetailModalSheet } from '@/page-components/events/home/ui-block/event-detail-modal/ui/EventDetailModalSheet';
+import type { MyEventItem } from '@/entities/domain/event/model/types';
 
 import { StatsCardsSection } from '../ui-block/stats-cards/ui/StatsCardsSection';
 import { ActivityCalendarView } from '../ui-block/calendar-view/ui/ActivityCalendarView';
 
-/** ログインユーザーID（TODO: 実際の認証から取得） */
-const CURRENT_USER_ID = '1';
-
 export function ActivityHomeContainer() {
+  // 認証情報からユーザーIDを取得
+  const { user } = useAppSelector((state) => state.auth);
+  const userId = user?.id ?? null;
+
   // 現在表示中の年月
   const [currentYear, setCurrentYear] = useState(() =>
     new Date().getFullYear(),
@@ -25,6 +27,16 @@ export function ActivityHomeContainer() {
   // イベント詳細モーダル
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
+  // API: 参加統計
+  const { data: statisticsResponse, isLoading: isStatisticsLoading } =
+    useAttendanceStatistics(userId);
+
+  // API: 自分のイベント
+  const { data: myEventsResponse } = useMyEvents({
+    year: currentYear,
+    month: currentMonth,
+  });
 
   // 月の移動
   const handlePrevMonth = () => {
@@ -46,44 +58,28 @@ export function ActivityHomeContainer() {
   };
 
   // イベントクリック
-  const handleEventClick = (event: EventItem) => {
+  const handleEventClick = (event: MyEventItem) => {
     setSelectedEventId(event.id);
     setIsDetailModalOpen(true);
   };
 
-  // 今後消す==========================================
-  // 自分が参加したイベントをフィルタリング
-  const participatedEvents = useMemo(() => {
-    return dummyEvents.filter((event) => {
-      // 月フィルター
-      const eventDate = new Date(event.scheduledDate);
-      if (
-        eventDate.getFullYear() !== currentYear ||
-        eventDate.getMonth() + 1 !== currentMonth
-      ) {
-        return false;
-      }
-
-      // 自分が参加しているかチェック
-      const isParticipating = event.participants.some(
-        (p) => p.userId === CURRENT_USER_ID && p.status === 'registered',
-      );
-
-      return isParticipating;
-    });
-  }, [currentYear, currentMonth]);
-  // =================================================
+  // データ取得
+  const statistics = statisticsResponse?.data ?? null;
+  const myEvents = myEventsResponse?.data.events ?? [];
 
   return (
     <div className='flex min-h-0 flex-1 overflow-hidden'>
       {/* 左側: 統計サイドバー */}
-      <StatsCardsSection statistics={dummyUserStatistics} />
+      <StatsCardsSection
+        statistics={statistics}
+        isLoading={isStatisticsLoading}
+      />
 
       {/* 右側: カレンダー */}
       <ActivityCalendarView
         year={currentYear}
         month={currentMonth}
-        events={participatedEvents}
+        events={myEvents}
         onEventClick={handleEventClick}
         onPrevMonth={handlePrevMonth}
         onNextMonth={handleNextMonth}

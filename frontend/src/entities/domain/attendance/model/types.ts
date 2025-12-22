@@ -90,3 +90,59 @@ export type MyRankingsResponse = {
   message: string;
   timestamp: string;
 };
+
+// ========================================
+// Attendance Statistics Types
+// ========================================
+
+/** 参加統計 */
+export type AttendanceStatistics = {
+  totalAttendanceDays: number;
+  currentStreakDays: number;
+  maxStreakDays: number;
+  thisMonthDays: number;
+  thisWeekDays: number;
+};
+
+/** 参加統計レスポンス */
+export type AttendanceStatisticsResponse = {
+  data: AttendanceStatistics;
+  message: string;
+  timestamp: string;
+};
+
+// ========================================
+// Attendance Summaries Types
+// ========================================
+
+/** 参加サマリーアイテム */
+export type AttendanceSummaryItem = {
+  date: string;
+  isMorningActive: boolean;
+};
+
+/** 参加サマリー期間 */
+export type AttendanceSummaryPeriod = {
+  dateFrom: string;
+  dateTo: string;
+};
+
+/** 参加サマリーデータ */
+export type AttendanceSummariesData = {
+  summaries: AttendanceSummaryItem[];
+  period: AttendanceSummaryPeriod;
+  total: number;
+};
+
+/** 参加サマリーレスポンス */
+export type AttendanceSummariesResponse = {
+  data: AttendanceSummariesData;
+  message: string;
+  timestamp: string;
+};
+
+/** 参加サマリークエリパラメータ */
+export type AttendanceSummariesParams = {
+  dateFrom?: string;
+  dateTo?: string;
+};

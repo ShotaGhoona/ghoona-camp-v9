@@ -2,7 +2,14 @@
 
 ## 概要
 
-イベントドメインのフロントエンド実装。イベントページのAPI接続、一覧・詳細・作成・更新・削除・参加・キャンセル機能をFSD構成で実装。
+イベントドメインのフロントエンド実装。イベントページ・参加履歴ページのAPI接続をFSD構成で実装。
+
+**イベントページ機能:**
+- 一覧・詳細・作成・更新・削除
+- イベント参加・キャンセル
+
+**参加履歴ページ機能:**
+- 自分が参加/主催のイベント取得（カレンダー表示用）
 
 ## 変更ファイル
 
@@ -12,35 +19,41 @@ frontend/src/
 │   ├── model/types.ts                    # 基本型定義（EventType, RecurrencePattern）
 │   └── data/event-master.ts              # マスターデータ（ラベル、色、定数）
 ├── entities/domain/event/
-│   ├── model/types.ts                    # API型定義
-│   └── api/event-api.ts                  # APIクライアント
+│   ├── model/types.ts                    # API型定義（+ MyEventItem等）
+│   └── api/event-api.ts                  # APIクライアント（+ getMyEvents）
 ├── features/domain/event/
 │   ├── get-events/lib/use-events.ts              # 一覧取得hook
+│   ├── get-my-events/lib/use-my-events.ts        # 自分のイベント取得hook
 │   ├── get-event-detail/lib/use-event-detail.ts  # 詳細取得hook
 │   ├── create-event/lib/use-create-event.ts      # 作成hook
 │   ├── update-event/lib/use-update-event.ts      # 更新hook
 │   ├── delete-event/lib/use-delete-event.ts      # 削除hook
 │   ├── join-event/lib/use-join-event.ts          # 参加hook
 │   └── leave-event/lib/use-leave-event.ts        # キャンセルhook
-└── page-components/events/home/
-    ├── ui/EventsHomeContainer.tsx                # API接続（useEvents）
-    └── ui-block/
-        ├── calendar-view/ui/
-        │   ├── EventsCalendarView.tsx            # カレンダー表示
-        │   └── components/CalendarCard.tsx       # 日付カード
-        ├── gallery-view/ui/
-        │   ├── EventsGalleryView.tsx             # ギャラリー表示
-        │   └── components/EventCard.tsx          # イベントカード
-        ├── filter-sidebar/
-        │   ├── model/types.ts                    # フィルター型
-        │   └── ui/EventsFilterSidebar.tsx        # フィルターサイドバー
-        ├── create-event/ui/CreateEventContent.tsx       # 作成フォーム
-        ├── edit-event/ui/
-        │   ├── EditEventModalSheet.tsx           # 編集モーダル
-        │   └── EditEventContent.tsx              # 編集フォーム
-        └── event-detail-modal/ui/
-            ├── EventDetailModalSheet.tsx         # 詳細モーダル
-            └── EventDetailContent.tsx            # 詳細表示・参加・削除
+├── page-components/events/home/
+│   ├── ui/EventsHomeContainer.tsx                # API接続（useEvents）
+│   └── ui-block/
+│       ├── calendar-view/ui/
+│       │   ├── EventsCalendarView.tsx            # カレンダー表示
+│       │   └── components/CalendarCard.tsx       # 日付カード
+│       ├── gallery-view/ui/
+│       │   ├── EventsGalleryView.tsx             # ギャラリー表示
+│       │   └── components/EventCard.tsx          # イベントカード
+│       ├── filter-sidebar/
+│       │   ├── model/types.ts                    # フィルター型
+│       │   └── ui/EventsFilterSidebar.tsx        # フィルターサイドバー
+│       ├── create-event/ui/CreateEventContent.tsx       # 作成フォーム
+│       ├── edit-event/ui/
+│       │   ├── EditEventModalSheet.tsx           # 編集モーダル
+│       │   └── EditEventContent.tsx              # 編集フォーム
+│       └── event-detail-modal/ui/
+│           ├── EventDetailModalSheet.tsx         # 詳細モーダル
+│           └── EventDetailContent.tsx            # 詳細表示・参加・削除
+└── page-components/activity/home/
+    ├── ui/ActivityHomeContainer.tsx              # API接続（useMyEvents）
+    └── ui-block/calendar-view/ui/
+        ├── ActivityCalendarView.tsx              # カレンダー表示（MyEventItem型）
+        └── components/ActivityEventCard.tsx      # イベントカード（MyEventItem型）
 ```
 
 ## Shared Domain層
@@ -145,11 +158,40 @@ type EventDetailResponse = {
 };
 ```
 
+**自分のイベント（/events/me）:**
+```typescript
+type EventRole = 'participant' | 'organizer';
+
+type MyEventItem = {
+  id: string;
+  title: string;
+  eventType: EventType;
+  scheduledDate: string; // YYYY-MM-DD
+  startTime: string; // HH:MM
+  endTime: string; // HH:MM
+  role: EventRole;
+  maxParticipants: number | null;
+  participantCount: number;
+};
+
+type MyEventsResponse = {
+  data: { events: MyEventItem[] };
+  message: string;
+  timestamp: string;
+};
+
+type MyEventsParams = {
+  year: number;
+  month: number;
+};
+```
+
 ### APIクライアント（event-api.ts）
 
 | メソッド | エンドポイント | 説明 |
 |---------|---------------|------|
 | `getEvents` | GET /api/v1/events | イベント一覧取得（月ベース） |
+| `getMyEvents` | GET /api/v1/events/me | 自分のイベント取得 |
 | `getEventById` | GET /api/v1/events/{id} | イベント詳細取得 |
 | `createEvent` | POST /api/v1/events | イベント作成 |
 | `updateEvent` | PUT /api/v1/events/{id} | イベント更新 |
@@ -164,6 +206,7 @@ type EventDetailResponse = {
 | hook | 用途 | React Query | キャッシュ無効化 |
 |------|------|-------------|-----------------|
 | `useEvents` | 一覧取得 | useQuery | - |
+| `useMyEvents` | 自分のイベント取得 | useQuery | - |
 | `useEventDetail` | 詳細取得 | useQuery | - |
 | `useCreateEvent` | 作成 | useMutation | `['events']` |
 | `useUpdateEvent` | 更新 | useMutation | `['events']`, `['event', id]` |
@@ -245,6 +288,19 @@ EditEventModalSheet
 - 編集/削除ボタン: `isOwner`で表示切り替え
 - 参加者一覧をアバターで表示
 
+### ActivityHomeContainer
+
+- `useMyEvents({ year, month })`で自分のイベントを取得
+- `useAttendanceStatistics(userId)`で参加統計を取得（Attendanceドメイン）
+- 月送りで`year`, `month`を更新
+- カレンダーに自分の参加/主催イベントを表示
+
+### ActivityCalendarView / ActivityEventCard
+
+- `MyEventItem`型を使用（`EventListItem`とは異なる）
+- `role`フィールドで参加者/主催者を識別
+- イベントカードにはタイプラベルと時間を表示
+
 ## イベントタイプ
 
 | eventType | ラベル | 色 |
@@ -257,6 +313,8 @@ EditEventModalSheet
 
 ## ダミーデータからの移行
 
+### イベントページ
+
 | 変更前 | 変更後 |
 |--------|--------|
 | `@/shared/types/event/event` (定数) | `@/shared/domain/event/data/event-master` |
@@ -264,10 +322,27 @@ EditEventModalSheet
 | `dummyEvents` | `useEvents()` |
 | ハードコードされたイベント | API取得 |
 
+### 参加履歴ページ（Activity）
+
+| 変更前 | 変更後 |
+|--------|--------|
+| `@/shared/dummy-data/events/events` (型) | `@/entities/domain/event/model/types` (MyEventItem) |
+| `dummyEvents` + フィルタリング | `useMyEvents({ year, month })` |
+| `CURRENT_USER_ID` | `useAppSelector((state) => state.auth)` |
+| `EVENT_TYPE_LABELS` (ダミー) | `@/shared/domain/event/data/event-master` |
+
 ## 備考
+
+### イベントページ
 
 - カレンダービュー: 月ベースでイベントを取得し、日付ごとにグループ化して表示
 - ギャラリービュー: 月のイベントをカード形式で一覧表示
 - フィルター: イベントタイプ（複数選択可）、参加状態でフィルタリング可能
 - 参加状態: `isParticipating`フラグで参加ボタンの表示を切り替え
 - 権限管理: `isOwner`フラグで編集/削除ボタンの表示を切り替え
+
+### 参加履歴ページ（Activity）
+
+- カレンダービュー: 自分が参加/主催のイベントのみ表示
+- `role`フィールド: `participant`（参加者）または`organizer`（主催者）
+- イベントカードクリックで詳細モーダルを表示（イベントページと共通）

@@ -1,12 +1,12 @@
 'use client';
 
 import { cn } from '@/shared/ui/shadcn/lib/utils';
-import type { EventItem } from '@/shared/dummy-data/events/events';
-import { EVENT_TYPE_LABELS } from '@/shared/dummy-data/events/events';
+import type { MyEventItem } from '@/entities/domain/event/model/types';
+import { EVENT_TYPE_LABELS } from '@/shared/domain/event/data/event-master';
 
 interface ActivityEventCardProps {
-  event: EventItem;
-  onClick?: (event: EventItem) => void;
+  event: MyEventItem;
+  onClick?: (event: MyEventItem) => void;
 }
 
 export function ActivityEventCard({ event, onClick }: ActivityEventCardProps) {

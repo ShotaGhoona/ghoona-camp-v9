@@ -14,6 +14,8 @@ import type {
   DeleteEventResponse,
   JoinEventResponse,
   LeaveEventResponse,
+  MyEventsParams,
+  MyEventsResponse,
 } from '../model/types';
 
 export const eventApi = {
@@ -23,10 +25,9 @@ export const eventApi = {
 
   /** イベント一覧取得（月ベース） */
   getEvents: async (params: EventSearchParams): Promise<EventListResponse> => {
-    const response = await httpClient.get<EventListResponse>(
-      '/api/v1/events',
-      { params },
-    );
+    const response = await httpClient.get<EventListResponse>('/api/v1/events', {
+      params,
+    });
     return response.data;
   },
 
@@ -89,6 +90,19 @@ export const eventApi = {
   leaveEvent: async (eventId: string): Promise<LeaveEventResponse> => {
     const response = await httpClient.delete<LeaveEventResponse>(
       `/api/v1/events/${eventId}/participants`,
+    );
+    return response.data;
+  },
+
+  // ========================================
+  // 自分のイベント
+  // ========================================
+
+  /** 自分が参加登録 or 主催のイベントを取得 */
+  getMyEvents: async (params: MyEventsParams): Promise<MyEventsResponse> => {
+    const response = await httpClient.get<MyEventsResponse>(
+      '/api/v1/events/me',
+      { params },
     );
     return response.data;
   },
