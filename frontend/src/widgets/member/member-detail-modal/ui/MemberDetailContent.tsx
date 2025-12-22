@@ -20,11 +20,8 @@ import {
 } from '@/shared/ui/shadcn/ui/tooltip';
 
 import type { UserDetail } from '@/entities/domain/user/model/types';
-import {
-  getSnsIcon,
-  getSnsLabel,
-  type SnsPlatform,
-} from '@/shared/types/user/sns';
+import type { SnsPlatform } from '@/shared/domain/sns/model/types';
+import { getSnsIcon, getSnsLabel } from '@/shared/domain/sns/lib/sns-utils';
 import type { TitleLevel } from '@/shared/domain/title/model/types';
 import { getTitleByLevel } from '@/shared/domain/title/lib/title-utils';
 import { useRivalAction } from '../lib/use-rival-action';

@@ -2,7 +2,7 @@
 
 import { Card } from '@/shared/ui/shadcn/ui/card';
 import { Skeleton } from '@/shared/ui/shadcn/ui/skeleton';
-import { Calendar, Flame, Trophy, CalendarDays } from 'lucide-react';
+import { Calendar, Flame, Trophy, CalendarDays, CalendarRange } from 'lucide-react';
 import type { AttendanceStatistics } from '@/entities/domain/attendance/model/types';
 
 interface StatsCardsSectionProps {
@@ -57,7 +57,8 @@ export function StatsCardsSection({
 }: StatsCardsSectionProps) {
   if (isLoading) {
     return (
-      <div className='flex w-72 shrink-0 flex-col gap-4 p-4'>
+      <div className='flex w-72 shrink-0 flex-col gap-3 p-4'>
+        <StatCardSkeleton />
         <StatCardSkeleton />
         <StatCardSkeleton />
         <StatCardSkeleton />
@@ -68,7 +69,7 @@ export function StatsCardsSection({
 
   if (!statistics) {
     return (
-      <div className='flex w-72 shrink-0 flex-col gap-4 p-4'>
+      <div className='flex w-72 shrink-0 flex-col gap-3 p-4'>
         <StatCard
           icon={<Calendar className='size-5 text-primary' />}
           label='総参加日数'
@@ -89,12 +90,17 @@ export function StatsCardsSection({
           label='今月の参加'
           value='--'
         />
+        <StatCard
+          icon={<CalendarRange className='size-5 text-primary' />}
+          label='今週の参加'
+          value='--'
+        />
       </div>
     );
   }
 
   return (
-    <div className='flex w-72 shrink-0 flex-col gap-4 p-4'>
+    <div className='flex w-72 shrink-0 flex-col gap-3 p-4'>
       {/* 総参加日数 */}
       <StatCard
         icon={<Calendar className='size-5 text-primary' />}
@@ -123,7 +129,13 @@ export function StatsCardsSection({
         icon={<CalendarDays className='size-5 text-primary' />}
         label='今月の参加'
         value={`${statistics.thisMonthDays}日`}
-        subValue={`今週 ${statistics.thisWeekDays}日`}
+      />
+
+      {/* 今週の参加 */}
+      <StatCard
+        icon={<CalendarRange className='size-5 text-primary' />}
+        label='今週の参加'
+        value={`${statistics.thisWeekDays}日`}
       />
     </div>
   );

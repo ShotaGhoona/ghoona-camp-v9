@@ -4,8 +4,8 @@
 
 Ghoona Camp アプリケーションのAPI実装進捗を追跡するためのチェックリストです。
 
-- **Total APIs**: 37
-- **Total Tasks**: 74 (Backend + Frontend)
+- **Total APIs**: 38
+- **Total Tasks**: 76 (Backend + Frontend)
 - **Reference**: `docs/requirements/12-api.md`
 
 ## Legend
@@ -53,17 +53,18 @@ Ghoona Camp アプリケーションのAPI実装進捗を追跡するための�
 
 ---
 
-## Event Management (7 APIs)
+## Event Management (8 APIs)
 
 | # | Method | Endpoint | Backend | Frontend |
 |---|--------|----------|---------|----------|
 | 18 | GET | `/events` | [x] | [x] |
-| 19 | POST | `/events` | [x] | [x] |
-| 20 | GET | `/events/{eventId}` | [x] | [x] |
-| 21 | PUT | `/events/{eventId}` | [x] | [x] |
-| 22 | DELETE | `/events/{eventId}` | [x] | [x] |
-| 23 | POST | `/events/{eventId}/participants` | [x] | [x] |
-| 24 | DELETE | `/events/{eventId}/participants` | [x] | [x] |
+| 19 | GET | `/events/me` | [x] | [x] |
+| 20 | POST | `/events` | [x] | [x] |
+| 21 | GET | `/events/{eventId}` | [x] | [x] |
+| 22 | PUT | `/events/{eventId}` | [x] | [x] |
+| 23 | DELETE | `/events/{eventId}` | [x] | [x] |
+| 24 | POST | `/events/{eventId}/participants` | [x] | [x] |
+| 25 | DELETE | `/events/{eventId}/participants` | [x] | [x] |
 
 ---
 
@@ -71,8 +72,8 @@ Ghoona Camp アプリケーションのAPI実装進捗を追跡するための�
 
 | # | Method | Endpoint | Backend | Frontend |
 |---|--------|----------|---------|----------|
-| 25 | GET | `/titles/{level}/holders` | [x] | [x] |
-| 26 | GET | `/users/{userId}/title-achievements` | [x] | [x] |
+| 26 | GET | `/titles/{level}/holders` | [x] | [x] |
+| 27 | GET | `/users/{userId}/title-achievements` | [x] | [x] |
 
 ---
 
@@ -80,10 +81,10 @@ Ghoona Camp アプリケーションのAPI実装進捗を追跡するための�
 
 | # | Method | Endpoint | Backend | Frontend |
 |---|--------|----------|---------|----------|
-| 27 | GET | `/rankings` | [x] | [x] |
-| 28 | GET | `/rankings/me` | [x] | [x] |
-| 29 | GET | `/users/{userId}/attendance/summaries` | [ ] | [ ] |
-| 30 | GET | `/users/{userId}/attendance/statistics` | [ ] | [ ] |
+| 28 | GET | `/rankings` | [x] | [x] |
+| 29 | GET | `/rankings/me` | [x] | [x] |
+| 30 | GET | `/users/{userId}/attendance/summaries` | [x] | [x] |
+| 31 | GET | `/users/{userId}/attendance/statistics` | [x] | [x] |
 
 ---
 
@@ -91,11 +92,11 @@ Ghoona Camp アプリケーションのAPI実装進捗を追跡するための�
 
 | # | Method | Endpoint | Backend | Frontend |
 |---|--------|----------|---------|----------|
-| 31 | GET | `/users/{userId}/notifications` | [ ] | [ ] |
-| 32 | PUT | `/notifications/{notificationId}` | [ ] | [ ] |
-| 33 | DELETE | `/notifications/{notificationId}` | [ ] | [ ] |
-| 34 | GET | `/users/{userId}/notification-settings` | [ ] | [ ] |
-| 35 | PUT | `/users/{userId}/notification-settings` | [ ] | [ ] |
+| 32 | GET | `/users/{userId}/notifications` | [ ] | [ ] |
+| 33 | PUT | `/notifications/{notificationId}` | [ ] | [ ] |
+| 34 | DELETE | `/notifications/{notificationId}` | [ ] | [ ] |
+| 35 | GET | `/users/{userId}/notification-settings` | [ ] | [ ] |
+| 36 | PUT | `/users/{userId}/notification-settings` | [ ] | [ ] |
 
 ---
 
@@ -103,8 +104,8 @@ Ghoona Camp アプリケーションのAPI実装進捗を追跡するための�
 
 | # | Method | Endpoint | Backend | Frontend |
 |---|--------|----------|---------|----------|
-| 36 | GET | `/health` | [ ] | [ ] |
-| 37 | GET | `/version` | [ ] | [ ] |
+| 37 | GET | `/health` | [ ] | [ ] |
+| 38 | GET | `/version` | [ ] | [ ] |
 
 ---
 
@@ -115,12 +116,12 @@ Ghoona Camp アプリケーションのAPI実装進捗を追跡するための�
 | Authentication | 4 | 3/4 | 3/4 |
 | User Management | 8 | 8/8 | 8/8 |
 | Goal Management | 5 | 5/5 | 5/5 |
-| Event Management | 7 | 7/7 | 7/7 |
+| Event Management | 8 | 8/8 | 8/8 |
 | Title Management | 2 | 2/2 | 2/2 |
-| Attendance Management | 4 | 2/4 | 2/4 |
+| Attendance Management | 4 | 4/4 | 4/4 |
 | Notification Management | 5 | 0/5 | 0/5 |
 | System API | 2 | 0/2 | 0/2 |
-| **Total** | **37** | **27/37** | **27/37** |
+| **Total** | **38** | **30/38** | **30/38** |
 
 ---
 

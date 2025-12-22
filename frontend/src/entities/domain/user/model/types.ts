@@ -4,7 +4,7 @@
  */
 
 import type { Pagination } from '@/shared/types/api/pagination';
-import type { SnsPlatform } from '@/shared/types/user/sns';
+import type { SnsPlatform } from '@/shared/domain/sns/model/types';
 
 // ========================================
 // 一覧用（GET /api/v1/users）
