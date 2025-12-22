@@ -95,7 +95,6 @@ export function ActivityHomeContainer() {
         open={isDetailModalOpen}
         onOpenChange={setIsDetailModalOpen}
         defaultViewMode='modal'
-        events={dummyEvents}
       />
     </div>
   );

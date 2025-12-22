@@ -1,4 +1,4 @@
-import type { EventType } from '@/shared/dummy-data/events/events';
+import type { EventType } from '@/entities/domain/event/model/types';
 
 /** イベントフィルター状態 */
 export interface EventsFilterState {

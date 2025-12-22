@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Save, User, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Loader2, Save, User, X } from 'lucide-react';
 
 import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
 import { Separator } from '@/shared/ui/shadcn/ui/separator';
@@ -14,12 +14,14 @@ import { TimeField } from '@/shared/ui/form-fields/ui/TimeField';
 import { SelectField } from '@/shared/ui/form-fields/ui/SelectField';
 import { NumberField } from '@/shared/ui/form-fields/ui/NumberField';
 
-import {
-  ALL_EVENT_TYPES,
-  EVENT_TYPE_LABELS,
-  type EventItem,
-  type EventType,
-} from '@/shared/dummy-data/events/events';
+import { useEventDetail } from '@/features/domain/event/get-event-detail/lib/use-event-detail';
+import { useUpdateEvent } from '@/features/domain/event/update-event/lib/use-update-event';
+import type {
+  EventType,
+  RecurrencePattern,
+  EventDetail,
+} from '@/entities/domain/event/model/types';
+import { ALL_EVENT_TYPES, EVENT_TYPE_LABELS } from '@/shared/domain/event/data/event-master';
 
 export interface EditEventFormData {
   title: string;
@@ -30,15 +32,15 @@ export interface EditEventFormData {
   endTime: string;
   maxParticipants: number | null;
   isRecurring: boolean;
-  recurrencePattern: string | null;
+  recurrencePattern: RecurrencePattern | null;
 }
 
 interface EditEventContentProps {
-  event: EventItem;
+  eventId: string | null;
   onClose?: () => void;
 }
 
-function getFormDataFromEvent(event: EventItem): EditEventFormData {
+function getFormDataFromEvent(event: EventDetail): EditEventFormData {
   return {
     title: event.title,
     description: event.description ?? '',
@@ -63,56 +65,85 @@ const recurrenceOptions = [
   { value: 'monthly', label: '毎月' },
 ];
 
-export function EditEventContent({ event, onClose }: EditEventContentProps) {
-  const [formData, setFormData] = useState<EditEventFormData>(() =>
-    getFormDataFromEvent(event),
-  );
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export function EditEventContent({ eventId, onClose }: EditEventContentProps) {
+  // API: イベント詳細取得
+  const { data: eventData, isLoading } = useEventDetail(eventId);
+  const event = eventData?.data.event ?? null;
+
+  const [formData, setFormData] = useState<EditEventFormData | null>(null);
+
+  // イベントデータが取得できたらフォームに反映
+  useEffect(() => {
+    if (event && !formData) {
+      setFormData(getFormDataFromEvent(event));
+    }
+  }, [event, formData]);
+
+  // API: イベント更新
+  const updateEvent = useUpdateEvent({
+    onSuccess: () => {
+      onClose?.();
+    },
+  });
 
   const handleTitleChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, title: value }));
+    setFormData((prev) => (prev ? { ...prev, title: value } : prev));
   };
 
   const handleDescriptionChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, description: value }));
+    setFormData((prev) => (prev ? { ...prev, description: value } : prev));
   };
 
   const handleEventTypeChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, eventType: value as EventType }));
+    setFormData((prev) =>
+      prev ? { ...prev, eventType: value as EventType } : prev,
+    );
   };
 
   const handleScheduledDateChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, scheduledDate: value }));
+    setFormData((prev) => (prev ? { ...prev, scheduledDate: value } : prev));
   };
 
   const handleStartTimeChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, startTime: value }));
+    setFormData((prev) => (prev ? { ...prev, startTime: value } : prev));
   };
 
   const handleEndTimeChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, endTime: value }));
+    setFormData((prev) => (prev ? { ...prev, endTime: value } : prev));
   };
 
   const handleMaxParticipantsChange = (value: number | '') => {
-    setFormData((prev) => ({
-      ...prev,
-      maxParticipants: value === '' || value === 0 ? null : value,
-    }));
+    setFormData((prev) =>
+      prev
+        ? {
+            ...prev,
+            maxParticipants: value === '' || value === 0 ? null : value,
+          }
+        : prev,
+    );
   };
 
   const handleIsRecurringChange = (checked: boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      isRecurring: checked,
-      recurrencePattern: checked ? 'weekly' : null,
-    }));
+    setFormData((prev) =>
+      prev
+        ? {
+            ...prev,
+            isRecurring: checked,
+            recurrencePattern: checked ? 'weekly' : null,
+          }
+        : prev,
+    );
   };
 
   const handleRecurrencePatternChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, recurrencePattern: value }));
+    setFormData((prev) =>
+      prev ? { ...prev, recurrencePattern: value as RecurrencePattern } : prev,
+    );
   };
 
   const handleSubmit = () => {
+    if (!eventId || !formData) return;
+
     if (!formData.title.trim()) {
       alert('タイトルを入力してください');
       return;
@@ -122,16 +153,34 @@ export function EditEventContent({ event, onClose }: EditEventContentProps) {
       return;
     }
 
-    setIsSubmitting(true);
-    // TODO: API呼び出し
-    alert(`イベント「${formData.title}」を更新しました（未実装）`);
-    setIsSubmitting(false);
-    onClose?.();
+    updateEvent.mutate({
+      eventId,
+      data: {
+        title: formData.title,
+        description: formData.description || null,
+        eventType: formData.eventType,
+        scheduledDate: formData.scheduledDate,
+        startTime: formData.startTime,
+        endTime: formData.endTime,
+        maxParticipants: formData.maxParticipants,
+        isRecurring: formData.isRecurring,
+        recurrencePattern: formData.recurrencePattern,
+      },
+    });
   };
 
   const handleCancel = () => {
     onClose?.();
   };
+
+  // ローディング中
+  if (isLoading || !event || !formData) {
+    return (
+      <div className='flex min-h-[300px] flex-1 items-center justify-center'>
+        <Loader2 className='size-8 animate-spin text-muted-foreground' />
+      </div>
+    );
+  }
 
   return (
     <div className='flex min-h-0 flex-1 flex-col'>
@@ -149,7 +198,7 @@ export function EditEventContent({ event, onClose }: EditEventContentProps) {
                   {event.creator.avatarUrl ? (
                     <img
                       src={event.creator.avatarUrl}
-                      alt={event.creator.displayName}
+                      alt={event.creator.displayName ?? ''}
                       className='size-full object-cover'
                     />
                   ) : (
@@ -284,7 +333,7 @@ export function EditEventContent({ event, onClose }: EditEventContentProps) {
         <button
           type='button'
           onClick={handleCancel}
-          disabled={isSubmitting}
+          disabled={updateEvent.isPending}
           className='flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium shadow-raised-sm transition-all hover:bg-muted disabled:opacity-50'
         >
           <X className='size-4' />
@@ -294,11 +343,11 @@ export function EditEventContent({ event, onClose }: EditEventContentProps) {
         <button
           type='button'
           onClick={handleSubmit}
-          disabled={isSubmitting}
+          disabled={updateEvent.isPending}
           className='flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-raised-sm transition-all hover:bg-primary/90 disabled:opacity-50'
         >
           <Save className='size-4' />
-          {isSubmitting ? '更新中...' : '更新する'}
+          {updateEvent.isPending ? '更新中...' : '更新する'}
         </button>
       </div>
     </div>

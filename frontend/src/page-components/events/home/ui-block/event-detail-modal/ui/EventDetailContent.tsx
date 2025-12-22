@@ -4,6 +4,7 @@ import {
   Calendar,
   Clock,
   Edit,
+  Loader2,
   Repeat,
   Trash2,
   User,
@@ -14,33 +15,78 @@ import { Badge } from '@/shared/ui/shadcn/ui/badge';
 import { Separator } from '@/shared/ui/shadcn/ui/separator';
 import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
 
-import type { EventItem } from '@/shared/dummy-data/events/events';
-import { EVENT_TYPE_LABELS } from '@/shared/dummy-data/events/events';
+import { useEventDetail } from '@/features/domain/event/get-event-detail/lib/use-event-detail';
+import { useJoinEvent } from '@/features/domain/event/join-event/lib/use-join-event';
+import { useLeaveEvent } from '@/features/domain/event/leave-event/lib/use-leave-event';
+import { useDeleteEvent } from '@/features/domain/event/delete-event/lib/use-delete-event';
+
+import { EVENT_TYPE_LABELS } from '@/shared/domain/event/data/event-master';
 
 interface EventDetailContentProps {
-  event: EventItem;
-  isOwner?: boolean;
-  isParticipating?: boolean;
-  onToggleParticipation?: () => void;
+  eventId: string | null;
   onMemberClick?: (memberId: string) => void;
-  onEdit?: () => void;
-  onDelete?: () => void;
+  onEdit?: (eventId: string) => void;
+  onClose?: () => void;
 }
 
 export function EventDetailContent({
-  event,
-  isOwner = false,
-  isParticipating = false,
-  onToggleParticipation,
+  eventId,
   onMemberClick,
   onEdit,
-  onDelete,
+  onClose,
 }: EventDetailContentProps) {
-  const participantCount = event.participants.filter(
-    (p) => p.status === 'registered',
-  ).length;
+  // API: イベント詳細取得
+  const { data: eventData, isLoading } = useEventDetail(eventId);
+  const event = eventData?.data.event ?? null;
+
+  // API: 参加・キャンセル・削除
+  const joinEvent = useJoinEvent();
+  const leaveEvent = useLeaveEvent();
+  const deleteEvent = useDeleteEvent({
+    onSuccess: () => {
+      onClose?.();
+    },
+  });
+
+  const isSubmitting =
+    joinEvent.isPending || leaveEvent.isPending || deleteEvent.isPending;
+
+  const handleToggleParticipation = () => {
+    if (!eventId) return;
+
+    if (event?.isParticipating) {
+      leaveEvent.mutate(eventId);
+    } else {
+      joinEvent.mutate(eventId);
+    }
+  };
+
+  const handleEdit = () => {
+    if (eventId) {
+      onEdit?.(eventId);
+    }
+  };
+
+  const handleDelete = () => {
+    if (!eventId || !event) return;
+
+    if (confirm(`「${event.title}」を削除してもよろしいですか？`)) {
+      deleteEvent.mutate(eventId);
+    }
+  };
+
+  // ローディング中
+  if (isLoading || !event) {
+    return (
+      <div className='flex min-h-[300px] flex-1 items-center justify-center'>
+        <Loader2 className='size-8 animate-spin text-muted-foreground' />
+      </div>
+    );
+  }
+
   const isFull =
-    event.maxParticipants !== null && participantCount >= event.maxParticipants;
+    event.maxParticipants !== null &&
+    event.participantCount >= event.maxParticipants;
 
   return (
     <div className='flex min-h-0 flex-1 flex-col'>
@@ -63,13 +109,13 @@ export function EventDetailContent({
               <button
                 type='button'
                 onClick={() => onMemberClick?.(event.creator.id)}
-                disabled={isOwner}
+                disabled={event.isOwner}
                 className='size-24 overflow-hidden rounded-full bg-background shadow-raised transition-transform hover:scale-105 disabled:cursor-default disabled:hover:scale-100'
               >
                 {event.creator.avatarUrl ? (
                   <img
                     src={event.creator.avatarUrl}
-                    alt={event.creator.displayName}
+                    alt={event.creator.displayName ?? ''}
                     className='size-full object-cover'
                   />
                 ) : (
@@ -87,7 +133,9 @@ export function EventDetailContent({
             <div className='text-center'>
               <h2 className='text-xl font-bold'>{event.title}</h2>
               <p className='mt-1 text-sm text-muted-foreground'>
-                {isOwner ? 'あなたが主催' : `主催: ${event.creator.displayName}`}
+                {event.isOwner
+                  ? 'あなたが主催'
+                  : `主催: ${event.creator.displayName}`}
               </p>
             </div>
 
@@ -144,7 +192,7 @@ export function EventDetailContent({
                   参加者
                 </h3>
                 <span className='text-xs text-muted-foreground'>
-                  {participantCount}
+                  {event.participantCount}
                   {event.maxParticipants !== null &&
                     ` / ${event.maxParticipants}`}
                   人
@@ -167,7 +215,7 @@ export function EventDetailContent({
                         {participant.avatarUrl ? (
                           <img
                             src={participant.avatarUrl}
-                            alt={participant.userName}
+                            alt={participant.userName ?? ''}
                             className='size-full object-cover'
                           />
                         ) : (
@@ -177,9 +225,9 @@ export function EventDetailContent({
                         )}
                       </button>
                     ))}
-                  {participantCount > 12 && (
+                  {event.participantCount > 12 && (
                     <div className='flex size-10 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground shadow-raised-sm'>
-                      +{participantCount - 12}
+                      +{event.participantCount - 12}
                     </div>
                   )}
                 </div>
@@ -194,21 +242,23 @@ export function EventDetailContent({
       </ScrollArea>
 
       {/* アクションボタン */}
-      {isOwner ? (
+      {event.isOwner ? (
         // 主催者の場合：編集・削除ボタン
         <div className='flex gap-3 border-t bg-background px-6 py-4'>
           <button
             type='button'
-            onClick={onDelete}
-            className='flex items-center justify-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm font-medium text-destructive shadow-raised-sm transition-all hover:bg-destructive/20'
+            onClick={handleDelete}
+            disabled={isSubmitting}
+            className='flex items-center justify-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm font-medium text-destructive shadow-raised-sm transition-all hover:bg-destructive/20 disabled:opacity-50'
           >
             <Trash2 className='size-4' />
             削除
           </button>
           <button
             type='button'
-            onClick={onEdit}
-            className='flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-raised-sm transition-all hover:bg-primary/90'
+            onClick={handleEdit}
+            disabled={isSubmitting}
+            className='flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-raised-sm transition-all hover:bg-primary/90 disabled:opacity-50'
           >
             <Edit className='size-4' />
             編集する
@@ -219,16 +269,18 @@ export function EventDetailContent({
         <div className='border-t bg-background px-6 py-4'>
           <button
             type='button'
-            onClick={onToggleParticipation}
-            disabled={!isParticipating && isFull}
+            onClick={handleToggleParticipation}
+            disabled={(!event.isParticipating && isFull) || isSubmitting}
             className='flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-raised-sm transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50'
           >
             <Users className='size-4' />
-            {isParticipating
-              ? '参加をキャンセル'
-              : isFull
-                ? '定員に達しました'
-                : 'このイベントに参加する'}
+            {isSubmitting
+              ? '処理中...'
+              : event.isParticipating
+                ? '参加をキャンセル'
+                : isFull
+                  ? '定員に達しました'
+                  : 'このイベントに参加する'}
           </button>
         </div>
       )}

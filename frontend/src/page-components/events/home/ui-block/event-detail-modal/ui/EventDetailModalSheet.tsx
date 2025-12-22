@@ -10,7 +10,6 @@ import {
   TooltipTrigger,
 } from '@/shared/ui/shadcn/ui/tooltip';
 
-import type { EventItem } from '@/shared/dummy-data/events/events';
 import { useViewMode, type ViewMode } from '../lib/use-view-mode';
 import { EventDetailContent } from './EventDetailContent';
 
@@ -21,9 +20,6 @@ interface EventDetailModalSheetProps {
   defaultViewMode?: ViewMode;
   onMemberClick?: (memberId: string) => void;
   onEdit?: (eventId: string) => void;
-  currentUserId?: string;
-  /** イベントリスト（eventIdからイベントを検索する用） */
-  events?: EventItem[];
 }
 
 export function EventDetailModalSheet({
@@ -33,51 +29,17 @@ export function EventDetailModalSheet({
   defaultViewMode = 'modal',
   onMemberClick,
   onEdit,
-  currentUserId = '1', // TODO: 実際のログインユーザーIDに置き換え
-  events = [],
 }: EventDetailModalSheetProps) {
   const { viewMode, toggleViewMode, isModal } = useViewMode(defaultViewMode);
 
-  // イベントリストから検索
-  const event = eventId ? events.find((e) => e.id === eventId) : null;
-
-  // 参加状態を確認
-  const isParticipating = event
-    ? event.participants.some(
-        (p) => p.userId === currentUserId && p.status === 'registered',
-      )
-    : false;
-
-  // 主催者かどうか
-  const isOwner = event?.creator.id === currentUserId;
-
-  const handleToggleParticipation = () => {
-    // TODO: API呼び出し
-    if (isParticipating) {
-      alert(`${event?.title}への参加をキャンセルしました（未実装）`);
-    } else {
-      alert(`${event?.title}に参加申込しました（未実装）`);
-    }
+  const handleClose = () => {
+    onOpenChange(false);
   };
 
-  const handleEdit = () => {
-    if (event) {
-      onEdit?.(event.id);
-      onOpenChange(false);
-    }
+  const handleEdit = (id: string) => {
+    onEdit?.(id);
+    onOpenChange(false);
   };
-
-  const handleDelete = () => {
-    // TODO: API呼び出し
-    if (confirm(`「${event?.title}」を削除してもよろしいですか？`)) {
-      alert(`${event?.title}を削除しました（未実装）`);
-      onOpenChange(false);
-    }
-  };
-
-  if (!event) {
-    return null;
-  }
 
   // 切り替えボタン
   const ViewModeToggle = (
@@ -112,13 +74,10 @@ export function EventDetailModalSheet({
           {ViewModeToggle}
           <div className='flex max-h-[85vh] flex-col'>
             <EventDetailContent
-              event={event}
-              isOwner={isOwner}
-              isParticipating={isParticipating}
-              onToggleParticipation={handleToggleParticipation}
+              eventId={eventId}
               onMemberClick={onMemberClick}
               onEdit={handleEdit}
-              onDelete={handleDelete}
+              onClose={handleClose}
             />
           </div>
         </DialogContent>
@@ -136,13 +95,10 @@ export function EventDetailModalSheet({
       >
         {ViewModeToggle}
         <EventDetailContent
-          event={event}
-          isOwner={isOwner}
-          isParticipating={isParticipating}
-          onToggleParticipation={handleToggleParticipation}
+          eventId={eventId}
           onMemberClick={onMemberClick}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onClose={handleClose}
         />
       </SheetContent>
     </Sheet>

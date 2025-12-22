@@ -8,11 +8,11 @@ import {
   AvatarImage,
 } from '@/shared/ui/shadcn/ui/avatar';
 
-import type { EventItem, EventType } from '@/shared/dummy-data/events/events';
+import type { EventListItem, EventType } from '@/entities/domain/event/model/types';
 
 interface CalendarCardProps {
-  event: EventItem;
-  onClick?: (event: EventItem) => void;
+  event: EventListItem;
+  onClick?: (event: EventListItem) => void;
 }
 
 /** イベントタイプに対応する左ボーダーの色 */
@@ -29,10 +29,6 @@ export function CalendarCard({ event, onClick }: CalendarCardProps) {
     e.stopPropagation();
     onClick?.(event);
   };
-
-  const participantCount = event.participants.filter(
-    (p) => p.status === 'registered',
-  ).length;
 
   return (
     <button
@@ -64,7 +60,7 @@ export function CalendarCard({ event, onClick }: CalendarCardProps) {
             </span>
             <span className='flex items-center gap-0.5'>
               <Users className='size-2.5' />
-              {participantCount}
+              {event.participantCount}
             </span>
           </div>
         </div>

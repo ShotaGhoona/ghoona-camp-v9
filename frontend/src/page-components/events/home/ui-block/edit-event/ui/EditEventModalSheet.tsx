@@ -10,7 +10,6 @@ import {
   TooltipTrigger,
 } from '@/shared/ui/shadcn/ui/tooltip';
 
-import type { EventItem } from '@/shared/dummy-data/events/events';
 import {
   useViewMode,
   type ViewMode,
@@ -22,8 +21,6 @@ interface EditEventModalSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultViewMode?: ViewMode;
-  /** イベントリスト（eventIdからイベントを検索する用） */
-  events?: EventItem[];
 }
 
 export function EditEventModalSheet({
@@ -31,20 +28,12 @@ export function EditEventModalSheet({
   open,
   onOpenChange,
   defaultViewMode = 'modal',
-  events = [],
 }: EditEventModalSheetProps) {
   const { viewMode, toggleViewMode, isModal } = useViewMode(defaultViewMode);
-
-  // イベントリストから検索
-  const event = eventId ? events.find((e) => e.id === eventId) : null;
 
   const handleClose = () => {
     onOpenChange(false);
   };
-
-  if (!event) {
-    return null;
-  }
 
   // ビューモード切替ボタン
   const ViewModeToggle = (
@@ -78,7 +67,7 @@ export function EditEventModalSheet({
         >
           {ViewModeToggle}
           <div className='flex max-h-[85vh] flex-col'>
-            <EditEventContent event={event} onClose={handleClose} />
+            <EditEventContent eventId={eventId} onClose={handleClose} />
           </div>
         </DialogContent>
       </Dialog>
@@ -94,7 +83,7 @@ export function EditEventModalSheet({
         showCloseButton={false}
       >
         {ViewModeToggle}
-        <EditEventContent event={event} onClose={handleClose} />
+        <EditEventContent eventId={eventId} onClose={handleClose} />
       </SheetContent>
     </Sheet>
   );

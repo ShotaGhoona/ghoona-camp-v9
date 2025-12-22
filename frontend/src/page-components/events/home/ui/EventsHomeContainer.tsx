@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { CalendarDays, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 
 import { Button } from '@/shared/ui/shadcn/ui/button';
-import { dummyEvents } from '@/shared/dummy-data/events/events';
-import type { EventItem } from '@/shared/dummy-data/events/events';
+import { useAppSelector } from '@/store/hooks';
 import { MemberDetailModalSheet } from '@/widgets/member/member-detail-modal/ui/MemberDetailModalSheet';
+
+import { useEvents } from '@/features/domain/event/get-events/lib/use-events';
+import type { EventListItem } from '@/entities/domain/event/model/types';
 
 import { EventsGalleryView } from '../ui-block/gallery-view/ui/EventsGalleryView';
 import { EventsCalendarView } from '../ui-block/calendar-view/ui/EventsCalendarView';
@@ -28,6 +30,10 @@ function getMonthLabel(year: number, month: number): string {
 }
 
 export function EventsHomeContainer() {
+  // 認証状態
+  const { user } = useAppSelector((state) => state.auth);
+  const currentUserId = user?.id ?? null;
+
   // ビュー切り替え
   const [viewType, setViewType] = useState<ViewType>('gallery');
 
@@ -58,6 +64,19 @@ export function EventsHomeContainer() {
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
 
+  // API: イベント一覧取得
+  const { data: eventsData, isLoading } = useEvents({
+    year: currentYear,
+    month: currentMonth,
+    eventTypes:
+      filter.selectedEventTypes.length > 0
+        ? filter.selectedEventTypes
+        : undefined,
+    participated: filter.participationStatus ?? undefined,
+  });
+
+  const events = eventsData?.data.events ?? [];
+
   // 月の移動
   const handlePrevMonth = () => {
     if (currentMonth === 1) {
@@ -78,7 +97,7 @@ export function EventsHomeContainer() {
   };
 
   // イベントクリック
-  const handleEventClick = (event: EventItem) => {
+  const handleEventClick = (event: EventListItem) => {
     setSelectedEventId(event.id);
     setIsDetailModalOpen(true);
   };
@@ -99,42 +118,6 @@ export function EventsHomeContainer() {
   const handleCreateClick = () => {
     setIsCreateModalOpen(true);
   };
-
-  // 今後消す==========================================
-  // フィルタリング
-  const filteredEvents = useMemo(() => {
-    return dummyEvents.filter((event) => {
-      // 月フィルター
-      const eventDate = new Date(event.scheduledDate);
-      if (
-        eventDate.getFullYear() !== currentYear ||
-        eventDate.getMonth() + 1 !== currentMonth
-      ) {
-        return false;
-      }
-
-      // イベントタイプフィルター
-      if (filter.selectedEventTypes.length > 0) {
-        if (!filter.selectedEventTypes.includes(event.eventType)) {
-          return false;
-        }
-      }
-
-      // 参加状態フィルター
-      if (filter.participationStatus !== null) {
-        // TODO: 実際にはログインユーザーIDで判定
-        const isParticipating = event.participants.some(
-          (p) => p.userId === '1' && p.status === 'registered',
-        );
-        if (filter.participationStatus !== isParticipating) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-  }, [currentYear, currentMonth, filter]);
-  // =================================================
 
   const activeFilterCount = getActiveFilterCount(filter);
 
@@ -182,7 +165,12 @@ export function EventsHomeContainer() {
             />
 
             {/* 新規作成ボタン */}
-            <Button onClick={handleCreateClick} variant='raised' size='lg' className='gap-2'>
+            <Button
+              onClick={handleCreateClick}
+              variant='raised'
+              size='lg'
+              className='gap-2'
+            >
               <Plus className='size-4' />
               新規作成
             </Button>
@@ -192,14 +180,16 @@ export function EventsHomeContainer() {
         {/* ビューコンテンツ */}
         {viewType === 'gallery' ? (
           <EventsGalleryView
-            events={filteredEvents}
+            events={events}
+            isLoading={isLoading}
             onEventClick={handleEventClick}
           />
         ) : (
           <EventsCalendarView
             year={currentYear}
             month={currentMonth}
-            events={filteredEvents}
+            events={events}
+            isLoading={isLoading}
             onEventClick={handleEventClick}
           />
         )}
@@ -220,7 +210,6 @@ export function EventsHomeContainer() {
         defaultViewMode='modal'
         onMemberClick={handleMemberClick}
         onEdit={handleEdit}
-        events={dummyEvents}
       />
 
       {/* イベント作成モーダル */}
@@ -234,7 +223,6 @@ export function EventsHomeContainer() {
         eventId={editEventId}
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
-        events={dummyEvents}
       />
 
       {/* メンバー詳細モーダル */}

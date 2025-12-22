@@ -1,13 +1,14 @@
 'use client';
 
-import type { EventItem } from '@/shared/dummy-data/events/events';
+import type { EventListItem } from '@/entities/domain/event/model/types';
 import { GalleryViewWidget } from '@/widgets/view/gallery-view/ui/GalleryViewWidget';
 
 import { EventCard } from './components/EventCard';
 
 interface EventsGalleryViewProps {
-  events: EventItem[];
-  onEventClick?: (event: EventItem) => void;
+  events: EventListItem[];
+  isLoading?: boolean;
+  onEventClick?: (event: EventListItem) => void;
 }
 
 export function EventsGalleryView({

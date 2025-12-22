@@ -14,11 +14,12 @@ import { TimeField } from '@/shared/ui/form-fields/ui/TimeField';
 import { SelectField } from '@/shared/ui/form-fields/ui/SelectField';
 import { NumberField } from '@/shared/ui/form-fields/ui/NumberField';
 
-import {
-  ALL_EVENT_TYPES,
-  EVENT_TYPE_LABELS,
-  type EventType,
-} from '@/shared/dummy-data/events/events';
+import { useCreateEvent } from '@/features/domain/event/create-event/lib/use-create-event';
+import type {
+  EventType,
+  RecurrencePattern,
+} from '@/entities/domain/event/model/types';
+import { ALL_EVENT_TYPES, EVENT_TYPE_LABELS } from '@/shared/domain/event/data/event-master';
 
 export interface CreateEventFormData {
   title: string;
@@ -29,7 +30,7 @@ export interface CreateEventFormData {
   endTime: string;
   maxParticipants: number | null;
   isRecurring: boolean;
-  recurrencePattern: string | null;
+  recurrencePattern: RecurrencePattern | null;
 }
 
 interface CreateEventContentProps {
@@ -66,7 +67,13 @@ const recurrenceOptions = [
 export function CreateEventContent({ onClose }: CreateEventContentProps) {
   const [formData, setFormData] =
     useState<CreateEventFormData>(getDefaultFormData);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // API: イベント作成
+  const createEvent = useCreateEvent({
+    onSuccess: () => {
+      onClose?.();
+    },
+  });
 
   const handleTitleChange = (value: string) => {
     setFormData((prev) => ({ ...prev, title: value }));
@@ -108,7 +115,10 @@ export function CreateEventContent({ onClose }: CreateEventContentProps) {
   };
 
   const handleRecurrencePatternChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, recurrencePattern: value }));
+    setFormData((prev) => ({
+      ...prev,
+      recurrencePattern: value as RecurrencePattern,
+    }));
   };
 
   const handleSubmit = () => {
@@ -121,11 +131,17 @@ export function CreateEventContent({ onClose }: CreateEventContentProps) {
       return;
     }
 
-    setIsSubmitting(true);
-    // TODO: API呼び出し
-    alert(`イベント「${formData.title}」を作成しました（未実装）`);
-    setIsSubmitting(false);
-    onClose?.();
+    createEvent.mutate({
+      title: formData.title,
+      description: formData.description || null,
+      eventType: formData.eventType,
+      scheduledDate: formData.scheduledDate,
+      startTime: formData.startTime,
+      endTime: formData.endTime,
+      maxParticipants: formData.maxParticipants,
+      isRecurring: formData.isRecurring,
+      recurrencePattern: formData.recurrencePattern,
+    });
   };
 
   const handleCancel = () => {
@@ -275,7 +291,7 @@ export function CreateEventContent({ onClose }: CreateEventContentProps) {
         <button
           type='button'
           onClick={handleCancel}
-          disabled={isSubmitting}
+          disabled={createEvent.isPending}
           className='flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium shadow-raised-sm transition-all hover:bg-muted disabled:opacity-50'
         >
           <X className='size-4' />
@@ -285,11 +301,11 @@ export function CreateEventContent({ onClose }: CreateEventContentProps) {
         <button
           type='button'
           onClick={handleSubmit}
-          disabled={isSubmitting}
+          disabled={createEvent.isPending}
           className='flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-raised-sm transition-all hover:bg-primary/90 disabled:opacity-50'
         >
           <Save className='size-4' />
-          {isSubmitting ? '作成中...' : '作成する'}
+          {createEvent.isPending ? '作成中...' : '作成する'}
         </button>
       </div>
     </div>

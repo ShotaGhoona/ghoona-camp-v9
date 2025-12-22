@@ -5,12 +5,12 @@ import { Calendar, Clock, Eye, Repeat, User, Users } from 'lucide-react';
 import { Badge } from '@/shared/ui/shadcn/ui/badge';
 import { Card } from '@/shared/ui/shadcn/ui/card';
 
-import type { EventItem } from '@/shared/dummy-data/events/events';
-import { EVENT_TYPE_LABELS } from '@/shared/dummy-data/events/events';
+import type { EventListItem } from '@/entities/domain/event/model/types';
+import { EVENT_TYPE_LABELS } from '@/shared/domain/event/data/event-master';
 
 interface EventCardProps {
-  event: EventItem;
-  onClick?: (event: EventItem) => void;
+  event: EventListItem;
+  onClick?: (event: EventListItem) => void;
 }
 
 /** 日付をフォーマット（短縮形） */
@@ -27,10 +27,6 @@ export function EventCard({ event, onClick }: EventCardProps) {
   const handleClick = () => {
     onClick?.(event);
   };
-
-  const participantCount = event.participants.filter(
-    (p) => p.status === 'registered',
-  ).length;
 
   return (
     <Card
@@ -97,7 +93,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
               {event.creator.avatarUrl ? (
                 <img
                   src={event.creator.avatarUrl}
-                  alt={event.creator.displayName}
+                  alt={event.creator.displayName ?? ''}
                   className='size-full object-cover'
                 />
               ) : (
@@ -115,7 +111,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
           <div className='flex items-center gap-1 text-xs text-muted-foreground'>
             <Users className='size-3' />
             <span>
-              {participantCount}
+              {event.participantCount}
               {event.maxParticipants !== null && `/${event.maxParticipants}`}
             </span>
           </div>

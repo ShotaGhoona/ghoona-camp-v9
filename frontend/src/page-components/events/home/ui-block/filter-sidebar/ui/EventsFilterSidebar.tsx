@@ -7,11 +7,9 @@ import { Button } from '@/shared/ui/shadcn/ui/button';
 import { Badge } from '@/shared/ui/shadcn/ui/badge';
 import { ScrollArea } from '@/shared/ui/shadcn/ui/scroll-area';
 import { Card, CardContent } from '@/shared/ui/shadcn/ui/card';
-import {
-  ALL_EVENT_TYPES,
-  EVENT_TYPE_LABELS,
-  type EventType,
-} from '@/shared/dummy-data/events/events';
+
+import type { EventType } from '@/entities/domain/event/model/types';
+import { ALL_EVENT_TYPES, EVENT_TYPE_LABELS } from '@/shared/domain/event/data/event-master';
 
 import type { EventsFilterState } from '../model/types';
 import { initialFilterState, isFilterActive } from '../model/types';
