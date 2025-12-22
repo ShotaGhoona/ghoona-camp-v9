@@ -1,8 +1,62 @@
-"""ランキング関連のPresentation層スキーマ（リクエスト/レスポンス）"""
+"""参加関連のPresentation層スキーマ（リクエスト/レスポンス）"""
 
 from pydantic import BaseModel
 
 from app.presentation.schemas.common import BaseAPIResponse
+
+# ========================================
+# 参加統計
+# ========================================
+
+
+class AttendanceStatisticsResponse(BaseModel):
+    """参加統計レスポンス"""
+
+    totalAttendanceDays: int
+    currentStreakDays: int
+    maxStreakDays: int
+    thisMonthDays: int
+    thisWeekDays: int
+
+
+class AttendanceStatisticsAPIResponse(BaseAPIResponse[AttendanceStatisticsResponse]):
+    """参加統計APIレスポンス"""
+
+    pass
+
+
+# ========================================
+# 参加サマリー
+# ========================================
+
+
+class AttendanceSummaryItemResponse(BaseModel):
+    """参加サマリーアイテムレスポンス"""
+
+    date: str
+    isMorningActive: bool
+
+
+class AttendanceSummaryPeriodResponse(BaseModel):
+    """参加サマリー期間レスポンス"""
+
+    dateFrom: str
+    dateTo: str
+
+
+class AttendanceSummariesDataResponse(BaseModel):
+    """参加サマリーデータレスポンス"""
+
+    summaries: list[AttendanceSummaryItemResponse]
+    period: AttendanceSummaryPeriodResponse
+    total: int
+
+
+class AttendanceSummariesAPIResponse(BaseAPIResponse[AttendanceSummariesDataResponse]):
+    """参加サマリーAPIレスポンス"""
+
+    pass
+
 
 # ========================================
 # ランキング共通

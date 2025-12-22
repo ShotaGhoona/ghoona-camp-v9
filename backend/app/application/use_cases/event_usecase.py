@@ -11,6 +11,8 @@ from app.application.schemas.event_schemas import (
     EventListDTO,
     EventListItemDTO,
     EventParticipantDTO,
+    MyEventItemDTO,
+    MyEventsListDTO,
     ParticipantResultDTO,
     UpdateEventInputDTO,
 )
@@ -33,6 +35,8 @@ from app.domain.repositories.event_repository import (
     EventSearchFilter,
     EventUpdateData,
     IEventRepository,
+    MyEventItem,
+    MyEventsFilter,
 )
 
 logger = logging.getLogger(__name__)
@@ -463,4 +467,62 @@ class EventUsecase:
             userName=participant.user_name,
             avatarUrl=participant.avatar_url,
             status=participant.status,
+        )
+
+    def get_my_events(
+        self,
+        current_user_id: str,
+        year: int,
+        month: int,
+    ) -> MyEventsListDTO:
+        """
+        自分が参加登録または主催しているイベント一覧を取得
+
+        Args:
+            current_user_id: 現在のユーザーID
+            year: 対象年
+            month: 対象月
+
+        Returns:
+            MyEventsListDTO: 自分のイベント一覧DTO
+        """
+        # バリデーション
+        if month < 1 or month > 12:
+            raise InvalidMonthError(month)
+
+        # フィルター作成
+        filter = MyEventsFilter(
+            year=year,
+            month=month,
+            user_id=UUID(current_user_id),
+        )
+
+        # リポジトリからデータ取得
+        events = self.event_repository.get_my_events(filter)
+
+        # DTOに変換
+        events_dto = [self._to_my_event_item_dto(event) for event in events]
+
+        logger.info(
+            '自分のイベント一覧取得: user_id=%s, year=%d, month=%d, count=%d',
+            current_user_id,
+            year,
+            month,
+            len(events),
+        )
+
+        return MyEventsListDTO(events=events_dto)
+
+    def _to_my_event_item_dto(self, event: MyEventItem) -> MyEventItemDTO:
+        """MyEventItemをMyEventItemDTOに変換"""
+        return MyEventItemDTO(
+            id=str(event.id),
+            title=event.title,
+            eventType=event.event_type,
+            scheduledDate=event.scheduled_date.isoformat(),
+            startTime=event.start_time.strftime('%H:%M'),
+            endTime=event.end_time.strftime('%H:%M'),
+            role=event.role,
+            maxParticipants=event.max_participants,
+            participantCount=event.participant_count,
         )

@@ -2,7 +2,17 @@
 
 ## 概要
 
-イベントドメインのバックエンドAPI（`GET /events`、`GET /events/{eventId}`、`POST /events`、`PUT /events/{eventId}`、`DELETE /events/{eventId}`、`POST /events/{eventId}/participants`、`DELETE /events/{eventId}/participants`）をオニオンアーキテクチャに従って実装。
+イベントドメインのバックエンドAPIをオニオンアーキテクチャに従って実装。
+
+**エンドポイント一覧:**
+- `GET /events` - 月ベースでイベント一覧取得
+- `GET /events/me` - 自分が参加/主催のイベント取得
+- `GET /events/{eventId}` - イベント詳細取得
+- `POST /events` - イベント作成
+- `PUT /events/{eventId}` - イベント更新
+- `DELETE /events/{eventId}` - イベント削除
+- `POST /events/{eventId}/participants` - イベント参加
+- `DELETE /events/{eventId}/participants` - 参加キャンセル
 
 月ベースでイベント一覧を取得し、参加・キャンセル機能を提供。
 
@@ -79,6 +89,59 @@ backend/app/
   "timestamp": "2025-01-21T10:00:00+00:00"
 }
 ```
+
+### GET /api/v1/events/me
+
+自分が参加登録または主催しているイベント一覧を取得。カレンダーのイベントカード表示用。
+
+**クエリパラメータ:**
+
+| パラメータ | 型 | 必須 | 説明 |
+|-----------|-----|------|------|
+| `year` | int | ○ | 対象年（2000-2100） |
+| `month` | int | ○ | 対象月（1-12） |
+
+**認証:** JWT Cookie認証必須（🔐 認証済み）
+
+**レスポンス:**
+```json
+{
+  "data": {
+    "events": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440001",
+        "title": "朝の瞑想会",
+        "eventType": "meditation",
+        "scheduledDate": "2025-01-06",
+        "startTime": "06:00",
+        "endTime": "06:30",
+        "role": "participant",
+        "maxParticipants": 10,
+        "participantCount": 5
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440002",
+        "title": "もくもく会",
+        "eventType": "study",
+        "scheduledDate": "2025-01-08",
+        "startTime": "06:00",
+        "endTime": "07:00",
+        "role": "organizer",
+        "maxParticipants": null,
+        "participantCount": 8
+      }
+    ]
+  },
+  "message": "success",
+  "timestamp": "2025-01-21T10:00:00+00:00"
+}
+```
+
+**フィールド説明:**
+
+| フィールド | 説明 |
+|-----------|------|
+| `role` | `"participant"` = 参加者, `"organizer"` = 主催者 |
 
 ### GET /api/v1/events/{event_id}
 
@@ -165,9 +228,11 @@ backend/app/
 
 **データクラス:**
 - `EventSearchFilter` - 検索フィルター（year, month, current_user_id, event_types, participated）
+- `MyEventsFilter` - 自分のイベント検索フィルター（year, month, user_id）
 - `EventCreator` - 主催者情報（id, display_name, avatar_url）
 - `EventParticipant` - 参加者情報（id, user_id, user_name, avatar_url, status）
 - `EventListItem` - 一覧用アイテム（11フィールド）
+- `MyEventItem` - 自分のイベントアイテム（id, title, event_type, scheduled_date, start_time, end_time, role, max_participants, participant_count）
 - `EventDetail` - 詳細用（一覧 + description, participants, is_owner等）
 - `EventCreateData` - 作成データ
 - `EventUpdateData` - 更新データ（部分更新用）
@@ -175,6 +240,7 @@ backend/app/
 
 **リポジトリインターフェース:**
 - `get_events_by_month()` - 月ベースでイベント一覧取得
+- `get_my_events()` - 自分が参加/主催のイベント取得
 - `get_event_by_id()` - イベント詳細取得
 - `create()` - イベント作成
 - `update()` - イベント更新
@@ -223,6 +289,13 @@ query = (
 - scheduled_date: 月初〜月末の範囲
 - event_type: IN検索
 - participated: 参加状態サブクエリでフィルタ
+
+**自分のイベント取得クエリ（get_my_events）:**
+- events, event_participants をJOIN
+- 参加者数サブクエリ
+- 主催者判定（creator_id = user_id）
+- フィルター: 対象月 + (主催者 OR 参加登録済み)
+- ソート: scheduled_date, start_time 昇順
 
 **参加者管理:**
 - add_participant: 既存キャンセル済みなら再登録、なければ新規作成

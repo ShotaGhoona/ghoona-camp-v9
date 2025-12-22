@@ -26,6 +26,15 @@ class EventSearchFilter:
     participated: bool | None = None
 
 
+@dataclass
+class MyEventsFilter:
+    """自分のイベント検索フィルター"""
+
+    year: int
+    month: int
+    user_id: UUID
+
+
 # =============================================================================
 # データクラス: イベント関連
 # =============================================================================
@@ -64,6 +73,21 @@ class EventListItem:
     is_participating: bool
     is_recurring: bool
     creator: EventCreator
+
+
+@dataclass
+class MyEventItem:
+    """自分のイベントアイテム"""
+
+    id: UUID
+    title: str
+    event_type: str
+    scheduled_date: date
+    start_time: time
+    end_time: time
+    role: str  # 'participant' or 'organizer'
+    max_participants: int | None
+    participant_count: int
 
 
 @dataclass
@@ -295,5 +319,18 @@ class IEventRepository(ABC):
 
         Returns:
             bool: 削除成功の場合True
+        """
+        pass
+
+    @abstractmethod
+    def get_my_events(self, filter: MyEventsFilter) -> list[MyEventItem]:
+        """
+        自分が参加登録または主催しているイベント一覧を取得
+
+        Args:
+            filter: 検索フィルター条件
+
+        Returns:
+            list[MyEventItem]: 自分のイベント一覧
         """
         pass

@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.infrastructure.logging.logging import setup_logging
 from app.presentation.api.attendance_api import router as attendance_router
+from app.presentation.api.attendance_api import users_attendance_router
 from app.presentation.api.auth_api import router as auth_router
 from app.presentation.api.event_api import router as event_router
 from app.presentation.api.goal_api import router as goal_router
@@ -60,6 +61,7 @@ app.include_router(auth_router)
 app.include_router(event_router, prefix='/api/v1')
 app.include_router(goal_router, prefix='/api/v1')
 app.include_router(attendance_router, prefix='/api/v1')
+app.include_router(users_attendance_router, prefix='/api/v1')
 app.include_router(title_router, prefix='/api/v1')
 app.include_router(users_title_router, prefix='/api/v1')
 app.include_router(user_router, prefix='/api/v1')

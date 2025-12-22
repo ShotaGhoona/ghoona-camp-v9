@@ -216,3 +216,34 @@ class LeaveEventAPIResponse(BaseAPIResponse[LeaveEventDataResponse]):
     """参加キャンセルAPIレスポンス"""
 
     message: str = '参加をキャンセルしました'
+
+
+# ========================================
+# 自分のイベント取得
+# ========================================
+
+
+class MyEventItemResponse(BaseModel):
+    """自分のイベントアイテムレスポンス"""
+
+    id: str
+    title: str
+    eventType: str
+    scheduledDate: str
+    startTime: str
+    endTime: str
+    role: str  # 'participant' or 'organizer'
+    maxParticipants: int | None
+    participantCount: int
+
+
+class MyEventsDataResponse(BaseModel):
+    """自分のイベントデータレスポンス"""
+
+    events: list[MyEventItemResponse]
+
+
+class MyEventsAPIResponse(BaseAPIResponse[MyEventsDataResponse]):
+    """自分のイベントAPIレスポンス"""
+
+    pass

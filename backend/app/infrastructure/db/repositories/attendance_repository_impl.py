@@ -1,14 +1,19 @@
-"""ランキングリポジトリの実装"""
+"""参加関連リポジトリの実装"""
 
 from calendar import monthrange
-from datetime import date
+from datetime import date, timedelta
 from uuid import UUID
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.domain.repositories.attendance_repository import (
+    AttendanceStatisticsResult,
+    AttendanceSummariesResult,
+    AttendanceSummaryItem,
     CurrentUserRanking,
+    DateRange,
+    IAttendanceRepository,
     IRankingRepository,
     MonthlyRankingList,
     RankingEntry,
@@ -448,3 +453,104 @@ class RankingRepositoryImpl(IRankingRepository):
         rank = higher_count + same_score_earlier + 1
 
         return CurrentUserRanking(rank=rank, score=user_score)
+
+
+class AttendanceRepositoryImpl(IAttendanceRepository):
+    """参加リポジトリの実装"""
+
+    def __init__(self, session: Session):
+        """
+        コンストラクタ
+
+        Args:
+            session: SQLAlchemyのセッション
+        """
+        self.session = session
+
+    def get_statistics(self, user_id: UUID) -> AttendanceStatisticsResult | None:
+        """
+        ユーザーの参加統計を取得
+        """
+        # 基本統計を取得
+        stats = (
+            self.session.query(AttendanceStatisticsModel)
+            .filter(AttendanceStatisticsModel.user_id == user_id)
+            .first()
+        )
+
+        if stats is None:
+            return None
+
+        # 今月の参加日数を動的計算
+        today = date.today()
+        month_start = date(today.year, today.month, 1)
+        _, last_day = monthrange(today.year, today.month)
+        month_end = date(today.year, today.month, last_day)
+
+        this_month_days = (
+            self.session.query(func.count(AttendanceSummaryModel.id))
+            .filter(
+                AttendanceSummaryModel.user_id == user_id,
+                AttendanceSummaryModel.date >= month_start,
+                AttendanceSummaryModel.date <= month_end,
+                AttendanceSummaryModel.is_morning_active.is_(True),
+            )
+            .scalar()
+        ) or 0
+
+        # 今週の参加日数を動的計算（月曜日始まり）
+        week_start = today - timedelta(days=today.weekday())
+        week_end = week_start + timedelta(days=6)
+
+        this_week_days = (
+            self.session.query(func.count(AttendanceSummaryModel.id))
+            .filter(
+                AttendanceSummaryModel.user_id == user_id,
+                AttendanceSummaryModel.date >= week_start,
+                AttendanceSummaryModel.date <= week_end,
+                AttendanceSummaryModel.is_morning_active.is_(True),
+            )
+            .scalar()
+        ) or 0
+
+        return AttendanceStatisticsResult(
+            total_attendance_days=stats.total_attendance_days,
+            current_streak_days=stats.current_streak_days,
+            max_streak_days=stats.max_streak_days,
+            this_month_days=this_month_days,
+            this_week_days=this_week_days,
+        )
+
+    def get_summaries(
+        self, user_id: UUID, date_from: date, date_to: date
+    ) -> AttendanceSummariesResult:
+        """
+        ユーザーの参加サマリーを取得
+        """
+        # サマリーを取得
+        results = (
+            self.session.query(AttendanceSummaryModel)
+            .filter(
+                AttendanceSummaryModel.user_id == user_id,
+                AttendanceSummaryModel.date >= date_from,
+                AttendanceSummaryModel.date <= date_to,
+                AttendanceSummaryModel.is_morning_active.is_(True),
+            )
+            .order_by(AttendanceSummaryModel.date.asc())
+            .all()
+        )
+
+        # AttendanceSummaryItemに変換
+        summaries = [
+            AttendanceSummaryItem(
+                date=row.date,
+                is_morning_active=row.is_morning_active,
+            )
+            for row in results
+        ]
+
+        return AttendanceSummariesResult(
+            summaries=summaries,
+            period=DateRange(date_from=date_from, date_to=date_to),
+            total=len(summaries),
+        )

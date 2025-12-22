@@ -1,10 +1,56 @@
-"""ランキングリポジトリインターフェース"""
+"""参加関連リポジトリインターフェース"""
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from datetime import date
 from uuid import UUID
 
 
+# =============================================================================
+# データクラス: 参加統計
+# =============================================================================
+@dataclass
+class AttendanceStatisticsResult:
+    """参加統計結果"""
+
+    total_attendance_days: int
+    current_streak_days: int
+    max_streak_days: int
+    this_month_days: int
+    this_week_days: int
+
+
+# =============================================================================
+# データクラス: 参加サマリー
+# =============================================================================
+@dataclass
+class AttendanceSummaryItem:
+    """参加サマリーアイテム"""
+
+    date: date
+    is_morning_active: bool
+
+
+@dataclass
+class DateRange:
+    """日付範囲"""
+
+    date_from: date
+    date_to: date
+
+
+@dataclass
+class AttendanceSummariesResult:
+    """参加サマリー結果"""
+
+    summaries: list[AttendanceSummaryItem]
+    period: DateRange
+    total: int
+
+
+# =============================================================================
+# データクラス: ランキング
+# =============================================================================
 @dataclass
 class RankingUser:
     """ランキング用ユーザー情報"""
@@ -165,5 +211,42 @@ class IRankingRepository(ABC):
 
         Returns:
             CurrentUserRanking: 順位とスコア
+        """
+        pass
+
+
+# =============================================================================
+# 参加リポジトリインターフェース
+# =============================================================================
+class IAttendanceRepository(ABC):
+    """参加リポジトリのインターフェース"""
+
+    @abstractmethod
+    def get_statistics(self, user_id: UUID) -> AttendanceStatisticsResult | None:
+        """
+        ユーザーの参加統計を取得
+
+        Args:
+            user_id: ユーザーID
+
+        Returns:
+            AttendanceStatisticsResult | None: 参加統計（存在しない場合はNone）
+        """
+        pass
+
+    @abstractmethod
+    def get_summaries(
+        self, user_id: UUID, date_from: date, date_to: date
+    ) -> AttendanceSummariesResult:
+        """
+        ユーザーの参加サマリーを取得
+
+        Args:
+            user_id: ユーザーID
+            date_from: 開始日
+            date_to: 終了日
+
+        Returns:
+            AttendanceSummariesResult: 参加サマリー結果
         """
         pass

@@ -1,8 +1,58 @@
-"""ランキング関連のApplication層スキーマ（DTO）"""
+"""参加関連のApplication層スキーマ（DTO）"""
 
 from pydantic import BaseModel, Field
 
 
+# =============================================================================
+# 参加統計DTO
+# =============================================================================
+class AttendanceStatisticsDTO(BaseModel):
+    """参加統計DTO"""
+
+    total_attendance_days: int = Field(alias='totalAttendanceDays')
+    current_streak_days: int = Field(alias='currentStreakDays')
+    max_streak_days: int = Field(alias='maxStreakDays')
+    this_month_days: int = Field(alias='thisMonthDays')
+    this_week_days: int = Field(alias='thisWeekDays')
+
+    class Config:
+        populate_by_name = True
+
+
+# =============================================================================
+# 参加サマリーDTO
+# =============================================================================
+class AttendanceSummaryItemDTO(BaseModel):
+    """参加サマリーアイテムDTO"""
+
+    date: str
+    is_morning_active: bool = Field(alias='isMorningActive')
+
+    class Config:
+        populate_by_name = True
+
+
+class AttendanceSummaryPeriodDTO(BaseModel):
+    """参加サマリー期間DTO"""
+
+    date_from: str = Field(alias='dateFrom')
+    date_to: str = Field(alias='dateTo')
+
+    class Config:
+        populate_by_name = True
+
+
+class AttendanceSummariesDTO(BaseModel):
+    """参加サマリー結果DTO"""
+
+    summaries: list[AttendanceSummaryItemDTO]
+    period: AttendanceSummaryPeriodDTO
+    total: int
+
+
+# =============================================================================
+# ランキングDTO
+# =============================================================================
 class RankingUserDTO(BaseModel):
     """ランキング用ユーザーDTO"""
 

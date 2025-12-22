@@ -1,10 +1,14 @@
-"""ランキング関連のAPIエンドポイント"""
+"""参加関連のAPIエンドポイント"""
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 
-from app.application.use_cases.attendance_usecase import RankingUsecase
-from app.di.attendance import get_ranking_usecase
-from app.domain.exceptions.attendance import InvalidMonthError
+from app.application.use_cases.attendance_usecase import AttendanceUsecase, RankingUsecase
+from app.di.attendance import get_attendance_usecase, get_ranking_usecase
+from app.domain.exceptions.attendance import (
+    InvalidDateRangeError,
+    InvalidMonthError,
+    NotOwnAttendanceError,
+)
 from app.infrastructure.security.security_service_impl import (
     User,
     get_current_user_from_cookie,
@@ -12,6 +16,12 @@ from app.infrastructure.security.security_service_impl import (
 from app.presentation.schemas.attendance_schemas import (
     AllRankingsAPIResponse,
     AllRankingsDataResponse,
+    AttendanceStatisticsAPIResponse,
+    AttendanceStatisticsResponse,
+    AttendanceSummariesAPIResponse,
+    AttendanceSummariesDataResponse,
+    AttendanceSummaryItemResponse,
+    AttendanceSummaryPeriodResponse,
     CurrentUserRankingResponse,
     CurrentUserRankingsResponse,
     MonthlyRankingListResponse,
@@ -23,6 +33,9 @@ from app.presentation.schemas.attendance_schemas import (
 from app.presentation.schemas.common import ErrorResponse
 
 router = APIRouter(prefix='/rankings', tags=['rankings'])
+
+# ユーザー参加情報ルーター（/users/{userId}/attendance/...）
+users_attendance_router = APIRouter(prefix='/users', tags=['attendance'])
 
 
 @router.get(
@@ -209,5 +222,124 @@ def get_my_rankings(
                 rank=result.streak.rank,
                 score=result.streak.score,
             ),
+        )
+    )
+
+
+# =============================================================================
+# ユーザー参加情報API
+# =============================================================================
+
+
+@users_attendance_router.get(
+    '/{user_id}/attendance/statistics',
+    response_model=AttendanceStatisticsAPIResponse,
+    responses={
+        401: {'model': ErrorResponse, 'description': '認証エラー'},
+        403: {'model': ErrorResponse, 'description': '権限エラー'},
+    },
+)
+def get_attendance_statistics(
+    user_id: str = Path(..., description='ユーザーID'),
+    current_user: User = Depends(get_current_user_from_cookie),
+    attendance_usecase: AttendanceUsecase = Depends(get_attendance_usecase),
+) -> AttendanceStatisticsAPIResponse:
+    """
+    ユーザーの参加統計を取得
+
+    本人のみアクセス可能。統計カードの表示に使用。
+    """
+    try:
+        result = attendance_usecase.get_statistics(
+            user_id=user_id,
+            current_user_id=current_user.id,
+        )
+    except NotOwnAttendanceError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                'code': 'FORBIDDEN',
+                'message': str(e),
+            },
+        ) from e
+
+    return AttendanceStatisticsAPIResponse(
+        data=AttendanceStatisticsResponse(
+            totalAttendanceDays=result.total_attendance_days,
+            currentStreakDays=result.current_streak_days,
+            maxStreakDays=result.max_streak_days,
+            thisMonthDays=result.this_month_days,
+            thisWeekDays=result.this_week_days,
+        )
+    )
+
+
+@users_attendance_router.get(
+    '/{user_id}/attendance/summaries',
+    response_model=AttendanceSummariesAPIResponse,
+    responses={
+        400: {'model': ErrorResponse, 'description': 'バリデーションエラー'},
+        401: {'model': ErrorResponse, 'description': '認証エラー'},
+        403: {'model': ErrorResponse, 'description': '権限エラー'},
+    },
+)
+def get_attendance_summaries(
+    user_id: str = Path(..., description='ユーザーID'),
+    date_from: str | None = Query(
+        None,
+        alias='date_from',
+        description='開始日（YYYY-MM-DD）、省略時は当月1日',
+    ),
+    date_to: str | None = Query(
+        None,
+        alias='date_to',
+        description='終了日（YYYY-MM-DD）、省略時は当月末日',
+    ),
+    current_user: User = Depends(get_current_user_from_cookie),
+    attendance_usecase: AttendanceUsecase = Depends(get_attendance_usecase),
+) -> AttendanceSummariesAPIResponse:
+    """
+    ユーザーの参加サマリーを取得
+
+    本人のみアクセス可能。カレンダーのマーカー表示に使用。
+    """
+    try:
+        result = attendance_usecase.get_summaries(
+            user_id=user_id,
+            current_user_id=current_user.id,
+            date_from=date_from,
+            date_to=date_to,
+        )
+    except NotOwnAttendanceError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                'code': 'FORBIDDEN',
+                'message': str(e),
+            },
+        ) from e
+    except InvalidDateRangeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                'code': 'VALIDATION_ERROR',
+                'message': str(e),
+            },
+        ) from e
+
+    return AttendanceSummariesAPIResponse(
+        data=AttendanceSummariesDataResponse(
+            summaries=[
+                AttendanceSummaryItemResponse(
+                    date=s.date,
+                    isMorningActive=s.is_morning_active,
+                )
+                for s in result.summaries
+            ],
+            period=AttendanceSummaryPeriodResponse(
+                dateFrom=result.period.date_from,
+                dateTo=result.period.date_to,
+            ),
+            total=result.total,
         )
     )

@@ -38,6 +38,9 @@ from app.presentation.schemas.event_schemas import (
     JoinEventAPIResponse,
     LeaveEventAPIResponse,
     LeaveEventDataResponse,
+    MyEventItemResponse,
+    MyEventsAPIResponse,
+    MyEventsDataResponse,
     ParticipantResultResponse,
     UpdateEventAPIResponse,
     UpdateEventDataResponse,
@@ -133,6 +136,66 @@ def get_events(
 
     return EventListAPIResponse(
         data=EventListDataResponse(events=events_response)
+    )
+
+
+# ========================================
+# 自分のイベント取得
+# ========================================
+
+
+@router.get(
+    '/me',
+    response_model=MyEventsAPIResponse,
+    responses={
+        401: {'model': ErrorResponse, 'description': '認証エラー'},
+        400: {'model': ErrorResponse, 'description': 'バリデーションエラー'},
+    },
+)
+def get_my_events(
+    year: int = Query(..., ge=2000, le=2100, description='対象年'),
+    month: int = Query(..., ge=1, le=12, description='対象月'),
+    current_user: User = Depends(get_current_user_from_cookie),
+    event_usecase: EventUsecase = Depends(get_event_usecase),
+) -> MyEventsAPIResponse:
+    """
+    自分が参加登録または主催しているイベント一覧を取得
+
+    カレンダーのイベントカード表示に使用。
+    """
+    try:
+        result = event_usecase.get_my_events(
+            current_user_id=current_user.id,
+            year=year,
+            month=month,
+        )
+    except InvalidMonthError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                'code': 'INVALID_MONTH',
+                'message': str(e),
+            },
+        ) from e
+
+    # レスポンス変換
+    events_response = [
+        MyEventItemResponse(
+            id=event.id,
+            title=event.title,
+            eventType=event.event_type,
+            scheduledDate=event.scheduled_date,
+            startTime=event.start_time,
+            endTime=event.end_time,
+            role=event.role,
+            maxParticipants=event.max_participants,
+            participantCount=event.participant_count,
+        )
+        for event in result.events
+    ]
+
+    return MyEventsAPIResponse(
+        data=MyEventsDataResponse(events=events_response)
     )
 
 

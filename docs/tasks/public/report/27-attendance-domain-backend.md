@@ -1,10 +1,16 @@
-# Attendance Domain（ランキング）バックエンド実装レポート
+# Attendance Domain バックエンド実装レポート
 
 ## 概要
 
-Attendanceドメインのランキング機能API（`GET /rankings`、`GET /rankings/me`）をオニオンアーキテクチャに従って実装。
+AttendanceドメインのバックエンドAPI（ランキング機能 + 参加統計/サマリー）をオニオンアーキテクチャに従って実装。
 
-月間・総合・連続日数の3種類のランキングを一括取得し、ログインユーザーの順位情報も含めて返却する。
+**ランキング機能:**
+- `GET /rankings` - 3種類のランキング一括取得
+- `GET /rankings/me` - ログインユーザーの順位情報
+
+**参加統計/サマリー機能:**
+- `GET /users/{userId}/attendance/statistics` - 参加統計（統計カード表示用）
+- `GET /users/{userId}/attendance/summaries` - 参加サマリー（カレンダーマーカー表示用）
 
 ## 変更ファイル
 
@@ -111,11 +117,100 @@ backend/app/
 }
 ```
 
+---
+
+### GET /api/v1/users/{userId}/attendance/statistics
+
+ユーザーの参加統計を取得。統計カードの表示に使用。
+
+**パスパラメータ:**
+
+| パラメータ | 型 | 説明 |
+|-----------|-----|------|
+| `userId` | UUID | ユーザーID |
+
+**認証:** JWT Cookie認証必須（👤 本人のみ）
+
+**レスポンス例:**
+```json
+{
+  "data": {
+    "totalAttendanceDays": 47,
+    "currentStreakDays": 12,
+    "maxStreakDays": 21,
+    "thisMonthDays": 14,
+    "thisWeekDays": 5
+  },
+  "message": "success",
+  "timestamp": "2025-01-21T10:00:00+00:00"
+}
+```
+
+**フィールド説明:**
+
+| フィールド | 説明 | 計算方法 |
+|-----------|------|----------|
+| `totalAttendanceDays` | 総参加日数 | DBから取得 |
+| `currentStreakDays` | 現在の連続日数 | DBから取得 |
+| `maxStreakDays` | 最大連続日数 | DBから取得 |
+| `thisMonthDays` | 今月の参加日数 | 動的計算（attendance_summariesから当月分をCOUNT） |
+| `thisWeekDays` | 今週の参加日数 | 動的計算（attendance_summariesから今週分をCOUNT） |
+
+**エラーレスポンス:**
+- `401`: 未認証
+- `403`: 他人のデータにアクセス
+
+---
+
+### GET /api/v1/users/{userId}/attendance/summaries
+
+日単位の参加サマリーを取得。カレンダーのマーカー表示用。
+
+**パスパラメータ:**
+
+| パラメータ | 型 | 説明 |
+|-----------|-----|------|
+| `userId` | UUID | ユーザーID |
+
+**クエリパラメータ:**
+
+| パラメータ | 型 | 必須 | 説明 |
+|-----------|-----|------|------|
+| `date_from` | string | - | 開始日（YYYY-MM-DD）、省略時は当月1日 |
+| `date_to` | string | - | 終了日（YYYY-MM-DD）、省略時は当月末日 |
+
+**認証:** JWT Cookie認証必須（👤 本人のみ）
+
+**レスポンス例:**
+```json
+{
+  "data": {
+    "summaries": [
+      { "date": "2025-01-06", "isMorningActive": true },
+      { "date": "2025-01-07", "isMorningActive": true },
+      { "date": "2025-01-08", "isMorningActive": true }
+    ],
+    "period": {
+      "dateFrom": "2025-01-01",
+      "dateTo": "2025-01-31"
+    },
+    "total": 14
+  },
+  "message": "success",
+  "timestamp": "2025-01-21T10:00:00+00:00"
+}
+```
+
+**エラーレスポンス:**
+- `400`: date_from > date_to（期間が不正）
+- `401`: 未認証
+- `403`: 他人のデータにアクセス
+
 ## 実装詳細
 
 ### Domain層
 
-**データクラス:**
+**データクラス（ランキング）:**
 - `RankingUser` - ランキング用ユーザー情報（id, display_name, avatar_url, tagline）
 - `RankingEntry` - ランキングエントリ（rank, user, current_title_level, score）
 - `RankingList` - ランキング一覧（entries, total）
@@ -125,7 +220,13 @@ backend/app/
 - `AllRankingsResult` - 全ランキング結果
 - `RankingFilter` - 検索条件
 
-**リポジトリインターフェース:**
+**データクラス（参加統計/サマリー）:**
+- `AttendanceStatisticsResult` - 参加統計結果（total_attendance_days, current_streak_days, max_streak_days, this_month_days, this_week_days）
+- `AttendanceSummaryItem` - 参加サマリーアイテム（date, is_morning_active）
+- `DateRange` - 日付範囲（date_from, date_to）
+- `AttendanceSummariesResult` - 参加サマリー結果（summaries, period, total）
+
+**リポジトリインターフェース（IRankingRepository）:**
 - `get_monthly_ranking()` - 月間ランキング取得
 - `get_total_ranking()` - 総合ランキング取得
 - `get_streak_ranking()` - 連続日数ランキング取得
@@ -133,8 +234,14 @@ backend/app/
 - `get_user_total_ranking()` - ユーザーの総合順位取得
 - `get_user_streak_ranking()` - ユーザーの連続順位取得
 
+**リポジトリインターフェース（IAttendanceRepository）:**
+- `get_statistics()` - ユーザーの参加統計取得
+- `get_summaries()` - ユーザーの参加サマリー取得
+
 **ドメイン例外:**
 - `InvalidMonthError` - 月が1-12の範囲外
+- `InvalidDateRangeError` - 日付範囲が不正（date_from > date_to）
+- `NotOwnAttendanceError` - 他人の参加データにアクセス
 
 ### Infrastructure層
 
@@ -154,39 +261,62 @@ backend/app/
 - 同スコアの場合は登録日順（先勝ち）
 - スコアが0の場合はrank=0（ランキング外）
 
+**参加統計クエリ（AttendanceRepositoryImpl）:**
+- 基本統計: `attendance_statistics` テーブルから取得
+- 今月参加日数: `attendance_summaries` から当月 + `is_morning_active = true` をCOUNT
+- 今週参加日数: `attendance_summaries` から今週（月曜始まり）+ `is_morning_active = true` をCOUNT
+
+**参加サマリークエリ:**
+- `attendance_summaries` から指定期間 + `is_morning_active = true` を取得
+- 日付昇順でソート
+
 ### Application層
 
-**DTO:**
+**DTO（ランキング）:**
 - `RankingUserDTO` / `RankingEntryDTO` - ランキング情報
 - `RankingListDTO` / `MonthlyRankingListDTO` - ランキング一覧
 - `CurrentUserRankingDTO` / `CurrentUserRankingsDTO` - 自分のランキング
 - `AllRankingsDTO` - 全ランキング
 
-**Usecaseメソッド:**
+**DTO（参加統計/サマリー）:**
+- `AttendanceStatisticsDTO` - 参加統計DTO
+- `AttendanceSummaryItemDTO` - 参加サマリーアイテムDTO
+- `AttendanceSummaryPeriodDTO` - 参加サマリー期間DTO
+- `AttendanceSummariesDTO` - 参加サマリー結果DTO
+
+**Usecaseメソッド（RankingUsecase）:**
 - `get_all_rankings()` - 全ランキング一括取得
 - `get_my_rankings()` - 自分のランキング情報取得
 
+**Usecaseメソッド（AttendanceUsecase）:**
+- `get_statistics()` - 参加統計取得（本人チェック + ゼロ値フォールバック）
+- `get_summaries()` - 参加サマリー取得（本人チェック + 日付バリデーション）
+
 ### Presentation層
 
-**スキーマ:**
+**スキーマ（ランキング）:**
 - `RankingUserResponse` / `RankingEntryResponse` - ランキング情報
 - `RankingListResponse` / `MonthlyRankingListResponse` - ランキング一覧
 - `CurrentUserRankingResponse` / `CurrentUserRankingsResponse` - 自分のランキング
 - `AllRankingsDataResponse` / `AllRankingsAPIResponse` - 全ランキング
 - `MyRankingsAPIResponse` - 自分のランキング
 
+**スキーマ（参加統計/サマリー）:**
+- `AttendanceStatisticsResponse` / `AttendanceStatisticsAPIResponse` - 参加統計
+- `AttendanceSummaryItemResponse` / `AttendanceSummaryPeriodResponse` - サマリーアイテム・期間
+- `AttendanceSummariesDataResponse` / `AttendanceSummariesAPIResponse` - 参加サマリー
+
+**APIルーター:**
+- `router` (`/rankings`) - ランキング関連API
+- `users_attendance_router` (`/users`) - ユーザー参加情報API
+
 ### DI層
 
 - `get_ranking_usecase()` - RankingUsecaseの依存性注入
+- `get_attendance_usecase()` - AttendanceUsecaseの依存性注入
 
 ## 関連ドキュメント
 
-- `docs/tasks/public/plan/ranking-api-design.md` - API設計書
+- `docs/tasks/public/plan/ranking-api-design.md` - ランキングAPI設計書
+- `docs/tasks/public/plan/attendance-activity-api-design.md` - 参加統計/サマリーAPI設計書
 - `docs/requirements/12-api.md` - API設計書（Attendance Management セクション）
-
-## 備考
-
-ファイル名は `attendance_*` だが、現在はランキング機能のみ実装。
-将来的に以下のAPIが追加される予定：
-- `GET /users/{userId}/attendance/summaries` - カレンダー表示用
-- `GET /users/{userId}/attendance/statistics` - 参加統計

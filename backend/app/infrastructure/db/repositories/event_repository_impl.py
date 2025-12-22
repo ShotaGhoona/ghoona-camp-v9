@@ -16,6 +16,8 @@ from app.domain.repositories.event_repository import (
     EventSearchFilter,
     EventUpdateData,
     IEventRepository,
+    MyEventItem,
+    MyEventsFilter,
     ParticipantResult,
 )
 from app.infrastructure.db.models.event_model import EventModel, EventParticipantModel
@@ -429,3 +431,75 @@ class EventRepositoryImpl(IEventRepository):
             is_participating=bool(is_participating),
             created_at=event.created_at,
         )
+
+    def get_my_events(self, filter: MyEventsFilter) -> list[MyEventItem]:
+        """
+        自分が参加登録または主催しているイベント一覧を取得
+        """
+        # 月初と月末を計算
+        month_start = date(filter.year, filter.month, 1)
+        _, last_day = calendar.monthrange(filter.year, filter.month)
+        month_end = date(filter.year, filter.month, last_day)
+
+        # 参加者数サブクエリ
+        participant_count_subq = (
+            select(func.count(EventParticipantModel.id))
+            .where(
+                EventParticipantModel.event_id == EventModel.id,
+                EventParticipantModel.status == 'registered',
+            )
+            .correlate(EventModel)
+            .scalar_subquery()
+        )
+
+        # 主催者かどうかのサブクエリ
+        is_organizer_subq = (EventModel.creator_id == filter.user_id)
+
+        # JOINクエリ
+        query = (
+            self.session.query(
+                EventModel,
+                participant_count_subq.label('participant_count'),
+                is_organizer_subq.label('is_organizer'),
+            )
+            .outerjoin(
+                EventParticipantModel,
+                (EventParticipantModel.event_id == EventModel.id)
+                & (EventParticipantModel.user_id == filter.user_id)
+                & (EventParticipantModel.status == 'registered'),
+            )
+            .filter(EventModel.is_active == True)
+            .filter(
+                EventModel.scheduled_date >= month_start,
+                EventModel.scheduled_date <= month_end,
+            )
+            .filter(
+                # 主催者または参加登録済み
+                (EventModel.creator_id == filter.user_id)
+                | (EventParticipantModel.id.isnot(None))
+            )
+            .order_by(
+                EventModel.scheduled_date.asc(),
+                EventModel.start_time.asc(),
+            )
+        )
+
+        results = query.all()
+
+        # MyEventItemに変換
+        events = [
+            MyEventItem(
+                id=event.id,
+                title=event.title,
+                event_type=event.event_type,
+                scheduled_date=event.scheduled_date,
+                start_time=event.start_time,
+                end_time=event.end_time,
+                role='organizer' if is_organizer else 'participant',
+                max_participants=event.max_participants,
+                participant_count=participant_count or 0,
+            )
+            for event, participant_count, is_organizer in results
+        ]
+
+        return events

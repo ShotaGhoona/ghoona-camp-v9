@@ -120,3 +120,26 @@ class ParticipantResultDTO(BaseModel):
 
     class Config:
         populate_by_name = True
+
+
+class MyEventItemDTO(BaseModel):
+    """自分のイベントアイテムDTO"""
+
+    id: str
+    title: str
+    event_type: str = Field(alias='eventType')
+    scheduled_date: str = Field(alias='scheduledDate')
+    start_time: str = Field(alias='startTime')
+    end_time: str = Field(alias='endTime')
+    role: str  # 'participant' or 'organizer'
+    max_participants: int | None = Field(alias='maxParticipants')
+    participant_count: int = Field(alias='participantCount')
+
+    class Config:
+        populate_by_name = True
+
+
+class MyEventsListDTO(BaseModel):
+    """自分のイベント一覧DTO"""
+
+    events: list[MyEventItemDTO]
