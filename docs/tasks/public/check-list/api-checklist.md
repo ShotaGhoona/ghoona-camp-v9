@@ -57,13 +57,13 @@ Ghoona Camp アプリケーションのAPI実装進捗を追跡するための�
 
 | # | Method | Endpoint | Backend | Frontend |
 |---|--------|----------|---------|----------|
-| 18 | GET | `/events` | [ ] | [ ] |
-| 19 | POST | `/events` | [ ] | [ ] |
-| 20 | GET | `/events/{eventId}` | [ ] | [ ] |
-| 21 | PUT | `/events/{eventId}` | [ ] | [ ] |
-| 22 | DELETE | `/events/{eventId}` | [ ] | [ ] |
-| 23 | POST | `/events/{eventId}/participants` | [ ] | [ ] |
-| 24 | PUT | `/events/{eventId}/participants/{userId}` | [ ] | [ ] |
+| 18 | GET | `/events` | [x] | [x] |
+| 19 | POST | `/events` | [x] | [x] |
+| 20 | GET | `/events/{eventId}` | [x] | [x] |
+| 21 | PUT | `/events/{eventId}` | [x] | [x] |
+| 22 | DELETE | `/events/{eventId}` | [x] | [x] |
+| 23 | POST | `/events/{eventId}/participants` | [x] | [x] |
+| 24 | DELETE | `/events/{eventId}/participants` | [x] | [x] |
 
 ---
 
@@ -115,12 +115,12 @@ Ghoona Camp アプリケーションのAPI実装進捗を追跡するための�
 | Authentication | 4 | 3/4 | 3/4 |
 | User Management | 8 | 8/8 | 8/8 |
 | Goal Management | 5 | 5/5 | 5/5 |
-| Event Management | 7 | 0/7 | 0/7 |
+| Event Management | 7 | 7/7 | 7/7 |
 | Title Management | 2 | 2/2 | 2/2 |
 | Attendance Management | 4 | 2/4 | 2/4 |
 | Notification Management | 5 | 0/5 | 0/5 |
 | System API | 2 | 0/2 | 0/2 |
-| **Total** | **37** | **20/37** | **20/37** |
+| **Total** | **37** | **27/37** | **27/37** |
 
 ---
 
@@ -134,3 +134,5 @@ Ghoona Camp アプリケーションのAPI実装進捗を追跡するための�
 - `docs/tasks/public/report/26-title-domain-frontend.md` - Title Domain フロントエンド実装レポート
 - `docs/tasks/public/report/27-attendance-domain-backend.md` - Attendance Domain バックエンド実装レポート
 - `docs/tasks/public/report/28-attendance-domain-frontend.md` - Attendance Domain フロントエンド実装レポート
+- `docs/tasks/public/report/29-event-domain-backend.md` - Event Domain バックエンド実装レポート
+- `docs/tasks/public/report/30-event-domain-frontend.md` - Event Domain フロントエンド実装レポート
