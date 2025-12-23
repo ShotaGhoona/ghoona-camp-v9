@@ -1,9 +1,10 @@
 'use client';
 
-import { useRef } from 'react';
-import { Camera, User } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { Camera, User, Loader2 } from 'lucide-react';
 
 import { cn } from '@/shared/ui/shadcn/lib/utils';
+import { uploadImageToS3 } from '@/shared/lib/upload/upload-to-s3';
 
 export interface AvatarFieldProps {
   id: string;
@@ -22,15 +23,25 @@ export function AvatarField({
   className,
 }: AvatarFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        onChange(event.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const publicUrl = await uploadImageToS3(file);
+      onChange(publicUrl);
+    } catch (error) {
+      console.error('Upload failed:', error);
+      // TODO: エラーハンドリング（toast表示など）
+    } finally {
+      setIsUploading(false);
+      // input をリセットして同じファイルを再選択可能にする
+      if (inputRef.current) {
+        inputRef.current.value = '';
+      }
     }
   };
 
@@ -44,7 +55,7 @@ export function AvatarField({
         <button
           type='button'
           onClick={() => inputRef.current?.click()}
-          disabled={disabled}
+          disabled={disabled || isUploading}
           className='group relative size-24 overflow-hidden rounded-full bg-background shadow-raised disabled:cursor-not-allowed'
         >
           {value ? (
@@ -60,8 +71,18 @@ export function AvatarField({
           )}
           {/* ホバーオーバーレイ */}
           <div className='absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100'>
-            <Camera className='size-6 text-white' />
+            {isUploading ? (
+              <Loader2 className='size-6 animate-spin text-white' />
+            ) : (
+              <Camera className='size-6 text-white' />
+            )}
           </div>
+          {/* アップロード中のオーバーレイ（常に表示） */}
+          {isUploading && (
+            <div className='absolute inset-0 flex items-center justify-center bg-black/50'>
+              <Loader2 className='size-6 animate-spin text-white' />
+            </div>
+          )}
         </button>
       </div>
 
@@ -73,9 +94,9 @@ export function AvatarField({
         ref={inputRef}
         id={id}
         type='file'
-        accept='image/*'
+        accept='image/png,image/jpeg,image/gif,image/webp'
         onChange={handleFileChange}
-        disabled={disabled}
+        disabled={disabled || isUploading}
         className='hidden'
       />
     </div>

@@ -13,6 +13,7 @@ from app.presentation.api.event_api import router as event_router
 from app.presentation.api.goal_api import router as goal_router
 from app.presentation.api.title_api import router as title_router
 from app.presentation.api.title_api import users_title_router
+from app.presentation.api.upload_api import router as upload_router
 from app.presentation.api.user_api import router as user_router
 
 # ロギングの設定を初期化
@@ -65,6 +66,7 @@ app.include_router(users_attendance_router, prefix='/api/v1')
 app.include_router(title_router, prefix='/api/v1')
 app.include_router(users_title_router, prefix='/api/v1')
 app.include_router(user_router, prefix='/api/v1')
+app.include_router(upload_router, prefix='/api/v1')
 
 # static ディレクトリが存在する場合のみマウント
 static_dir = 'app/static'

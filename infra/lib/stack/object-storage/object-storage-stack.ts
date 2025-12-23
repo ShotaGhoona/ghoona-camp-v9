@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { EnvironmentConfig } from '../../../config/environment';
 import { ObjectStorageResource } from '../../resource/object-storage-resource';
+import { AvatarStorageResource } from '../../resource/avatar-storage-resource';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 
 export interface ObjectStorageStackProps extends cdk.StackProps {
@@ -18,7 +19,7 @@ export interface ObjectStorageStackProps extends cdk.StackProps {
  * 
  * 変更頻度: 低（バケット追加時のみ）
  * デプロイ時間: 約1-2分
- * 
+ *
  * スタック分離の理由:
  * - S3バケットは変更頻度が低い
  * - データベースと独立してデプロイ可能
@@ -26,6 +27,7 @@ export interface ObjectStorageStackProps extends cdk.StackProps {
  */
 export class ObjectStorageStack extends cdk.Stack {
   public readonly dataBucket: s3.Bucket;
+  public readonly avatarBucket?: s3.Bucket;
 
   constructor(
     scope: Construct,
@@ -46,6 +48,17 @@ export class ObjectStorageStack extends cdk.Stack {
 
     this.dataBucket = objectStorage.bucket;
 
+    // アバターストレージの作成（設定がある場合のみ）
+    if (config.avatarStorage) {
+      const avatarBucketName = `${config.envName}-${config.avatarStorage.bucketNamePrefix}`;
+      const avatarStorage = new AvatarStorageResource(this, 'AvatarStorage', {
+        bucketName: avatarBucketName,
+        removalPolicy: config.removalPolicy,
+        allowedOrigins: config.avatarStorage.allowedOrigins,
+      });
+      this.avatarBucket = avatarStorage.bucket;
+    }
+
     // タグ付け
     cdk.Tags.of(this).add('Environment', config.envName);
     cdk.Tags.of(this).add('Project', config.tags.Project);
@@ -64,6 +77,27 @@ export class ObjectStorageStack extends cdk.Stack {
       description: 'S3 Data Bucket ARN',
       exportName: `${config.envName}-DataBucketArn`,
     });
+
+    // アバターバケットのOutputs
+    if (this.avatarBucket) {
+      new cdk.CfnOutput(this, 'AvatarBucketName', {
+        value: this.avatarBucket.bucketName,
+        description: 'S3 Avatar Bucket Name',
+        exportName: `${config.envName}-AvatarBucketName`,
+      });
+
+      new cdk.CfnOutput(this, 'AvatarBucketArn', {
+        value: this.avatarBucket.bucketArn,
+        description: 'S3 Avatar Bucket ARN',
+        exportName: `${config.envName}-AvatarBucketArn`,
+      });
+
+      new cdk.CfnOutput(this, 'AvatarBucketUrl', {
+        value: `https://${this.avatarBucket.bucketName}.s3.${config.region}.amazonaws.com`,
+        description: 'S3 Avatar Bucket URL',
+        exportName: `${config.envName}-AvatarBucketUrl`,
+      });
+    }
   }
 }
 

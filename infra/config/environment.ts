@@ -148,6 +148,22 @@ export interface EnvironmentConfig {
   };
 
   /**
+   * アバターストレージ設定
+   * undefinedの場合、アバターバケットは作成されません
+   */
+  avatarStorage?: {
+    /**
+     * バケット名のプレフィックス
+     * 実際のバケット名は `{envName}-{bucketNamePrefix}` になります
+     */
+    bucketNamePrefix: string;
+    /**
+     * CORS許可オリジン
+     */
+    allowedOrigins: string[];
+  };
+
+  /**
    * タグ設定
    */
   tags: {

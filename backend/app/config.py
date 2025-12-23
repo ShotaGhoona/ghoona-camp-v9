@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     jwt_private_key: str = ''  # RSA private key for signing (RS256)
     jwt_public_key: str = ''  # RSA public key for verification (RS256)
 
+    # AWS S3 settings
+    aws_region: str = 'ap-northeast-1'
+    s3_bucket_name: str = ''
+
     # 一旦これだけ書いてる
     class Config:
         env_file = '.env'

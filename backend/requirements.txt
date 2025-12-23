@@ -19,5 +19,8 @@ cryptography==41.0.7
 # Environment
 python-dotenv==1.0.1
 
+# AWS
+boto3==1.35.0
+
 # Code Quality
 ruff==0.8.4

@@ -68,6 +68,15 @@ export const devConfig: EnvironmentConfig = {
   // 💡 開発環境ではLambdaを無効化（コスト削減）
   // Lambda: undefined,
 
+  // アバターストレージ設定
+  avatarStorage: {
+    bucketNamePrefix: 'ghoona-camp-avatars',
+    allowedOrigins: [
+      'http://localhost:3004',
+      'http://127.0.0.1:3004',
+    ],
+  },
+
   tags: {
     Environment: 'dev',
     Project: 'cdk-template',
