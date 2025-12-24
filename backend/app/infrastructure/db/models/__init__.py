@@ -33,6 +33,9 @@ from app.infrastructure.db.models.notification_model import (
     NotificationSettingsModel,
 )
 
+# Dashboard Management
+from app.infrastructure.db.models.dashboard_model import DashboardLayoutModel
+
 __all__ = [
     'Base',
     # User Management
@@ -55,4 +58,6 @@ __all__ = [
     # Notification Management
     'NotificationModel',
     'NotificationSettingsModel',
+    # Dashboard Management
+    'DashboardLayoutModel',
 ]

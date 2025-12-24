@@ -9,6 +9,7 @@ from app.infrastructure.logging.logging import setup_logging
 from app.presentation.api.attendance_api import router as attendance_router
 from app.presentation.api.attendance_api import users_attendance_router
 from app.presentation.api.auth_api import router as auth_router
+from app.presentation.api.dashboard_api import router as dashboard_router
 from app.presentation.api.event_api import router as event_router
 from app.presentation.api.goal_api import router as goal_router
 from app.presentation.api.title_api import router as title_router
@@ -58,6 +59,7 @@ app.add_middleware(
 
 # API ルーターをアプリケーションに含める
 app.include_router(auth_router)
+app.include_router(dashboard_router, prefix='/api/v1')
 app.include_router(event_router, prefix='/api/v1')
 app.include_router(goal_router, prefix='/api/v1')
 app.include_router(attendance_router, prefix='/api/v1')

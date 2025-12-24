@@ -24,6 +24,9 @@ from app.domain.entities.attendance_statistics import AttendanceStatistics
 # Notification Management
 from app.domain.entities.notification import Notification, NotificationSettings
 
+# Dashboard Management
+from app.domain.entities.dashboard_layout import DashboardBlock, DashboardLayout
+
 __all__ = [
     # User Management
     'User',
@@ -45,4 +48,7 @@ __all__ = [
     # Notification Management
     'Notification',
     'NotificationSettings',
+    # Dashboard Management
+    'DashboardBlock',
+    'DashboardLayout',
 ]
