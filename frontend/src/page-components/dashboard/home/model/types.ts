@@ -1,15 +1,13 @@
 /** ダッシュボードブロックの種類 */
 export type DashboardBlockType =
-  | 'block-a'
-  | 'block-b'
-  | 'block-c'
-  | 'block-d'
-  | 'block-e'
-  | 'block-f'
-  | 'block-g'
-  | 'block-h'
-  | 'block-i'
-  | 'block-j';
+  | 'current-title'
+  | 'title-journey'
+  | 'user-stats'
+  | 'activity-calendar'
+  | 'events-calendar'
+  | 'ranking'
+  | 'goals-sidebar'
+  | 'goals-timeline';
 
 /** ブロックのサイズ制約 */
 export interface BlockSizeConstraints {

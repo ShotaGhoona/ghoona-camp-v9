@@ -3,16 +3,14 @@
 import { Trash2 } from 'lucide-react';
 
 import type { DashboardBlockType } from '../../model/types';
-import { BlockA } from '../../ui-block/block-a/ui/BlockA';
-import { BlockB } from '../../ui-block/block-b/ui/BlockB';
-import { BlockC } from '../../ui-block/block-c/ui/BlockC';
-import { BlockD } from '../../ui-block/block-d/ui/BlockD';
-import { BlockE } from '../../ui-block/block-e/ui/BlockE';
-import { BlockF } from '../../ui-block/block-f/ui/BlockF';
-import { BlockG } from '../../ui-block/block-g/ui/BlockG';
-import { BlockH } from '../../ui-block/block-h/ui/BlockH';
-import { BlockI } from '../../ui-block/block-i/ui/BlockI';
-import { BlockJ } from '../../ui-block/block-j/ui/BlockJ';
+import { ActivityCalendarBlock } from '../../ui-block/activity-calendar-block/ui/ActivityCalendarBlock';
+import { CurrentTitleBlock } from '../../ui-block/current-title-block/ui/CurrentTitleBlock';
+import { EventsCalendarBlock } from '../../ui-block/events-calendar-block/ui/EventsCalendarBlock';
+import { GoalsSidebarBlock } from '../../ui-block/goals-sidebar-block/ui/GoalsSidebarBlock';
+import { GoalsTimelineBlock } from '../../ui-block/goals-timeline-block/ui/GoalsTimelineBlock';
+import { RankingBlock } from '../../ui-block/ranking-block/ui/RankingBlock';
+import { TitleJourneyBlock } from '../../ui-block/title-journey-block/ui/TitleJourneyBlock';
+import { UserStatsBlock } from '../../ui-block/user-stats-block/ui/UserStatsBlock';
 
 interface BlockRenderContentProps {
   blockType: DashboardBlockType;
@@ -27,26 +25,22 @@ export function BlockRenderContent({
 }: BlockRenderContentProps) {
   const renderBlockComponent = () => {
     switch (blockType) {
-      case 'block-a':
-        return <BlockA isEditMode={isEditMode} />;
-      case 'block-b':
-        return <BlockB isEditMode={isEditMode} />;
-      case 'block-c':
-        return <BlockC isEditMode={isEditMode} />;
-      case 'block-d':
-        return <BlockD isEditMode={isEditMode} />;
-      case 'block-e':
-        return <BlockE isEditMode={isEditMode} />;
-      case 'block-f':
-        return <BlockF isEditMode={isEditMode} />;
-      case 'block-g':
-        return <BlockG isEditMode={isEditMode} />;
-      case 'block-h':
-        return <BlockH isEditMode={isEditMode} />;
-      case 'block-i':
-        return <BlockI isEditMode={isEditMode} />;
-      case 'block-j':
-        return <BlockJ isEditMode={isEditMode} />;
+      case 'current-title':
+        return <CurrentTitleBlock />;
+      case 'title-journey':
+        return <TitleJourneyBlock />;
+      case 'user-stats':
+        return <UserStatsBlock />;
+      case 'activity-calendar':
+        return <ActivityCalendarBlock />;
+      case 'events-calendar':
+        return <EventsCalendarBlock />;
+      case 'ranking':
+        return <RankingBlock />;
+      case 'goals-sidebar':
+        return <GoalsSidebarBlock />;
+      case 'goals-timeline':
+        return <GoalsTimelineBlock />;
       default:
         return null;
     }
