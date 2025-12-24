@@ -2,7 +2,7 @@
 
 import { Trash2 } from 'lucide-react';
 
-import type { DashboardBlockType } from '../../model/types';
+import type { DashboardBlockType } from '@/entities/domain/dashboard/model/types';
 import { ActivityCalendarBlock } from '../../ui-block/activity-calendar-block/ui/ActivityCalendarBlock';
 import { CurrentTitleBlock } from '../../ui-block/current-title-block/ui/CurrentTitleBlock';
 import { EventsCalendarBlock } from '../../ui-block/events-calendar-block/ui/EventsCalendarBlock';

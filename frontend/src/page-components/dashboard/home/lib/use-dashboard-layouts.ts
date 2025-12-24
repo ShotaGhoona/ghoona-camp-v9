@@ -1,83 +1,133 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 
-import { BLOCK_CONFIGS, DEFAULT_LAYOUTS } from '../config/block-config';
-import type { DashboardBlockType, DashboardLayoutItem } from '../model/types';
+import type {
+  DashboardBlock,
+  DashboardBlockType,
+} from '@/entities/domain/dashboard/model/types';
+import { useDashboardLayout } from '@/features/domain/dashboard/get-layout/lib/use-dashboard-layout';
+import { useUpdateLayout } from '@/features/domain/dashboard/update-layout/lib/use-update-layout';
+
+import { BLOCK_CONFIGS } from '../config/block-config';
+import type { GridLayoutItem } from '../model/types';
+
+// DashboardBlock → GridLayoutItem 変換
+function toGridLayoutItem(block: DashboardBlock): GridLayoutItem {
+  const config = BLOCK_CONFIGS[block.type];
+  return {
+    i: block.id,
+    x: block.x,
+    y: block.y,
+    w: block.w,
+    h: block.h,
+    minW: config.constraints.minW,
+    maxW: config.constraints.maxW,
+    minH: config.constraints.minH,
+    maxH: config.constraints.maxH,
+  };
+}
 
 export function useDashboardLayouts() {
-  const [layouts, setLayouts] =
-    useState<DashboardLayoutItem[]>(DEFAULT_LAYOUTS);
+  const { data: layoutData, isLoading } = useDashboardLayout();
+  const { mutate: updateLayout } = useUpdateLayout();
 
-  // レイアウト変更時のハンドラ
+  const [blocks, setBlocks] = useState<DashboardBlock[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // デバウンス用のタイマーRef
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // APIデータが取得されたらローカル状態に反映
+  useEffect(() => {
+    if (layoutData && !isInitialized) {
+      setBlocks(layoutData.data.blocks);
+      setIsInitialized(true);
+    }
+  }, [layoutData, isInitialized]);
+
+  // デバウンスでAPIに保存
+  const saveToApi = useCallback(
+    (newBlocks: DashboardBlock[]) => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+
+      saveTimeoutRef.current = setTimeout(() => {
+        updateLayout({ blocks: newBlocks });
+      }, 500); // 500msデバウンス
+    },
+    [updateLayout],
+  );
+
+  // react-grid-layoutからのレイアウト変更
   const handleLayoutChange = useCallback(
     (newLayout: readonly { i: string; x: number; y: number; w: number; h: number }[]) => {
-      setLayouts((prevLayouts) => {
-        return newLayout.map((item) => {
-          const existingItem = prevLayouts.find((l) => l.i === item.i);
+      setBlocks((prevBlocks) => {
+        const updatedBlocks = newLayout.map((item) => {
+          const existingBlock = prevBlocks.find((b) => b.id === item.i);
           return {
-            i: item.i,
+            id: item.i,
+            type: existingBlock?.type ?? ('current-title' as DashboardBlockType),
             x: item.x,
             y: item.y,
             w: item.w,
             h: item.h,
-            blockType: existingItem?.blockType ?? ('block-a' as DashboardBlockType),
           };
         });
-      });
 
-      // TODO: バックエンドで保存
+        saveToApi(updatedBlocks);
+        return updatedBlocks;
+      });
     },
-    [],
+    [saveToApi],
   );
 
   // ブロック追加
-  const handleAddBlock = useCallback((blockType: DashboardBlockType) => {
-    const config = BLOCK_CONFIGS[blockType];
-    const newId = `item-${Date.now()}`;
+  const handleAddBlock = useCallback(
+    (blockType: DashboardBlockType) => {
+      const config = BLOCK_CONFIGS[blockType];
+      const newId = `block-${Date.now()}`;
 
-    const newBlock: DashboardLayoutItem = {
-      i: newId,
-      x: 0,
-      y: Infinity, // 一番下に追加
-      w: config.constraints.defaultW,
-      h: config.constraints.defaultH,
-      blockType,
-    };
+      const newBlock: DashboardBlock = {
+        id: newId,
+        type: blockType,
+        x: 0,
+        y: Infinity, // 一番下に追加
+        w: config.constraints.defaultW,
+        h: config.constraints.defaultH,
+      };
 
-    setLayouts((prev) => [...prev, newBlock]);
-
-    // TODO: バックエンドで保存
-  }, []);
+      setBlocks((prev) => {
+        const newBlocks = [...prev, newBlock];
+        saveToApi(newBlocks);
+        return newBlocks;
+      });
+    },
+    [saveToApi],
+  );
 
   // ブロック削除
-  const handleRemoveBlock = useCallback((itemId: string) => {
-    setLayouts((prev) => prev.filter((item) => item.i !== itemId));
+  const handleRemoveBlock = useCallback(
+    (blockId: string) => {
+      setBlocks((prev) => {
+        const newBlocks = prev.filter((block) => block.id !== blockId);
+        saveToApi(newBlocks);
+        return newBlocks;
+      });
+    },
+    [saveToApi],
+  );
 
-    // TODO: バックエンドで保存
-  }, []);
-
-  // レイアウトに制約を適用
-  const layoutsWithConstraints = useMemo(() => {
-    return layouts.map((item) => {
-      const config = BLOCK_CONFIGS[item.blockType];
-      return {
-        i: item.i,
-        x: item.x,
-        y: item.y,
-        w: item.w,
-        h: item.h,
-        minW: config.constraints.minW,
-        maxW: config.constraints.maxW,
-        minH: config.constraints.minH,
-        maxH: config.constraints.maxH,
-      };
-    });
-  }, [layouts]);
+  // react-grid-layout用のレイアウト（制約付き）
+  const gridLayouts = useMemo(() => {
+    return blocks.map(toGridLayoutItem);
+  }, [blocks]);
 
   return {
-    layouts,
-    layoutsWithConstraints,
+    blocks,
+    gridLayouts,
+    isLoading,
     handleLayoutChange,
     handleAddBlock,
     handleRemoveBlock,

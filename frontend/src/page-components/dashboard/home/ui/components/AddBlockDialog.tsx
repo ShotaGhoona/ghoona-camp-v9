@@ -7,8 +7,9 @@ import {
   DialogTitle,
 } from '@/shared/ui/shadcn/ui/dialog';
 
+import type { DashboardBlockType } from '@/entities/domain/dashboard/model/types';
+
 import { BLOCK_CONFIGS } from '../../config/block-config';
-import type { DashboardBlockType } from '../../model/types';
 
 interface AddBlockDialogProps {
   open: boolean;

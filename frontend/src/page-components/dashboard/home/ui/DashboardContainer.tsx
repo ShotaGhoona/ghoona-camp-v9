@@ -22,8 +22,9 @@ export function DashboardContainer() {
   const [isAddBlockModalOpen, setIsAddBlockModalOpen] = useState(false);
 
   const {
-    layouts,
-    layoutsWithConstraints,
+    blocks,
+    gridLayouts,
+    isLoading,
     handleLayoutChange,
     handleAddBlock,
     handleRemoveBlock,
@@ -39,7 +40,7 @@ export function DashboardContainer() {
     handleResize,
     handleResizeStop,
   } = useGridBackground({
-    layouts,
+    layouts: gridLayouts,
     containerWidth,
     cols: COLS,
     margin: MARGIN,
@@ -88,7 +89,7 @@ export function DashboardContainer() {
         )}
         <GridLayout
           className={isEditMode ? '[&_.react-grid-placeholder]:hidden' : ''}
-          layout={layoutsWithConstraints}
+          layout={gridLayouts}
           width={gridWidth}
           gridConfig={{
             cols: COLS,
@@ -110,12 +111,12 @@ export function DashboardContainer() {
           onResize={handleResize}
           onResizeStop={handleResizeStop}
         >
-          {layouts.map((item) => (
-            <div key={item.i} className='relative'>
+          {blocks.map((block) => (
+            <div key={block.id} className='relative'>
               <BlockRenderContent
-                blockType={item.blockType}
+                blockType={block.type}
                 isEditMode={isEditMode}
-                onRemove={() => handleRemoveBlock(item.i)}
+                onRemove={() => handleRemoveBlock(block.id)}
               />
             </div>
           ))}

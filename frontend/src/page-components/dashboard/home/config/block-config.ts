@@ -1,4 +1,6 @@
-import type { BlockConfig, DashboardBlockType } from '../model/types';
+import type { DashboardBlockType } from '@/entities/domain/dashboard/model/types';
+
+import type { BlockConfig } from '../model/types';
 
 /** グリッド設定 */
 export const GRID_CONFIG = {
@@ -51,9 +53,3 @@ export const BLOCK_CONFIGS: Record<DashboardBlockType, BlockConfig> = {
   },
 };
 
-/** デフォルトのレイアウト */
-export const DEFAULT_LAYOUTS = [
-  { i: 'item-1', x: 0, y: 0, w: 3, h: 2, blockType: 'current-title' as const },
-  { i: 'item-2', x: 3, y: 0, w: 2, h: 3, blockType: 'user-stats' as const },
-  { i: 'item-3', x: 5, y: 0, w: 7, h: 2, blockType: 'title-journey' as const },
-];
