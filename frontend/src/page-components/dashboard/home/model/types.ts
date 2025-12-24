@@ -17,6 +17,8 @@ export interface BlockSizeConstraints {
   maxW: number;
   minH: number;
   maxH: number;
+  defaultW: number;
+  defaultH: number;
 }
 
 /** ブロックの設定 */
@@ -24,8 +26,6 @@ export interface BlockConfig {
   type: DashboardBlockType;
   label: string;
   constraints: BlockSizeConstraints;
-  defaultW: number;
-  defaultH: number;
 }
 
 /** ダッシュボードのレイアウトアイテム */
@@ -35,10 +35,6 @@ export interface DashboardLayoutItem {
   y: number;
   w: number;
   h: number;
-  minW?: number;
-  maxW?: number;
-  minH?: number;
-  maxH?: number;
   blockType: DashboardBlockType;
 }
 

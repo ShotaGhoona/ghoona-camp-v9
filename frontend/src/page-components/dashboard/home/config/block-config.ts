@@ -1,76 +1,63 @@
-import type { BlockConfig, DashboardBlockType } from './types';
+import type { BlockConfig, DashboardBlockType } from '../model/types';
+
+/** グリッド設定 */
+export const GRID_CONFIG = {
+  ROW_HEIGHT: 100,
+  COLS: 12,
+  MARGIN: 16,
+} as const;
 
 /** 各ブロックの設定 */
 export const BLOCK_CONFIGS: Record<DashboardBlockType, BlockConfig> = {
   'block-a': {
     type: 'block-a',
     label: 'ブロック A',
-    constraints: { minW: 2, maxW: 6, minH: 2, maxH: 4 },
-    defaultW: 3,
-    defaultH: 2,
+    constraints: { minW: 2, maxW: 6, minH: 2, maxH: 4, defaultW: 3, defaultH: 2 },
   },
   'block-b': {
     type: 'block-b',
     label: 'ブロック B',
-    constraints: { minW: 1, maxW: 4, minH: 1, maxH: 3 },
-    defaultW: 2,
-    defaultH: 2,
+    constraints: { minW: 1, maxW: 4, minH: 1, maxH: 3, defaultW: 2, defaultH: 2 },
   },
   'block-c': {
     type: 'block-c',
     label: 'ブロック C',
-    constraints: { minW: 3, maxW: 8, minH: 2, maxH: 5 },
-    defaultW: 4,
-    defaultH: 3,
+    constraints: { minW: 3, maxW: 8, minH: 2, maxH: 5, defaultW: 4, defaultH: 3 },
   },
   'block-d': {
     type: 'block-d',
     label: 'ブロック D',
-    constraints: { minW: 2, maxW: 12, minH: 1, maxH: 2 },
-    defaultW: 6,
-    defaultH: 1,
+    constraints: { minW: 2, maxW: 12, minH: 1, maxH: 2, defaultW: 6, defaultH: 1 },
   },
   'block-e': {
     type: 'block-e',
     label: 'ブロック E',
-    constraints: { minW: 2, maxW: 4, minH: 2, maxH: 6 },
-    defaultW: 2,
-    defaultH: 4,
+    constraints: { minW: 2, maxW: 4, minH: 2, maxH: 6, defaultW: 2, defaultH: 4 },
   },
   'block-f': {
     type: 'block-f',
     label: 'ブロック F',
-    constraints: { minW: 4, maxW: 12, minH: 3, maxH: 6 },
-    defaultW: 6,
-    defaultH: 3,
+    constraints: { minW: 4, maxW: 12, minH: 3, maxH: 6, defaultW: 6, defaultH: 3 },
   },
   'block-g': {
     type: 'block-g',
     label: 'ブロック G',
-    constraints: { minW: 1, maxW: 3, minH: 1, maxH: 2 },
-    defaultW: 2,
-    defaultH: 1,
+    constraints: { minW: 1, maxW: 3, minH: 1, maxH: 2, defaultW: 2, defaultH: 1 },
   },
   'block-h': {
     type: 'block-h',
     label: 'ブロック H',
-    constraints: { minW: 3, maxW: 6, minH: 2, maxH: 4 },
-    defaultW: 3,
-    defaultH: 2,
+    constraints: { minW: 3, maxW: 6, minH: 2, maxH: 4, defaultW: 3, defaultH: 2 },
   },
   'block-i': {
     type: 'block-i',
     label: 'ブロック I',
-    constraints: { minW: 2, maxW: 8, minH: 2, maxH: 5 },
-    defaultW: 4,
-    defaultH: 2,
+    constraints: { minW: 2, maxW: 8, minH: 2, maxH: 5, defaultW: 4, defaultH: 2 },
   },
   'block-j': {
     type: 'block-j',
     label: 'ブロック J',
-    constraints: { minW: 2, maxW: 6, minH: 1, maxH: 3 },
-    defaultW: 3,
-    defaultH: 2,
+    constraints: { minW: 2, maxW: 6, minH: 1, maxH: 3, defaultW: 3, defaultH: 2 },
   },
 };
 

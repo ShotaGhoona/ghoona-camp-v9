@@ -1,5 +1,5 @@
-import { BLOCK_CONFIGS } from '../../../lib/block-config';
-import type { DashboardBlockProps } from '../../../lib/types';
+import { BLOCK_CONFIGS } from '../../../config/block-config';
+import type { DashboardBlockProps } from '../../../model/types';
 
 const config = BLOCK_CONFIGS['block-g'];
 
