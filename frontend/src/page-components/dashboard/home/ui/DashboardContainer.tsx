@@ -8,7 +8,7 @@ import { useDashboardLayouts } from '../lib/use-dashboard-layouts';
 import { useGridBackground } from '../lib/use-grid-background';
 import { AddBlockDialog } from './components/AddBlockDialog';
 import { BlockRenderContent } from './components/BlockRenderContent';
-import { DashboardHeaderActions } from './components/DashboardHeaderActions';
+import { DashboardFab } from './components/DashboardHeaderActions';
 import { GridBackground } from './GridBackground';
 
 import 'react-grid-layout/css/styles.css';
@@ -64,16 +64,6 @@ export function DashboardContainer() {
 
   return (
     <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
-      {/* ヘッダー */}
-      <div className='flex items-center justify-between border-b px-6 py-4'>
-        <h1 className='text-xl font-bold'>ダッシュボード</h1>
-        <DashboardHeaderActions
-          isEditMode={isEditMode}
-          onToggleEditMode={() => setIsEditMode(!isEditMode)}
-          onAddBlockClick={() => setIsAddBlockModalOpen(true)}
-        />
-      </div>
-
       {/* グリッド */}
       <div ref={containerRef} className='relative flex-1 overflow-auto p-6'>
         {/* 編集モード時のグリッド背景 */}
@@ -122,6 +112,13 @@ export function DashboardContainer() {
           ))}
         </GridLayout>
       </div>
+
+      {/* FAB */}
+      <DashboardFab
+        isEditMode={isEditMode}
+        onToggleEditMode={() => setIsEditMode(!isEditMode)}
+        onAddBlockClick={() => setIsAddBlockModalOpen(true)}
+      />
 
       <AddBlockDialog
         open={isAddBlockModalOpen}
