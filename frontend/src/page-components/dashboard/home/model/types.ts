@@ -1,22 +1,3 @@
-import type { DashboardBlockType } from '@/entities/domain/dashboard/model/types';
-
-/** ブロックのサイズ制約 */
-export type BlockSizeConstraints = {
-  minW: number;
-  maxW: number;
-  minH: number;
-  maxH: number;
-  defaultW: number;
-  defaultH: number;
-};
-
-/** ブロックの設定 */
-export type BlockConfig = {
-  type: DashboardBlockType;
-  label: string;
-  constraints: BlockSizeConstraints;
-};
-
 /** react-grid-layout用のレイアウトアイテム */
 export type GridLayoutItem = {
   i: string; // react-grid-layout用のID（= DashboardBlock.id）

@@ -3,14 +3,7 @@
 import { Trash2 } from 'lucide-react';
 
 import type { DashboardBlockType } from '@/entities/domain/dashboard/model/types';
-import { ActivityCalendarBlock } from '../../ui-block/activity-calendar-block/ui/ActivityCalendarBlock';
-import { CurrentTitleBlock } from '../../ui-block/current-title-block/ui/CurrentTitleBlock';
-import { EventsCalendarBlock } from '../../ui-block/events-calendar-block/ui/EventsCalendarBlock';
-import { GoalsSidebarBlock } from '../../ui-block/goals-sidebar-block/ui/GoalsSidebarBlock';
-import { GoalsTimelineBlock } from '../../ui-block/goals-timeline-block/ui/GoalsTimelineBlock';
-import { RankingBlock } from '../../ui-block/ranking-block/ui/RankingBlock';
-import { TitleJourneyBlock } from '../../ui-block/title-journey-block/ui/TitleJourneyBlock';
-import { UserStatsBlock } from '../../ui-block/user-stats-block/ui/UserStatsBlock';
+import { BLOCK_CONFIGS } from '../../config/block-config';
 
 interface BlockRenderContentProps {
   blockType: DashboardBlockType;
@@ -23,28 +16,7 @@ export function BlockRenderContent({
   isEditMode,
   onRemove,
 }: BlockRenderContentProps) {
-  const renderBlockComponent = () => {
-    switch (blockType) {
-      case 'current-title':
-        return <CurrentTitleBlock />;
-      case 'title-journey':
-        return <TitleJourneyBlock />;
-      case 'user-stats':
-        return <UserStatsBlock />;
-      case 'activity-calendar':
-        return <ActivityCalendarBlock />;
-      case 'events-calendar':
-        return <EventsCalendarBlock />;
-      case 'ranking':
-        return <RankingBlock />;
-      case 'goals-sidebar':
-        return <GoalsSidebarBlock />;
-      case 'goals-timeline':
-        return <GoalsTimelineBlock />;
-      default:
-        return null;
-    }
-  };
+  const { Component } = BLOCK_CONFIGS[blockType];
 
   return (
     <>
@@ -63,7 +35,7 @@ export function BlockRenderContent({
           </button>
         </>
       )}
-      {renderBlockComponent()}
+      <Component />
     </>
   );
 }
